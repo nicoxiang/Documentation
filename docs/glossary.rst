@@ -1,5 +1,5 @@
 ========
-Glossary
+术语
 ========
 
 The goal of this page is to help keep documentation, discussions, and APIs consistent.
@@ -9,7 +9,7 @@ Term           Meaning
 ============== =======
 *Activator*    Part of a *Registration* that, given a *Context* and a set of *Parameters*, can create a *Component Instance* bound to that *Context*
 *Argument*     A formal argument to a constructor on a .NET type
-*Component*    A body of code that declares the *Services* it provides and the *Dependencies* it consumes
+*组件*    A body of code that declares the *Services* it provides and the *Dependencies* it consumes
 *Instance*     A .NET object obtained by *Activating* a *Component* that provides *Services* within a *Container* (also *Component Instance*)
 *Container*    A construct that manages the *Components* that make up an application
 *Context*      A bounded region in which a specific set of *Services* is available
