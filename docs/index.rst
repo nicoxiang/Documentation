@@ -3,7 +3,7 @@
 
 .. image:: logo.png
 
-Autofac 是一个适用于Microsoft .NET 4.5, Silverlight 5, Windows Store apps, and Windows Phone 8 apps的超赞的 `IoC 容器 <http://martinfowler.com/articles/injection.html>`_ . 它可以管理类之间的依赖关系从而使 **应用在规模及复杂性增长的情况下依然可以轻易地修改** . 通过将常规.net类当做 :doc:`组件 <glossary>`处理实现 .
+Autofac 是一个适用于Microsoft .NET 4.5, Silverlight 5, Windows Store apps, and Windows Phone 8 apps的超赞的 `IoC 容器 <http://martinfowler.com/articles/injection.html>`_ . 它可以管理类之间的依赖关系从而使 **应用在规模及复杂性增长的情况下依然可以轻易地修改** . 通过将常规.net类当做:doc:`组件 <glossary>` 处理实现 .
 
 .. toctree::
    :maxdepth: 3
