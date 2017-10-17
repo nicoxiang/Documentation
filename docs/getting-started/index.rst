@@ -1,29 +1,29 @@
 ===============
-Getting Started
+入门
 ===============
 
-The basic pattern for integrating Autofac into your application is:
+将Autofac整合到你的应用的基本模式如下:
 
-- Structure your app with *inversion of control* (IoC) in mind.
-- Add Autofac references.
-- At application startup...
-- Create a `ContainerBuilder`.
-- Register components.
-- Build the container and store it for later use.
-- During application execution...
-- Create a lifetime scope from the container.
-- Use the lifetime scope to resolve instances of the components.
+- 按照*控制反转* (IoC) 的思想构建你的应用.
+- 添加Autofac引用.
+- 在应用的 startup 处...
+- 创建 `ContainerBuilder`.
+- 注册组件.
+- 创建容器,将其保存以备后续使用.
+- 应用执行阶段...
+- 从容器中创建一个生命周期.
+- 在此生命周期范围内解析组件实例.
 
-This getting started guide walks you through these steps for a simple console application. Once you have the basics down, you can check out the rest of the wiki for more advanced usage and :doc:`integration information for WCF, ASP.NET, and other application types <../integration/index>`.
+本入门通过一个简单的控制台应用来介绍上述步骤. 一旦你学会了这些基础，你可以查看wiki的剩余部分来了解更多高级用法和 :doc:`集成 WCF, ASP.NET, 和其他应用类型 <../integration/index>`.
 
-Structuring the Application
+构建应用
 ===========================
 
-The idea behind inversion of control is that, rather than tie the classes in your application together and let classes "new up" their dependencies, you switch it around so dependencies are instead passed in during class construction. `Martin Fowler has an excellent article explaining dependency injection/inversion of control <http://martinfowler.com/articles/injection.html>`_ if you want more on that.
+控制反转背后的核心思想是, 我们不再将类绑定在应用里,让类自己去 "new up" 他们的依赖, 而是反过来在类的构造器中将依赖传递进去. 如果你想进一步深入的话, `Martin Fowler 有一篇解释 dependency injection/inversion of control 非常好的文章 <http://martinfowler.com/articles/injection.html>`_ .
 
-For our sample app, we'll define a class that writes the current date out. However, we don't want it tied to the ``Console`` because we want to be able to test the class later or use it in a place where the console isn't available.
+在我们的示例应用中, 我们将定义一个类来输出当前的日期. 然而,我们不希望和 ``Console`` 绑定因为我们想在控制台不可用的情况依然可以测试和使用这个类.
 
-We'll also go as far as allowing the mechanism writing the date to be abstracted, so if we want to, later, swap in a version that writes *tomorrow's* date, it'll be a snap.
+同样，我们会将输出日期的方法定义成抽象的(接口),这样如果我们后续想要切换版本输出*明天*的日期,我们很快就能搞定.
 
 尝试如下代码:
 
@@ -85,23 +85,23 @@ We'll also go as far as allowing the mechanism writing the date to be abstracted
       }
     }
 
-Now that we have a reasonably structured (if contrived) set of dependencies, let's get Autofac in the mix!
+现在我们已经有了一组结构合理的依赖,是时候让Autofac混合进来了!
 
-Add Autofac References
+添加 Autofac 引用
 ======================
 
-The first step is to add Autofac references to your project. For this example, we're only using core Autofac. :doc:`Other application types may use additional Autofac integration libraries. <../integration/index>`.
+第一步是把Autofac的引用添加进项目. 在这次示例中，我们只使用Autofac的核心部分. :doc:`其他应用类型可能需要添加额外的Autofac集成类库. <../integration/index>`.
 
-The easiest way to do this is through NuGet. The "Autofac" package has all the core functionality you'll need.
+最简单的方法是通过 NuGet. "Autofac" 包涵盖了你需要的所有核心功能.
 
 .. image:: gsnuget.png
 
-Application Startup
+应用启动
 ===================
 
-At application startup, you need to create a `ContainerBuilder` and register your :doc:`components <../glossary>` with it. A *component* is an expression, .NET type, or other bit of code that exposes one or more *services* and can take in other *dependencies*.
+在应用启动的地方, 你需要添加一个 `ContainerBuilder` 并且通过它注册你的 :doc:`组件 <../glossary>` . *组件*可以是一个表达式, .NET 类型, 或者其他暴露一个或多个*服务*的一段代码, 同时它也可以引入其他的*依赖*.
 
-In simple terms, think about a .NET type that implements an interface, like this:
+简而言之, 考虑有下面这样实现一个接口的.NET类型:
 
 .. sourcecode:: csharp
 
@@ -109,14 +109,14 @@ In simple terms, think about a .NET type that implements an interface, like this
     {
     }
 
-You could address that type in one of two ways:
+你可以通过两种方法访问该类型:
 
-- As the type itself, ``SomeType``
-- As the interface, an ``IService``
+- 通过类型本身, ``SomeType``
+- 通过接口, ``IService``
 
-In this case, the *component* is ``SomeType`` and the *services* it exposes are ``SomeType`` and ``IService``.
+这个示例中,*组件*指的是 ``SomeType`` 而它暴露的*服务*指的是 ``SomeType`` 和 ``IService``.
 
-In Autofac, you'd register that with a ``ContainerBuilder`` something like this:
+在Autofac中, 你需要通过 ``ContainerBuilder`` 注册, 如下:
 
 .. sourcecode:: csharp
 
@@ -131,9 +131,9 @@ In Autofac, you'd register that with a ``ContainerBuilder`` something like this:
     // you can say so:
     builder.RegisterType<SomeType>().AsSelf().As<IService>();
 
-For our sample app, we need to register all of our components (classes) and expose their services (interfaces) so things can get wired up nicely.
+对于我们的示例应用, 我们需要注册所有的组件 (类) 并且暴露他们的服务 (接口) , 这样对象就能很好地连接起来.
 
-We also need to store the container so it can be used to resolve types later.
+同时我们还要保存这个容器，这样就可以在后续解析类型.
 
 .. sourcecode:: csharp
 
@@ -161,24 +161,24 @@ We also need to store the container so it can be used to resolve types later.
       }
     }
 
-Now we have a *container* with all of the *components* registered and they're exposing the proper *services*. Let's make use of it.
+现在我们已经拥有了一个注册了所有*组件*的*容器*, 并且他们暴露了合适的*服务*. 开始使用它们吧.
 
-Application Execution
+应用执行
 =====================
 
-During application execution, you'll need to make use of the components you registered. You do this by *resolving* them from a *lifetime scope*.
+在应用程序执行阶段, 你将充分利用这些刚注册的组件. 你可以从一个*生命周期*中*解析*它们.
 
-The container itself *is* a lifetime scope, and you can technically just resolve things right from the container. **It is not recommended to resolve from the container directly**, however.
+容器本身是也是一个生命周期, 从技术角度来说, 你可以直接从Container解析组件. 然而, **我们并不推荐直接这么做**.
 
-When you resolve a component, depending on the :doc:`instance scope you define <../lifetime/instance-scope>`, a new instance of the object gets created. (Resolving a component is roughly equivalent to calling "new" to instantiate a class. That's really, really oversimplifying it, but from an analogy perspective it's fine.) Some components may need to be disposed (like they implement ``IDisposable``) - :doc:`Autofac can handle disposing those components for you <../lifetime/disposal>` when the lifetime scope is disposed.
+解析组件时, 根据 :doc:`定义的实例范围 <../lifetime/instance-scope>`, 创建一个对象的新实例. (解析一个组件大致相当于调用"new"实例化一个类. 虽然这个概念看上去有点过于简单化了, 但是从类比的角度来说这是完全合适的). 一些组件需要被释放 (实现``IDisposable``接口) - :doc:`Autofac会为你在生命周期释放时处理组件的释放 <../lifetime/disposal>`.
 
-However, the container lives for the lifetime of your application. If you resolve a lot of stuff directly from the container, you may end up with a lot of things hanging around waiting to be disposed. That's not good (and you may see a "memory leak" doing that).
+然而, 容器在应用的生命周期内一直存在. 如果你直接从该容器中解析了太多东西, 应用结束时将会有一堆东西等着被释放. 这是非常不合适的 (很有可能造成"内存泄漏").
 
-Instead, create a *child lifetime scope* from the container and resolve from that. When you're done resolving components, dispose of the child scope and everything gets cleaned up for you.
+因此, 我们可以从容器中创建一个*子生命周期*并从中解析. 当你完成了解析组件, 释放掉子生命周期, 其他所有也就随之被一并清理干净了.
 
-(When you're working with the :doc:`Autofac integration libraries <../integration/index>`, this child scope creation is largely done for you so you don't have to think about it.)
+(当使用 :doc:`Autofac 集成类库 <../integration/index>`时, 大部分情况下子生命周期创建已经完成了, 因此无需考虑.)
 
-For our sample app, we'll implement the "WriteDate" method to get the writer from a scope and dispose of the scope when we're done.
+对于我们的示例应用程序, 我们在生命周期内实现"WriteDate"方法并在结束调用后释放它.
 
 .. sourcecode:: csharp
 
@@ -206,37 +206,37 @@ For our sample app, we'll implement the "WriteDate" method to get the writer fro
       }
     }
 
-Now when you run your program...
+现在当运行程序时...
 
-- The "WriteDate" method asks Autofac for an ``IDateWriter``.
-- Autofac sees that ``IDateWriter`` maps to ``TodayWriter`` so starts creating a ``TodayWriter``.
-- Autofac sees that the ``TodayWriter`` needs an ``IOutput`` in its constructor.
-- Autofac sees that ``IOutput`` maps to ``ConsoleOutput`` so creates a new ``ConsoleOutput`` instance.
-- Autofac uses the new ``ConsoleOutput`` instance to finish constructing the ``TodayWriter``.
-- Autofac returns the fully-constructed ``TodayWriter`` for "WriteDate" to consume.
+- "WriteDate"方法向Autofac请求一个``IDateWriter``.
+- Autofac发现``IDateWriter``对应``TodayWriter``因此开始创建``TodayWriter``.
+- Autofac发现``TodayWriter``在它构造器中需要一个``IOutput``.
+- Autofac发现``IOutput``对应``ConsoleOutput``因此开始创建新的``ConsoleOutput``实例.
+- Autofac使用新的``ConsoleOutput``实例完成``TodayWriter``的创建.
+- Autofac返回完整构建的``TodayWriter``给"WriteDate"使用.
 
-Later, if you want your application to write a different date, you could implement a different ``IDateWriter`` and then change the registration at app startup. You don't have to change any other classes. Yay, inversion of control!
+之后，如果你希望你的应用输出一个不同的日期, 你可以实现另外一个``IDateWriter``然后在应用启动时改变一下注册过程. 你不需要修改任何其他的类. 耶, 这就是控制反转!
 
-**Note: generally speaking, service location is largely considered an anti-pattern** `(see article) <http://blog.ploeh.dk/2010/02/03/ServiceLocatorIsAnAntiPattern.aspx>`_. That is, manually creating scopes everywhere and sprinkling use of the container through your code is not necessarily the best way to go. Using the :doc:`Autofac integration libraries <../integration/index>` you usually won't have to do what we did in the sample app above. Instead, things get resolved from a central, "top level" location in the application and manual resolution is rare. Of course, how you design your app is up to you.
+**注意: 通常来说, 服务位置大多考虑反模式** `(看此文章) <http://blog.ploeh.dk/2010/02/03/ServiceLocatorIsAnAntiPattern.aspx>`_. 也就是说, 在代码中四处人为地创建生命周期并且少量使用容器并不是最佳的方式. 使用 :doc:`Autofac 集成类库 <../integration/index>` 时你通常不必做在示例应用中的这些事. 事情都会在关键部分和应用的"顶层"位置得到解决, 人为的处理是极少存在的. 当然, 如何构建你的应用取决于你自身.
 
-Going Further
+更进一步
 =============
 
-The sample app gives you an idea of how to use Autofac, but there's a lot more you can do.
+这个例子告诉你怎么使用Autofac，但依然有很多你可以做的.
 
-- Check out the list of :doc:`integration libraries <../integration/index>` to see how to integrate Autofac with your application.
-- Learn about the :doc:`ways to register components <../register/index>` that add flexibility.
-- Learn about :doc:`Autofac configuration options <../configuration/index>` that allow you to better manage your component registrations.
+- 查看 :doc:`集成类库 <../integration/index>` 列表, 看看如何将Autofac集成进你的应用.
+- 学习 :doc:`注册组件的方法 <../register/index>` 来提高灵活性.
+- 学习 :doc:`Autofac配置选项 <../configuration/index>` 使你更好地管理的组件的注册.
 
-Need Help?
+需要帮助?
 ==========
 
-- You can `ask questions on StackOverflow <http://stackoverflow.com/questions/tagged/autofac>`_.
-- You can `participate in the Autofac Google Group <https://groups.google.com/forum/#forum/autofac>`_.
-- There's an introductory `Autofac tutorial <http://www.codeproject.com/KB/architecture/di-with-autofac.aspx>`_ on CodeProject.
-- We have :doc:`advanced debugging tips <../advanced/debugging>` if you want to dive deep.
+- 你可以`在StackOverflow上提问 <http://stackoverflow.com/questions/tagged/autofac>`_.
+- 你可以 `参与 Autofac Google Group <https://groups.google.com/forum/#forum/autofac>`_.
+- 这里有一篇基础 `Autofac 教程 <http://www.codeproject.com/KB/architecture/di-with-autofac.aspx>`_ on CodeProject.
+- 如果你想深入, 我们有 :doc:`高级调试tips <../advanced/debugging>`.
 
-Building from Source
+源代码Build
 ====================
 
-The source code along with Visual Studio project files is available `on GitHub <https://github.com/autofac/Autofac>`_. Build instructions and details on contributing can be found in the :doc:`Contributor Guide <../contributors>`.
+支持Visual Studio的项目源代码 `托管在GitHub <https://github.com/autofac/Autofac>`_. Build说明和贡献源码细节可以查看 :doc:`贡献者向导 <../contributors>`.
