@@ -1,33 +1,27 @@
-Welcome to Autofac's documentation!
+欢迎来到 Autofac 中文文档!
 ===================================
 
 .. image:: logo.png
 
-Autofac is an addictive `IoC container <http://martinfowler.com/articles/injection.html>`_ for Microsoft .NET 4.5, Silverlight 5, Windows Store apps, and Windows Phone 8 apps. It manages the dependencies between classes so that **applications stay easy to change as they grow** in size and complexity. This is achieved by treating regular .NET classes as :doc:`components <glossary>`.
+Autofac 是一个适用于Microsoft .NET 4.5, Silverlight 5, Windows Store apps, and Windows Phone 8 apps的超赞的 `IoC 容器 <http://martinfowler.com/articles/injection.html>`_ . 它可以管理类之间的依赖关系从而使 **应用在规模及复杂性增长的情况下依然可以轻易地修改** . 通过将常规.net类当做 :doc:`组件 <glossary>`处理实现 .
 
 .. toctree::
    :maxdepth: 3
 
-   getting-started/index.rst
-   whats-new/index.rst
-   register/index.rst
-   resolve/index.rst
-   lifetime/index.rst
-   configuration/index.rst
-   integration/index.rst
-   best-practices/index.rst
-   advanced/index.rst
-   examples/index.rst
-   faq/index.rst
-   glossary.rst
-   contributors.rst
-   support.rst
-   API Documentation <http://autofac.org/apidoc/>
+   入门 <getting-started/index.rst>
+   更新 <whats-new/index.rst>
+   注册组件 <register/index.rst>
+   解析组件 <resolve/index.rst>
+   生命周期 <lifetime/index.rst>
+   配置 <configuration/index.rst>
+   集成 <integration/index.rst>
+   最佳实践 <best-practices/index.rst>
+   高级 <advanced/index.rst>
+   示例<examples/index.rst>
+   问答 <faq/index.rst>
+   术语 <glossary.rst>
+   贡献者 <contributors.rst>
+   支持 <support.rst>
+   API 文档 <http://autofac.org/apidoc/>
 
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
