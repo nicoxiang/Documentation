@@ -25,7 +25,7 @@ For our sample app, we'll define a class that writes the current date out. Howev
 
 We'll also go as far as allowing the mechanism writing the date to be abstracted, so if we want to, later, swap in a version that writes *tomorrow's* date, it'll be a snap.
 
-We'll do something like this:
+尝试如下代码:
 
 .. sourcecode:: csharp
 
