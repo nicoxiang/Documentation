@@ -11,7 +11,7 @@ Autofac 是一款适用于Microsoft .NET 4.5, Silverlight 5, Windows Store apps,
    入门 <getting-started/index.rst>
    更新 <whats-new/index.rst>
    注册组件 <register/index.rst>
-   解析组件 <resolve/index.rst>
+   解析服务 <resolve/index.rst>
    生命周期 <lifetime/index.rst>
    配置 <configuration/index.rst>
    集成 <integration/index.rst>
