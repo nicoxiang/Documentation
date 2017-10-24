@@ -56,3 +56,39 @@ The build generates a lot of warnings. These indicate where we're missing docume
 Build output gets put in the `artifacts` folder.
 
 The contents of `artifacts\doc\Website` is what gets copied to the `autofac.github.com` repo.
+
+### ZH-CN Translation Progress
+* Getting Started ![Progress](http://progressed.io/bar/100)
+* Registering Components
+  * Registration Concepts
+  * Passing Parameters to Register
+  * Property and Method Injection
+  * Assembly Scanning
+* Resolving Services
+  * index ![Progress](http://progressed.io/bar/100)
+  * Passing Parameters to Resolve
+  * Implicit Relationship Types
+
+* Controlling Scope and Lifetime
+  * Working with Lifetime Scopes
+  * Instance Scope
+  * Captive Dependencies
+  * Disposal
+  * Lifetime Events
+  * Running Code at Startup 
+  
+* Configuration  
+  * JSON/XML Configuration
+  * Modules
+  
+* Application Integration
+  * ASP.NET
+  * .NET Core
+  * ASP.NET Core
+  * Windows Communication Foundation (WCF)
+  * Managed Extensibility Framework (MEF)
+  * Common Service Locator
+  * Enterprise Library 5
+  * NHibernate
+  * Moq
+  * FakeItEasy
