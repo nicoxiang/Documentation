@@ -19,7 +19,7 @@
 构建应用
 ===========================
 
-控制反转背后的核心思想是, 我们不再将类绑定在应用里,让类自己去 "new up" 他们的依赖, 而是反过来在类的构造器中将依赖传递进去. 如果你想进一步深入的话, `Martin Fowler 有一篇解释 dependency injection/inversion of control 非常好的文章 <http://martinfowler.com/articles/injection.html>`_ .
+控制反转背后的核心思想是, 我们不再将类绑定在应用里,让类自己去 "new up" 他们的依赖, 而是反过来在类的构造方法中将依赖传递进去. 如果你想进一步深入的话, `Martin Fowler 有一篇解释 dependency injection/inversion of control 非常好的文章 <http://martinfowler.com/articles/injection.html>`_ .
 
 在我们的示例应用中, 我们将定义一个类来输出当前的日期. 然而,我们不希望和 ``Console`` 绑定因为我们想在控制台不可用的情况依然可以测试和使用这个类.
 
@@ -210,7 +210,7 @@
 
 - "WriteDate"方法向Autofac请求一个``IDateWriter``.
 - Autofac发现``IDateWriter``对应``TodayWriter``因此开始创建``TodayWriter``.
-- Autofac发现``TodayWriter``在它构造器中需要一个``IOutput``.
+- Autofac发现``TodayWriter``在它构造方法中需要一个``IOutput``.
 - Autofac发现``IOutput``对应``ConsoleOutput``因此开始创建新的``ConsoleOutput``实例.
 - Autofac使用新的``ConsoleOutput``实例完成``TodayWriter``的创建.
 - Autofac返回完整构建的``TodayWriter``给"WriteDate"使用.
