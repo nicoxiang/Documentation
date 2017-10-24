@@ -60,7 +60,7 @@ The contents of `artifacts\doc\Website` is what gets copied to the `autofac.gith
 ### ZH-CN Translation Progress
 * Getting Started ![Progress](http://progressed.io/bar/100)
 * Registering Components
-  * Registration Concepts
+  * Registration Concepts(http://progressed.io/bar/50)
   * Passing Parameters to Register
   * Property and Method Injection
   * Assembly Scanning
