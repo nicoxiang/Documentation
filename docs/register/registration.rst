@@ -197,7 +197,7 @@ Autofac提供了 :doc:`一流的方法可用来完成参数注入 <prop-method-i
 
     var card = container.Resolve<CreditCard>(new NamedParameter("accountId", "12345"));
 
-如果声明一个创建 ``CreditCard`` 实例的委托和一个委托工厂 <../advanced/delegate-factories>` , 语法可以变得更加干净, 类型安全.
+如果声明一个创建 ``CreditCard`` 实例的委托和 :doc:`一个委托工厂 <../advanced/delegate-factories>` , 语法可以变得更加干净, 类型安全.
 
 Open Generic Components
 =======================
