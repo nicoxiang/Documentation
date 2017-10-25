@@ -199,10 +199,10 @@ Autofac提供了 :doc:`一流的方法可用来完成参数注入 <prop-method-i
 
 如果声明一个创建 ``CreditCard`` 实例的委托和 :doc:`一个委托工厂 <../advanced/delegate-factories>` , 语法可以变得更加干净, 类型安全.
 
-Open Generic Components
+开放泛型组件
 =======================
 
-Autofac supports open generic types. Use the ``RegisterGeneric()`` builder method:
+Autofac支持开放泛型. 使用 ``RegisterGeneric()`` 方法:
 
 .. sourcecode:: csharp
 
@@ -210,26 +210,26 @@ Autofac supports open generic types. Use the ``RegisterGeneric()`` builder metho
            .As(typeof(IRepository<>))
            .InstancePerLifetimeScope();
 
-When a matching service type is requested from the container, Autofac will map this to an equivalent closed version of the implementation type:
+当容器请求一个匹配的服务类型时, Autofac将会找到对应的封闭类型的具体实现:
 
 .. sourcecode:: csharp
 
     // Autofac will return an NHibernateRepository<Task>
     var tasks = container.Resolve<IRepository<Task>>();
 
-Registration of a specialized service type (e.g. ``IRepository<Person>``) will override the open generic version.
+注册具体的服务类型 (e.g. ``IRepository<Person>``) 会覆盖开放类型的版本.
 
-Services vs. Components
+服务 vs. 组件
 =======================
 
-When you register :doc:`components <../glossary>`, you have to tell Autofac which :doc:`services <../glossary>` that component exposes. By default, most registrations will just expose themselves as the type registered:
+注册 :doc:`组件 <../glossary>` 时, 我们得告诉Autofac, 组件暴露了哪些 :doc:`服务 <../glossary>` . 默认地, 类型注册时大部分情况下暴露它们自身:
 
 .. sourcecode:: csharp
 
     // This exposes the service "CallLogger"
     builder.RegisterType<CallLogger>();
 
-Components can only be :doc:`resolved <../resolve/index>` by the services they expose. In this simple example it means:
+组件能够被它暴露的服务 :doc:`解析 <../resolve/index>` . 示例中:
 
 .. sourcecode:: csharp
 
@@ -242,7 +242,7 @@ Components can only be :doc:`resolved <../resolve/index>` by the services they e
     // the ILogger interface on CallLogger:
     scope.Resolve<ILogger>();
 
-You can expose a component with any number of services you like:
+你可以让一个组件暴露任意数量的服务:
 
 .. sourcecode:: csharp
 
@@ -250,7 +250,7 @@ You can expose a component with any number of services you like:
            .As<ILogger>()
            .As<ICallInterceptor>();
 
-Once you expose a service, you can resolve the component based on that service. Note, however, that once you expose a component as a specific service, the default service (the component type) is overridden:
+暴露服务后, 你就可以解析基于该服务的组件了. 但请注意, 一旦你将组件暴露为一个特定的服务, 默认的服务 (组件类型) 将被覆盖:
 
 .. sourcecode:: csharp
 
@@ -263,7 +263,7 @@ Once you expose a service, you can resolve the component based on that service. 
     // service overrides on the component:
     scope.Resolve<CallLogger>();
 
-If you want to expose a component as a set of services as well as using the default service, use the ``AsSelf`` method:
+如果你既想组件暴露一系列特定的服务, 又想让它暴露默认的服务, 可以使用 ``AsSelf`` 方法:
 
 .. sourcecode:: csharp
 
@@ -272,7 +272,7 @@ If you want to expose a component as a set of services as well as using the defa
            .As<ILogger>()
            .As<ICallInterceptor>();
 
-Now all of these will work:
+这样所有的解析就都能成功了:
 
 .. sourcecode:: csharp
 
@@ -282,44 +282,44 @@ Now all of these will work:
     scope.Resolve<ICallInterceptor>();
     scope.Resolve<CallLogger>();
 
-Default Registrations
+默认注册
 =====================
-If more than one component exposes the same service, **Autofac will use the last registered component as the default provider of that service**:
+如果不止一个组件暴露了相同的服务, **Autofac将使用最后注册的组件作为服务的提供方**:
 
 .. sourcecode:: csharp
 
     builder.Register<ConsoleLogger>().As<ILogger>();
     builder.Register<FileLogger>().As<ILogger>();
 
-In this scenario, ``FileLogger`` will be the default for ``ILogger`` because it was the last one registered.
+上例中, ``FileLogger`` 将会作为 ``ILogger`` 默认的服务提供方因为它是最后被注册的.
 
-To override this behavior, use the ``PreserveExistingDefaults()`` modifier:
+想要覆盖这种行为, 使用 ``PreserveExistingDefaults()`` 方法修改:
 
 .. sourcecode:: csharp
 
     builder.Register<ConsoleLogger>().As<ILogger>();
     builder.Register<FileLogger>().As<ILogger>().PreserveExistingDefaults();
 
-In this scenario, ``ConsoleLogger`` will be the default for ``ILogger`` because the later registration for ``FileLogger`` used ``PreserveExistingDefaults()``.
+上例中, ``ConsoleLogger`` 将会作为 ``ILogger`` 默认的服务提供方因为最后注册的 ``FileLogger`` 使用了 ``PreserveExistingDefaults()``.
 
-Conditional Registration
+有条件的注册
 ========================
 
-.. note:: Conditional registration was introduced in Autofac **4.4.0**
+.. note:: 有条件的注册自Autofac **4.4.0** 引入
 
-In most cases, overriding registrations as noted in the section above, "Default Registrations," is enough to get the right component resolved at runtime. Ensuring things get registered in the right order; using ``PreserveExistingDefaults()``; and taking advantage of lambda/delegate registrations for more complex conditions and behavior can get you pretty far.
+大多数情况下, 像上面那样覆盖默认的注册其实已经足够让我们在运行时成功地解析正确的组建了. 我们可以使用 ``PreserveExistingDefaults()`` 保证组件以正确的顺序被注册; 对于复杂的条件和行为我们也可以利用 lambda表达式/委托 注册处理的很不错了.
 
-There can be a few scenarios where this may not be the way you want to go:
+但依然有些场景应该是你不想碰到的:
 
-- You don't want the component present in the system if something else is handling the functionality. For example, if you resolve an ``IEnumerable<T>`` of a service, all of the registered components implementing that service will be returned, whether or not you've used ``PreserveExistingDefaults()``. Usually this is fine, but there are some edge cases where you may not want that.
-- You only want to register the component if some other component *isn't* registered; or only if some other component *is* registered. You can't resolve things out of a container that you're building, and you shouldn't update a container that's already built. Being able to conditionally register a component based on other registrations can be helpful.
+- 你不想在程序中有些功能在正常运作的情况下某个组件还会出现. 例如, 如果你解析了 ``IEnumerable<T>`` 的服务(一堆服务), 所有实现了这些服务的已注册组件都将被返回, 不管你是否使用了 ``PreserveExistingDefaults()``. 大多数情况下这样也行, 但在某些极端情况下你不希望如此.
+- 你只想要在其他一些组件 *未被* 注册的情况下才注册组件; 或者只想在其他一些组件 *已被* 注册的情况下. 你不会从容器中解析出你不想要的东西, 并且你也不用修改已经创建的容器. 能够基于其他的注册情况来进行有条件的组件注册非常好用.
 
-There are two registration extensions that can help in these cases:
+这边有两种好用的注册扩展方法:
 
-- ``OnlyIf()`` - Provide a lambda that uses an ``IComponentRegistry`` to determine if a registration should happen.
-- ``IfNotRegistered()`` - Shortcut to stop a registration from happening if some other service is already registered.
+- ``OnlyIf()`` - 提供一个表达式, 使用一个 ``IComponentRegistry`` 来决定注册是否发生.
+- ``IfNotRegistered()`` - 有其他服务已被注册的情况下阻止注册发生的快捷方法.
 
-These extensions run at the time of ``ContainerBuilder.Build()`` and will execute in the order of the actual component registrations. Here are some examples showing how they work:
+这些方法在 ``ContainerBuilder.Build()`` 时执行并且以实际组件注册的顺序执行. 下面是一些展示它们如何工作的示例:
 
 .. sourcecode:: csharp
 
@@ -371,12 +371,12 @@ These extensions run at the time of ``ContainerBuilder.Build()`` and will execut
     // to the ContainerBuilder.
     var container = builder.Build();
 
-Configuration of Registrations
+注册的配置
 ==============================
-You can :doc:`use XML or programmatic configuration ("modules") <../configuration/index>` to provide groups of registrations together or change registrations at runtime. You can also use :doc:`use Autofac modules <../configuration/modules>` for some dynamic registration generation or conditional registration logic.
+你可以 :doc:`使用 XML 或or 编程式配置 ("模块") <../configuration/index>` 来提供注册的群组或者在运行时改变注册. 对于一些动态的注册的生成或者有条件的注册逻辑, 你可以 :doc:`使用 Autofac 模块 <../configuration/modules>` .
 
-Dynamically-Provided Registrations
+动态提供的注册
 ==================================
-:doc:`Autofac modules <../configuration/modules>` are the simplest way to introduce dynamic registration logic or simple cross-cutting features. For example, you can use a module to :doc:`dynamically attach a log4net logger instance to a service being resolved <../examples/log4net>`.
+:doc:`Autofac模块 <../configuration/modules>` 是引入动态注册逻辑或简单切面功能的最简单的方法. 例如, 你可以使用一个模块 :doc:`动态地在被解析的服务上附加一个log4net logger实例 <../examples/log4net>`.
 
-If you find that you need even more dynamic behavior, such as adding support for a new :doc:`implicit relationship type <../resolve/relationships>`, you might want to :doc:`check out the registration sources section in the advanced concepts area <../advanced/registration-sources>`.
+如果想要完成更加动态的操作, 例如添加对新的 :doc:`隐式关系类型 <../resolve/relationships>` 的支持, 你可以 :doc:`在高级概念章节查看注册源模块 <../advanced/registration-sources>`.
