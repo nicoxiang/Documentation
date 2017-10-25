@@ -1,28 +1,28 @@
 ==============================
-Passing Parameters to Register
+注册时传参
 ==============================
 
-When you :doc:`register components <registration>` you have the ability to provide a set of parameters that can be used during the :doc:`resolution of services <../resolve/index>` based on that component. (If you'd rather provide the parameters at resolution time, :doc:`you can do that instead <../resolve/parameters>`.)
+:doc:`注册组件 <registration>` 时你可以提供一组参数, 可以在基于该组件的 :doc:`服务解析 <../resolve/index>` 时使用. (如果你想要在解析时提供参数, :doc:`当然也是可以的 <../resolve/parameters>`.)
 
-Available Parameter Types
+可使用的参数类型
 =========================
 
-Autofac offers several different parameter matching strategies:
+Autofac提供了多种不同的参数匹配机制:
 
-* ``NamedParameter`` - match target parameters by name
-* ``TypedParameter`` - match target parameters by type (exact type match required)
-* ``ResolvedParameter`` - flexible parameter matching
+* ``NamedParameter`` - 通过名字匹配目标参数
+* ``TypedParameter`` - 通过类型匹配目标参数 (需要匹配具体的类型)
+* ``ResolvedParameter`` - 复杂参数的匹配
 
-``NamedParameter`` and ``TypedParameter`` can supply constant values only.
+``NamedParameter`` 和 ``TypedParameter`` 只支持常量值.
 
-``ResolvedParameter`` can be used as a way to supply values dynamically retrieved from the container, e.g. by resolving a service by name.
+``ResolvedParameter`` 可以用于提供不同的值来从容器中动态获取对象, 例如, 通过名字解析服务.
 
-Parameters with Reflection Components
+反射组件的参数
 =====================================
 
-When you register a reflection-based component, the constructor of the type may require a parameter that can't be resolved from the container. You can use a parameter on the registration to provide that value.
+当你注册一个基于反射的组件时, 类型的构造方法也许会需要一个无法从容器中解析出来的参数. 你可以在注册时提供该值.
 
-Say you have a configuration reader that needs a configuration section name passed in:
+假设你有个 configuration reader 需要传入一个 configuration section name :
 
 .. sourcecode:: csharp
 
@@ -36,13 +36,13 @@ Say you have a configuration reader that needs a configuration section name pass
       // ...read configuration based on the section name.
     }
 
-You could use a lambda expression component for that:
+你可以使用lambda表达式组件:
 
 .. sourcecode:: csharp
 
     builder.Register(c => new ConfigReader("sectionName")).As<IConfigReader>();
 
-Or you could pass a parameter to a reflection component registration:
+或者在反射组件注册时传参:
 
 .. sourcecode:: csharp
 
@@ -64,12 +64,12 @@ Or you could pass a parameter to a reflection component registration:
                (pi, ctx) => pi.ParameterType == typeof(string) && pi.Name == "configSectionName",
                (pi, ctx) => "sectionName"));
 
-Parameters with Lambda Expression Components
+Lambda表达式组件的参数
 ============================================
 
-With lambda expression component registrations, rather than passing the parameter value *at registration time* you enable the ability to pass the value *at service resolution time*. (:doc:`Read more about resolving with parameters. <../resolve/parameters>`)
+使用lambda表达式组件注册, 你可以不用 *在注册时* 传入参数值, 而是可以 *在服务解析时* 传入具体的参数值. (:doc:`阅读使用参数解析章节. <../resolve/parameters>`)
 
-In the component registration expression, you can make use of the incoming parameters by changing the delegate signature you use for registration. Instead of just taking in an ``IComponentContext`` parameter, take in an ``IComponentContext`` and an ``IEnumerable<Parameter>``:
+在组件注册表达式中, 你可以用入参来改变你用于注册的委托签名. 并且不要只接受一个 ``IComponentContext`` 参数, 接受一个 ``IComponentContext`` 和一个 ``IEnumerable<Parameter>``:
 
 .. sourcecode:: csharp
 
@@ -80,7 +80,7 @@ In the component registration expression, you can make use of the incoming param
                      new ConfigReader(p.Named<string>("configSectionName")))
            .As<IConfigReader>();
 
-When :doc:`resolving with parameters <../resolve/parameters>`, your lambda will use the parameters passed in:
+当 :doc:`使用参数解析时 <../resolve/parameters>`, 你的lambda表达式会传入这些参数的值:
 
 .. sourcecode:: csharp
 
