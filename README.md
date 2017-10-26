@@ -63,7 +63,7 @@ The contents of `artifacts\doc\Website` is what gets copied to the `autofac.gith
   * Registration Concepts ![Progress](http://progressed.io/bar/100)
   * Passing Parameters to Register ![Progress](http://progressed.io/bar/100)
   * Property and Method Injection
-  * Assembly Scanning
+  * Assembly Scanning ![Progress](http://progressed.io/bar/90)
 * Resolving Services
   * index ![Progress](http://progressed.io/bar/100)
   * Passing Parameters to Resolve

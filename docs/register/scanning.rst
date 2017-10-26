@@ -1,13 +1,13 @@
 =================
-Assembly Scanning
+程序集扫描
 =================
 
-Autofac can use conventions to find and register components in assemblies. You can scan and register individual types or you can scan specifically for :doc:`Autofac modules <../configuration/modules>`.
+Autofac可以在程序集中通过约定找到和注册组件. 你可以扫描和注册单独的类型, 也可以专门扫描 :doc:`Autofac模块 <../configuration/modules>`.
 
-Scanning for Types
+扫描类型
 ==================
 
-Otherwise known as convention-driven registration or scanning, Autofac can register a set of types from an assembly according to user-specified rules:
+Autofac也可以被认为是约定驱动注册或扫描的, 它可以根据用户指定的规则注册一组类型:
 
 .. sourcecode:: csharp
 
@@ -17,35 +17,35 @@ Otherwise known as convention-driven registration or scanning, Autofac can regis
            .Where(t => t.Name.EndsWith("Repository"))
            .AsImplementedInterfaces();
 
-Each ``RegisterAssemblyTypes()`` call will apply one set of rules only - multiple invocations of ``RegisterAssemblyTypes()`` are necessary if there are multiple different sets of components to register.
+每次 ``RegisterAssemblyTypes()`` 方法调用将应用一组规则 - 如果有多组不同的组件注册时, 我们有必要多次调用 ``RegisterAssemblyTypes()`` .
 
-Filtering Types
+过滤类型
 ---------------
 
-``RegisterAssemblyTypes()`` accepts a parameter array of one or more assemblies. By default, **all concrete classes in the assembly will be registered.** This includes internal and nested private classes. You can filter the set of types to register using some provided LINQ-style predicates.
+``RegisterAssemblyTypes()`` 接收包含一个或多个程序集的数组作为参数. 默认地, **程序中所有具体的类都将被注册.** 包括内部类(internal)和嵌套的私有类. 你可以使用LINQ表达式过滤注册的类型集合.
 
-In 4.8.0 a ``PublicOnly()`` extension was added to make data encapsulation easier. If you only want your public classes registered, use ``PublicOnly()``:
+4.8.0 版本中 ``PublicOnly()`` 扩展方法被引入了, 这使得数据的封装变得更容易了. 如果你只想要你的公有方法被注册, 使用 ``PublicOnly()``:
 
 .. sourcecode:: csharp
 
     builder.RegisterAssemblyTypes(asm)
            .PublicOnly();
 
-To apply custom filtering to the types that are registered, use the ``Where()`` predicate:
+要过滤注册的类型, 使用 ``Where()`` 谓语表达式:
 
 .. sourcecode:: csharp
 
     builder.RegisterAssemblyTypes(asm)
            .Where(t => t.Name.EndsWith("Repository"));
 
-To exclude types from scanning, use the ``Except()`` predicate:
+要从扫描类型中排除类型, 使用 ``Except()`` 谓语表达式:
 
 .. sourcecode:: csharp
 
     builder.RegisterAssemblyTypes(asm)
            .Except<MyUnwantedType>();
 
-The ``Except()`` predicate also allows you to customize the registration for the specific excluded type:
+``Except()`` 谓语表达式同样允许你自定义类型排除的规则:
 
 .. sourcecode:: csharp
 
@@ -53,7 +53,7 @@ The ``Except()`` predicate also allows you to customize the registration for the
            .Except<MyCustomisedType>(ct =>
               ct.As<ISpecial>().SingleInstance());
 
-Multiple filters can be used, in which case they will be applied with logical AND.
+也可以使用多个过滤条件, 他们将会以AND逻辑连接.
 
 .. sourcecode:: csharp
 
@@ -62,10 +62,11 @@ Multiple filters can be used, in which case they will be applied with logical AN
            .Where(t => t.Name.EndsWith("Repository"))
            .Except<MyUnwantedRepository>();
 
-Specifying Services
+
+指定服务
 -------------------
 
-The registration syntax for ``RegisterAssemblyTypes()`` is a superset of :doc:`the registration syntax for single types <index>`, so methods like ``As()`` all work with assemblies as well:
+``RegisterAssemblyTypes()`` 的注册语法是 :doc:`单个类型注册语法 <index>` 的超集, 因此类似 ``As()`` 方法同样适用于程序集:
 
 .. sourcecode:: csharp
 
@@ -73,16 +74,16 @@ The registration syntax for ``RegisterAssemblyTypes()`` is a superset of :doc:`t
            .Where(t => t.Name.EndsWith("Repository"))
            .As<IRepository>();
 
-Additional overloads to ``As()`` and ``Named()`` accept lambda expressions that determine, for a type, which services it will provide:
+``As()`` 和 ``Named()`` 方法还有接收lambda表达式的重载, 表达式决定了对于一个类型而言, 它提供了哪些服务:
 
 .. sourcecode:: csharp
 
     builder.RegisterAssemblyTypes(asm)
            .As(t => t.GetInterfaces()[0]);
 
-As with normal component registrations, multiple calls to ``As()`` are added together.
+和普通组件注册一样, 多次调用 ``As()`` 方法, 暴露的服务叠加.
 
-A number of additional registration methods have been added to make it easier to build up common conventions:
+为了能够更容易地建立常用的约定, Autofac添加了一些额外的注册方法:
 
 +-------------------------------+---------------------------------------+--------------------------------------------------------+
 | Method                        | Description                           | Example                                                |
@@ -105,12 +106,12 @@ A number of additional registration methods have been added to make it easier to
 |                               |                                       |             .AsSelf();                                 |
 +-------------------------------+---------------------------------------+--------------------------------------------------------+
 
-Scanning for Modules
+扫描模块
 ====================
 
-Module scanning is performed with the ``RegisterAssemblyModules()`` registration method, which does exactly what its name suggests. It scans through the provided assemblies for :doc:`Autofac modules <../configuration/modules>`, creates instances of the modules, and then registers them with the current container builder.
+我们通过 ``RegisterAssemblyModules()`` 方法进行模块扫描, 正如它名字的表达的意思那样. 它通过提供的程序集扫描 :doc:`Autofac模块 <../configuration/modules>`, 创建模块的实例, 然后使用当前的container builder来注册它们.
 
-For example, say the two simple module classes below live in the same assembly and each register a single component:
+例如, 假设下面两个普通的模块类在同一个程序集中, 并且每个模块注册一个组件:
 
 .. sourcecode:: csharp
 
@@ -130,7 +131,7 @@ For example, say the two simple module classes below live in the same assembly a
       }
     }
 
-The overload of ``RegisterAssemblyModules()`` that *does not accept a type parameter* will register all classes implementing ``IModule`` found in the provided list of assemblies. In the example below **both modules** get registered:
+``RegisterAssemblyModules()`` 的重载 *不接受类型参数* , 它将会注册所提供程序集列表中的所有实现 ``IModule`` 的类. 在下面的示例中 **所有的模块** 都将被注册:
 
 .. sourcecode:: csharp
 
@@ -140,7 +141,7 @@ The overload of ``RegisterAssemblyModules()`` that *does not accept a type param
     // Registers both modules
     builder.RegisterAssemblyModules(assembly);
 
-The overload of ``RegisterAssemblyModules()`` with *the generic type parameter* allows you to specify a base type that the modules must derive from. In the example below **only one module** is registered because the scanning is restricted:
+使用 *泛型类型参数* 的 ``RegisterAssemblyModules()`` 的重载允许你指定一个所有模块都必须从它派生的基类. 在下面的示例中 **只有一个模块** 被注册了因为扫描被限制了:
 
 .. sourcecode:: csharp
 
@@ -150,7 +151,7 @@ The overload of ``RegisterAssemblyModules()`` with *the generic type parameter* 
     // Registers AModule but not BModule
     builder.RegisterAssemblyModules<AModule>(assembly);
 
-The overload of ``RegisterAssemblyModules()`` with *a Type object parameter* works like the generic type parameter overload but allows you to specify a type that might be determined at runtime. In the example below **only one module** is registered because the scanning is restricted:
+使用 *一个Type对象参数* 的 ``RegisterAssemblyModules()`` 和使用泛型类型参数的重载作用差不多但它允许你指定一个也许会在运行时才被决定的type. 在下面的示例中 **只有一个模块** 被注册了因为扫描被限制了:
 
 .. sourcecode:: csharp
 
@@ -160,17 +161,17 @@ The overload of ``RegisterAssemblyModules()`` with *a Type object parameter* wor
     // Registers AModule but not BModule
     builder.RegisterAssemblyModules(typeof(AModule), assembly);
 
-IIS Hosted Web Applications
+IIS 托管的 Web 应用
 ===========================
 
-When using assembly scanning with IIS applications, you can run into a little trouble depending on how you do the assembly location. (:doc:`This is one of our FAQs <../faq/iis-restart>`)
+当在IIS托管的应用中使用程序集扫描时, 你可能会因为程序集的位置遇到一个小小的问题. (:doc:`问答章节中的一个问题 <../faq/iis-restart>`)
 
-When hosting applications in IIS all assemblies are loaded into the ``AppDomain`` when the application first starts, but **when the AppDomain is recycled by IIS the assemblies are then only loaded on demand.**
+应用第一次启动时IIS托管应用里面所有的程序集都被加载进 ``AppDomain`` , 但是 **当AppDomain被IIS回收时, 程序集只会按需加载.**
 
-To avoid this issue use the `GetReferencedAssemblies() <http://msdn.microsoft.com/en-us/library/system.web.compilation.buildmanager.getreferencedassemblies.aspx>`_ method on `System.Web.Compilation.BuildManager <http://msdn.microsoft.com/en-us/library/system.web.compilation.buildmanager.aspx>`_ to get a list of the referenced assemblies instead:
+为了避免这个问题, 使用位于 `System.Web.Compilation.BuildManager <http://msdn.microsoft.com/en-us/library/system.web.compilation.buildmanager.aspx>`_ 的 `GetReferencedAssemblies() <http://msdn.microsoft.com/en-us/library/system.web.compilation.buildmanager.getreferencedassemblies.aspx>`_ 方法来获取相关程序集的列表:
 
 .. sourcecode:: csharp
 
     var assemblies = BuildManager.GetReferencedAssemblies().Cast<Assembly>();
 
-That will force the referenced assemblies to be loaded into the ``AppDomain`` immediately making them available for module scanning.
+它会立刻强制相关的程序集加载进 ``AppDomain`` 使其可以被用于模块扫描.
