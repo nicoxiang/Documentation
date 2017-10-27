@@ -1,42 +1,42 @@
 =============================
-Property and Method Injection
+属性和方法注入
 =============================
 
-While constructor parameter injection is the preferred method of passing values to a component being constructed, you can also use property or method injection to provide values.
+尽管构造方法参数注入是一种传值给组件的首选的方法, 但你同样可以使用属性或方法注入来传值.
 
-**Property injection** uses writeable properties rather than constructor parameters to perform injection. **Method injection** sets dependencies by calling a method.
+**属性注入** 使用可写属性而不是构造方法参数来完成注入. **方法注入** 通过调用方法来设置依赖.
 
-Property Injection
+属性注入
 ==================
 
-If the component is a :ref:`lambda expression component <register-registration-lambda-expression-components>`, use an object initializer:
+如果组件是一个 :ref:`lambda表达式组件 <register-registration-lambda-expression-components>`, 使用对象构造器:
 
 .. sourcecode:: csharp
 
     builder.Register(c => new A { B = c.Resolve<B>() });
 
-To support :doc:`circular dependencies <../advanced/circular-dependencies>`, use an :doc:`activated event handler <../lifetime/events>`:
+为了支持 :doc:`循环依赖 <../advanced/circular-dependencies>`, 可以使用 :doc:`激活后事件处理程序(activated event handler) <../lifetime/events>`:
 
 .. sourcecode:: csharp
 
     builder.Register(c => new A()).OnActivated(e => e.Instance.B = e.Context.Resolve<B>());
 
-If the component is a :ref:`reflection component <register-registration-reflection-components>`, use the ``PropertiesAutowired()`` modifier to inject properties:
+如果组件是一个 :ref:`反射组件 <register-registration-reflection-components>`, 使用 ``PropertiesAutowired()`` 修饰语来注入属性:
 
 .. sourcecode:: csharp
 
     builder.RegisterType<A>().PropertiesAutowired();
 
-If you have one specific property and value to wire up, you can use the ``WithProperty()`` modifier:
+如果你需要绑定一个特定的属性和它的值, 使用 ``WithProperty()`` 修饰语:
 
 .. sourcecode:: csharp
 
     builder.RegisterType<A>().WithProperty("PropertyName", propertyValue);
 
-Method Injection
+方法注入
 ================
 
-The simplest way to call a method to set a value on a component is to use a :ref:`lambda expression component <register-registration-lambda-expression-components>` and handle the method call right in the activator:
+想要调用一个方法来设置组件上的某个值, 最简单的方法是使用 :ref:`lambda表达式组件 <register-registration-lambda-expression-components>` 然后在activator中进行正确的方法调用:
 
 .. sourcecode:: csharp
 
@@ -47,7 +47,7 @@ The simplest way to call a method to set a value on a component is to use a :ref
       return result;
     });
 
-If you can't use a registration lambda, you can add an :doc:`activating event handler <../lifetime/events>`:
+如果你没法使用注册lambda表达式, 你可以添加一个 :doc:`激活时事件处理程序(activating event handler) <../lifetime/events>`:
 
 .. sourcecode:: csharp
 
