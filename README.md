@@ -67,7 +67,7 @@ The contents of `artifacts\doc\Website` is what gets copied to the `autofac.gith
 * Resolving Services
   * index ![Progress](http://progressed.io/bar/100)
   * Passing Parameters to Resolve
-  * Implicit Relationship Types
+  * Implicit Relationship Types ![Progress](http://progressed.io/bar/70)
 
 * Controlling Scope and Lifetime
   * Working with Lifetime Scopes
