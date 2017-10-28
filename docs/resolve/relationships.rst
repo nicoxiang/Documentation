@@ -1,22 +1,22 @@
 ===========================
-Implicit Relationship Types
+隐式关系类型
 ===========================
 
-Autofac supports automatically resolving particular types implicitly to support special relationships between :doc:`components and services <../glossary>`. To take advantage of these relationships, simply register your components as normal, but change the constructor parameter in the consuming component or the type being resolved in the ``Resolve()`` call so it takes in the specified relationship type.
+为了支持 :doc:`组建和服务 <../glossary>` 之间的特殊关系, Autofac支持隐式地自动解析特定服务. 想要使用这种关系, 只需正常地注册你的组件, 但是在使用组件时改变构造方法的参数或者在 ``Resolve()`` 调用时改变被解析的类型, 这样就能引入特定的关系类型.
 
-For example, when Autofac is injecting a constructor parameter of type ``IEnumerable<ITask>`` it will **not** look for a component that supplies ``IEnumerable<ITask>``. Instead, the container will find all implementations of ``ITask`` and inject all of them.
+例如, 当Autofac正在注入一个 ``IEnumerable<ITask>`` 类型的构造方法参数, 它 **不会** 寻找提供 ``IEnumerable<ITask>`` 的组件. 而是寻找 ``ITask`` 的所有实现并且注入它们所有.
 
-(Don't worry - there are examples below showing the usage of the various types and what they mean.)
+(不必担心 - 下面有很多示例展示了多种类别的使用方法和含义.)
 
-Note: To override this default behavior *it is still possible to register explicit implementations of these types*.
+注意: 如果想要覆盖这种默认的行为, *我们依然可以注册这些类型的显式实现*.
 
-[Content on this document based on Nick Blumhardt's blog article `The Relationship Zoo <http://nblumhardt.com/2010/01/the-relationship-zoo/>`_.]
+[本文基于 Nick Blumhardt 的博文 `The Relationship Zoo <http://nblumhardt.com/2010/01/the-relationship-zoo/>`_.]
 
 
-Supported Relationship Types
+支持的关系类型
 ============================
 
-The table below summarizes each of the supported relationship types in Autofac and shows the .NET type you can use to consume them. Each relationship type has a more detailed description and use case after that.
+下表简述了Autofac中各种支持的关系类型并且展示了你可以用来使用它们的 .NET 类型. 每种关系类型在后面都有一个更详细的描述和用例.
 
 =================================================== ==================================================== =======================================================
 Relationship                                        Type                                                 Meaning
@@ -36,9 +36,9 @@ Relationship                                        Type                        
   :depth: 1
 
 
-Direct Dependency (B)
+直接依赖 (B)
 ---------------------
-A *direct dependency* relationship is the most basic relationship supported - component ``A`` needs service ``B``. This is handled automatically through standard constructor and property injection:
+*直接依赖* 关系是支持的最基本的关系 - 组件 ``A`` 需要服务 ``B``. 通过基础的构造方法和属性注入自动完成:
 
 .. sourcecode:: csharp
 
@@ -47,7 +47,7 @@ A *direct dependency* relationship is the most basic relationship supported - co
       public A(B dependency) { ... }
     }
 
-Register the ``A`` and ``B`` components, then resolve:
+注册 ``A`` 和 ``B`` 组件, 然后解析:
 
 .. sourcecode:: csharp
 
@@ -63,9 +63,9 @@ Register the ``A`` and ``B`` components, then resolve:
     }
 
 
-Delayed Instantiation (Lazy<B>)
+延迟实例化 (Lazy<B>)
 -------------------------------
-A *lazy dependency* is not instantiated until its first use. This appears where the dependency is infrequently used, or expensive to construct. To take advantage of this, use a ``Lazy<B>`` in the constructor of ``A``:
+*延迟依赖* 直到它第一次使用时才会被实例化. 通常用于当依赖并非频繁使用, 或者构造需要较大代价时. 想要使用延迟依赖, 在 ``A`` 的构造方法中使用 ``Lazy<B>`` :
 
 .. sourcecode:: csharp
 
@@ -83,14 +83,14 @@ A *lazy dependency* is not instantiated until its first use. This appears where 
       }
     }
 
-If you have a lazy dependency for which you also need metadata, you can use ``Lazy<B,M>`` instead of the longer ``Meta<Lazy<B>, M>``.
+如果你有一个延迟依赖, 同时你也需要它的元数据, 可以使用 ``Lazy<B,M>`` 更不是更长的 ``Meta<Lazy<B>, M>``.
 
 
-Controlled Lifetime (Owned<B>)
+可控生命周期 (Owned<B>)
 ------------------------------
-An *owned dependency* can be released by the owner when it is no longer required. Owned dependencies usually correspond to some unit of work performed by the dependent component.
+*独占依赖* 当它不再被需要时可以被它的所有者释放. 独占依赖通常对应了它所依赖组件执行的某些工作单元.
 
-This type of relationship is interesting particularly when working with components that implement ``IDisposable``. :doc:`Autofac automatically disposes of disposable components <../lifetime/disposal>` at the end of a lifetime scope, but that may mean a component is held onto for too long; or you may just want to take control of disposing the object yourself. In this case, you'd use an *owned dependency*.
+使用实现 ``IDisposable`` 的组件时, 关系类型非常有意思. :doc:`Autofac在生命周期范围最后自动释放disposable的组件 <../lifetime/disposal>` , 但这也许会意味着一个组件会被持有过长时间; 或者你也许会想要自己来控制对象的释放. 这种情况下, 你可以使用 *独占依赖*.
 
 .. sourcecode:: csharp
 
@@ -111,9 +111,9 @@ This type of relationship is interesting particularly when working with componen
       }
     }
 
-Internally, Autofac creates a tiny lifetime scope in which the ``B`` service is resolved, and when you call ``Dispose()`` on it, the lifetime scope is disposed. What that means is that disposing of ``B`` will *also dispose of its dependencies* unless those dependencies are shared (e.g., singletons).
+在内部, Autofac创建一个小型的生命周期范围, 在这个范围内 ``B`` 服务被解析, 并且当你调用 ``Dispose()`` 时, 生命周期被释放. 这意味着 ``B`` 的释放将会 *同样释放它的依赖* 除非这些依赖是共享的 (例如, 单例).
 
-This also means that if you have ``InstancePerLifetimeScope()`` registrations and you resolve one as ``Owned<B>`` then you may not get the same instance as being used elsewhere in the same lifetime scope. This example shows the gotcha:
+这也意味着如果你有一个 ``InstancePerLifetimeScope()`` 注册并且把它作为 ``Owned<B>`` 解析, 你得到的实例和在同一生命周期解析出来的其他实例将会是不同的. 看下下面的示例:
 
 .. sourcecode:: csharp
 
@@ -137,18 +137,18 @@ This also means that if you have ``InstancePerLifetimeScope()`` registrations an
       a.M();
     }
 
-This is by design because you wouldn't want one component to dispose the ``B`` out from under everything else. However, it may lead to some confusion if you're not aware.
+这样设计是因为你肯定不会想要在组件外部还要去做 ``B`` 的释放. 然而, 如果你不清楚这个的话它可能会带来一些疑惑.
 
-If you would rather control ``B`` disposal yourself all the time, :doc:`register B as ExternallyOwned() <../lifetime/disposal>`.
+如果你更想要随时控制 ``B`` 的释放, :doc:`以 ExternallyOwned() 注册B <../lifetime/disposal>`.
 
 
-Dynamic Instantiation (Func<B>)
+动态实例化 (Func<B>)
 -------------------------------
-Using an *auto-generated factory* can let you effectively call ``Resolve<T>()`` without tying your component to Autofac. Use this relationship type if you need to create more than one instance of a given service, or if you're not sure if you're going to need a service and want to make the decision at runtime. This relationship is also useful in cases like :doc:`WCF integration <../integration/wcf>` where you need to create a new service proxy after faulting the channel.
+使用 *自动生成工厂* 可以让你无需绑定组件到Autofac就能高效的调用 ``Resolve<T>()`` . 如果你需要创建不止一个所提供服务的实例, 或者如果你不确定是否你需要一个服务并且希望在运行时才去作出选择, 可以使用这种关系类型. This relationship is also useful in cases like :doc:`WCF integration <../integration/wcf>` where you need to create a new service proxy after faulting the channel.
 
-**Lifetime scopes are respected** using this relationship type. If you register an object as ``InstancePerDependency()`` and call the ``Func<B>`` multiple times, you'll get a new instance each time. However, if you register an object as ``SingleInstance()`` and call the ``Func<B>`` to resolve the object more than once, you will get *the same object instance every time*.
+使用这种关系类型, **生命周期对实例化的影响是无法改变的**. 如果你以 ``InstancePerDependency()`` 注册一个对象并且多次调用 ``Func<B>`` 方法, 你每次都会得到一个新的实例. 然而, 如果你以 ``SingleInstance()`` 注册一个对象并且多次调用 ``Func<B>`` 来解析对象, 你 *每次只会得到一个相同的对象*.
 
-An example of this relationship looks like:
+这种关系类型的示例如下:
 
 .. sourcecode:: csharp
 
@@ -166,9 +166,9 @@ An example of this relationship looks like:
     }
 
 
-Parameterized Instantiation (Func<X, Y, B>)
+带参数实例化 (Func<X, Y, B>)
 -------------------------------------------
-You can also use an *auto-generated factory* to pass strongly-typed parameters to the resolution function. This is an alternative to :doc:`passing parameters during registration <../register/parameters>` or :doc:`passing during manual resolution <../resolve/parameters>`:
+你可以使用一个 *自动生成工厂* 来传参给解析方法. 这是区别于 :doc:`注册时传参 <../register/parameters>` 或 :doc:`手动解析时传参 <../resolve/parameters>` 的另一种替代方法:
 
 .. sourcecode:: csharp
 
@@ -185,7 +185,7 @@ You can also use an *auto-generated factory* to pass strongly-typed parameters t
         }
     }
 
-Internally, Autofac treats these as typed parameters. What that means is that **auto-generated function factories cannot have duplicate types in the input parameter list.** For example, say you have a type like this:
+在内部, Autofac会把Func的入参作为类型参数. 这就意味着 **自动生成工厂在入参列表不能有重复的类型.** 例如, 假设你有如下类型:
 
 .. sourcecode:: csharp
 
@@ -197,7 +197,7 @@ Internally, Autofac treats these as typed parameters. What that means is that **
       }
     }
 
-You might want to register that type and have an auto-generated function factory for it. *You will be able to resolve the function, but you won't be able to execute it.*
+你也许想要注册这个类型然后给它写了一个自动生成工厂. *你依然能解析Func, 但是你不能执行它.*
 
 .. sourcecode:: csharp
 
@@ -206,29 +206,29 @@ You might want to register that type and have an auto-generated function factory
     // Throws a DependencyResolutionException:
     var obj = func(1, 2, "three");
 
-In a loosely coupled scenario where the parameters are matched on type, you shouldn't really know about the order of the parameters for a specific object's constructor. If you need to do something like this, you should use a custom delegate type instead:
+在这种参数按类型匹配的松耦合的场景下, 你不必完全清楚指定对象构造方法的参数的顺序. 而如果你想要做重复参数的那种情况, 你需要自定义委托:
 
 .. sourcecode:: csharp
 
     public delegate DuplicateTypes FactoryDelegate(int a, int b, string c);
 
-Then register that delegate using ``RegisterGeneratedFactory()``:
+使用 ``RegisterGeneratedFactory()`` 注册委托:
 
 .. sourcecode:: csharp
 
     builder.RegisterType<DuplicateTypes>();
     builder.RegisterGeneratedFactory<FactoryDelegate>(new TypedService(typeof(DuplicateTypes)));
 
-Now the function will work:
+这样方法就能work了:
 
 .. sourcecode:: csharp
 
     var func = scope.Resolve<FactoryDelegate>();
     var obj = func(1, 2, "three");
 
-Another option you have is to use a :doc:`delegate factory, which you can read about in the advanced topics section <../advanced/delegate-factories>`.
+另一个选择是 :doc:`委托工厂, 你可以查看高级章节 <../advanced/delegate-factories>`.
 
-Should you decide to use the built-in auto-generated factory behavior (``Func<X, Y, B>``) and only resolve a factory with one of each type, it will work but you'll get the same input for all constructor parameters of the same type.
+如果你依然决定使用内置的自动生成工厂 (``Func<X, Y, B>``) 解析一个工厂, 并且保证每种类型入参只有一个, 它还是能正常运行的, 但是构造方法中相同的类型的参数都会是相同的值.
 
 .. sourcecode:: csharp
 
@@ -238,16 +238,16 @@ Should you decide to use the built-in auto-generated factory behavior (``Func<X,
     // new DuplicateTypes(1, 1, "three")
     var obj = func(1, "three");
 
-You can read more about delegate factories and the ``RegisterGeneratedFactory()`` method :doc:`in the advanced topics section <../advanced/delegate-factories>`.
+你可以 :doc:`在高级章节 <../advanced/delegate-factories>` 阅读更多关于委托工厂的内容和 ``RegisterGeneratedFactory()`` 方法.
 
-**Lifetime scopes are respected** using this relationship type as well as when using delegate factories. If you register an object as ``InstancePerDependency()`` and call the ``Func<X, Y, B>`` multiple times, you'll get a new instance each time. However, if you register an object as ``SingleInstance()`` and call the ``Func<X, Y, B>`` to resolve the object more than once, you will get *the same object instance every time regardless of the different parameters you pass in.* Just passing different parameters will not break the respect for the lifetime scope.
+使用这种关系类型和使用委托工厂, **生命周期对实例化的影响是无法改变的** . 如果你以 ``InstancePerDependency()`` 注册一个对象并且多次调用 ``Func<X, Y, B>`` , 你每次都会得到一个新的实例. 然而, 如果你以 ``SingleInstance()`` 注册一个对象并且多次调用 ``Func<X, Y, B>`` 来解析对象, 你 *每次只会得到一个相同的对象, 无论你是否传入了不同的参数.* 只是传入不同的参数无法覆盖掉生命周期造成的影响.
 
 
-Enumeration (IEnumerable<B>, IList<B>, ICollection<B>)
+可遍历型 (IEnumerable<B>, IList<B>, ICollection<B>)
 ------------------------------------------------------
-Dependencies of an *enumerable type* provide multiple implementations of the same service (interface). This is helpful in cases like message handlers, where a message comes in and more than one handler is registered to process the message.
+*可遍历类型* 的依赖提供了相同服务 (接口) 的多个实现. 它在例如消息处理程序中非常有用, 当一个消息传入时, 多个注册成功的处理程序都会处理这个消息.
 
-Let's say you have a dependency interface defined like this:
+假设有个依赖接口定义如下:
 
 .. sourcecode:: csharp
 
@@ -256,7 +256,7 @@ Let's say you have a dependency interface defined like this:
       void HandleMessage(Message m);
     }
 
-Further, you have a consumer of dependencies like that where you need to have more than one registered and the consumer needs all of the registered dependencies:
+接下来, 你有一个依赖的消费者(使用依赖的地方), 在那里依赖都已经被注册了并且消费者需要所有已被注册的依赖:
 
 .. sourcecode:: csharp
 
@@ -278,7 +278,7 @@ Further, you have a consumer of dependencies like that where you need to have mo
       }
     }
 
-You can easily accomplish this using the implicit enumerable relationship type. Just register all of the dependencies and the consumer, and when you resolve the consumer the *set of all matching dependencies* will be resolved as an enumeration.
+使用隐式可遍历关系类型可以轻松完成. 只要注册所有的依赖和消费者, 然后当你解析消费者时, *所有一系列匹配的依赖* 都会被作为可遍历型解析.
 
 .. sourcecode:: csharp
 
@@ -297,21 +297,21 @@ You can easily accomplish this using the implicit enumerable relationship type. 
       processor.ProcessMessage(m);
     }
 
-**The enumerable support will return an empty set if no matching items are registered in the container.** That is, using the above example, if you don't register any ``IMessageHandler`` implementations, this will break:
+**可遍历关系类型如果容器中没有一个匹配的已注册组件, 那么将会返回空集合.** 意思是, 上面示例如果你不注册任何 ``IMessageHandler`` 的实现, 将会抛错:
 
 .. sourcecode:: csharp
 
     // This throws an exception - none are registered!
     scope.Resolve<IMessageHandler>();
 
-*However, this works:*
+*然而, 下面还是能work的:*
 
 .. sourcecode:: csharp
 
     // This returns an empty list, NOT an exception:
     scope.Resolve<IEnumerable<IMessageHandler>>();
 
-This can create a bit of a "gotcha" where you might think you'll get a null value if you inject something using this relationship. Instead, you'll get an empty list.
+所以当你使用这种关系类型注入些东西时, 也许会觉得 "我懂了, 可能会得到一个null值" . 然而, 你只是会得到一个空列表.
 
 Metadata Interrogation (Meta<B>, Meta<B, X>)
 --------------------------------------------
