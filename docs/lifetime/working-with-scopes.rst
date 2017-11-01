@@ -1,11 +1,11 @@
 ============================
-Working with Lifetime Scopes
+开始使用生命周期范围
 ============================
 
-Creating a New Lifetime Scope
+创建一个新的生命周期范围
 =============================
 
-You can create a lifetime scope by calling the ``BeginLifetimeScope()`` method on any existing lifetime scope, starting with the root container. **Lifetime scopes are disposable and they track component disposal, so make sure you always call "Dispose()"" or wrap them in "using" statements.**
+你可以通过在一个已存在的生命周期上调用 ``BeginLifetimeScope()`` 方法来创建另一个生命周期范围, 以根容器作为起始. **生命周期范围是可释放的并且追踪组件的释放, 因此确保你总是调用了 "Dispose()"" 或者把它们包裹在 "using" 语句内.**
 
 .. sourcecode:: csharp
 
@@ -22,12 +22,12 @@ You can create a lifetime scope by calling the ``BeginLifetimeScope()`` method o
     }
   }
 
-Tagging a Lifetime Scope
+给生命周期范围打标签
 ========================
 
-There are some cases where you want to share services across units of work but you don't want those services to be shared globally like singletons. A common example is "per-request" lifetimes in web applications. (:doc:`You can read more about per-request scoping in the "Instance Scope" topic. <instance-scope>`) In this case, you'd want to tag your lifetime scope and register services as ``InstancePerMatchingLifetimeScope()``.
+有时候你想要在工作单元之间共享服务但是你并不想这些服务像单例那样全局共享. web应用中的 "per-request" 生命周期就是一个普遍的例子. (:doc:`你可以在 "实例范围" 章节阅读更多关于每个请求范围的内容. <instance-scope>`) 在这种情况下, 你会想要给你的生命周期打上标签并且以 ``InstancePerMatchingLifetimeScope()`` 注册服务.
 
-For example, say you have a component that sends emails. A logical transaction in your system may need to send more than one email, so you can share that component across individual pieces of the logical transaction. However, you don't want the email component to be a global singleton. Your setup might look something like this:
+例如, 假设你有一个发送电子邮件的组件. 你系统中的一个业务逻辑层也许会需要发送不止一封邮件, 因此你可以在各个独立的业务逻辑块共享组件. 然而, 你并不想要发邮件组件是一个全局单例. 你可以像下面这样做:
 
 .. sourcecode:: csharp
 
@@ -74,12 +74,12 @@ For example, say you have a component that sends emails. A logical transaction i
     }
   }
 
-Again, :doc:`you can read more about tagged scopes and per-request scoping in the "Instance Scope" topic. <instance-scope>`
+同样地, :doc:`你可以在 "实例范围" 章节阅读更多关于带标签的范围和每个请求范围的内容. <instance-scope>`
 
-Adding Registrations to a Lifetime Scope
+向生命周期范围内添加注册
 ========================================
 
-Autofac allows you to add registrations "on the fly" as you create lifetime scopes. This can help you when you need to do a sort of "spot weld" limited registration override or if you generally just need some additional stuff in a scope that you don't want to register globally. You do this by passing a lambda to ``BeginLifetimeScope()`` that takes a ``ContainerBuilder`` and adds registrations.
+Autofac允许你在创建生命周期范围的同时随手添加. 如果你做一些 "焊接式的" 有限制的注册重写或者如果你只是在范围内需要一些不想全局注册的额外的东西, 它将非常有用. 你可以通过给 ``BeginLifetimeScope()`` 传递一个引用 ``ContainerBuilder`` 的lambda表达式并在其中添加注册来完成.
 
 .. sourcecode:: csharp
 
