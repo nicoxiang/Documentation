@@ -70,6 +70,7 @@ The contents of `artifacts\doc\Website` is what gets copied to the `autofac.gith
   * Implicit Relationship Types ![Progress](http://progressed.io/bar/70)
 
 * Controlling Scope and Lifetime
+  * index ![Progress](http://progressed.io/bar/100)
   * Working with Lifetime Scopes
   * Instance Scope
   * Captive Dependencies

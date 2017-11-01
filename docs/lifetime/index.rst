@@ -1,34 +1,34 @@
 ==============================
-Controlling Scope and Lifetime
+控制范围和生命周期
 ==============================
 
-A great place to start learning about Autofac scope and lifetime is in `Nick Blumhardt's Autofac lifetime primer <http://nblumhardt.com/2011/01/an-autofac-lifetime-primer/>`_. There's a lot to digest, though, and a lot of intermixed concepts there, so we'll try to complement that article here.
+这个有一篇学习Autofac控制范围和生命周期很好的文章 `Nick Blumhardt's Autofac lifetime primer <http://nblumhardt.com/2011/01/an-autofac-lifetime-primer/>`_. 里面有很多东西可以学习, 并且有很多混合的概念, 因此我们尝试在这边对该文做些补充.
 
-You may recall from the :doc:`registration topic <../register/registration>` that you add **components** to the container that implement **services**. You then end up :doc:`resolving services <../resolve/index>` and using those service instances to do your work.
+回忆下 :doc:`注册章节 <../register/registration>` , 你向容器中添加了一个实现 **服务** 的 **组件** . 最后 :doc:`解析服务 <../resolve/index>` 并且使用这些服务的实例来完成一些事.
 
-The **lifetime** of a service is how long the service instance will live in your application - from the original instantiation to :doc:`disposal <disposal>`. For example, if you "new up" an object that implements `IDisposable <http://msdn.microsoft.com/en-us/library/system.idisposable.aspx>`_ and then later call ``Dispose()`` on it, the lifetime of that object is from the time you instantiated it all the way through disposal (or garbage collection if you didn't proactively dispose it).
+服务的 **生命周期** 是指服务实例在你的应用中存在的时长 - 从开始实例化到最后 :doc:`释放 <disposal>` 结束. 例如, 如果你 "new up" 了一个 实现 `IDisposable <http://msdn.microsoft.com/en-us/library/system.idisposable.aspx>`_ 的对象并且之后调用了它的 ``Dispose()`` 方法, 对象的生命周期是从你实例化一直到释放 (或者是被垃圾回收, 如果你没有提前释放它的话).
 
-The **scope** of a service is the area in the application where that service can be shared with other components that consume it. For example, in your application you may have a global static singleton - the "scope" of that global object instance would be the whole application. On the other hand, you might create a local variable in a ``for`` loop that makes use of the global singleton - the local variable has a much smaller scope than the global.
+服务的 **范围** 是指它在应用中能共享给其他组件并被消费的范围. 例如, 在你的应用中你有个全局的静态单例 - 该全局对象实例的 "范围" 将会是整个应用. 另一方面, 如果你在一个 ``for`` 循环中创建了引用了全局单例的一个局部变量 - 那么这个局部变量就拥有比全局变量小很多的范围.
 
-The concept of a **lifetime scope** in Autofac combines these two notions. Effectively, a lifetime scope equates with a unit of work in your application. A unit of work might begin a lifetime scope at the start, then services required for that unit of work get resolved from a lifetime scope. As you resolve services, Autofac tracks disposable (``IDisposable``) components that are resolved. At the end of the unit of work, you dispose of the associated lifetime scope and Autofac will automatically clean up/dispose of the resolved services.
+Autofac中 **生命周期范围** 的概念其实是把这两个概念组合在了一起. 实际上, 生命周期范围等同于你应用中的一个工作单元. 一个工作单元将会在开始时启动生命周期范围, 然后需要该工作单元的服务被从生命周期范围中解析出. 当你解析服务时, Autofac将会追踪被解析的可释放/可销毁 (``IDisposable``) 组件. 在工作单元最后, 你释放了相关的生命周期范围然后Autofac将会自动清理/释放那些被解析的服务.
 
-**The two important things lifetime scopes control are sharing and disposal.**
+**生命周期控制范围的两个要素是共享和释放.**
 
-- **Lifetime scopes are nestable and they control how components are shared.** For example, a "singleton" service might be resolved from a root lifetime scope while individual units of work may require their own instances of other services. You can determine how a component is shared by :doc:`setting its instance scope at registration <instance-scope>`.
-- **Lifetime scopes track disposable objects and dispose of them when the lifetime scope is disposed.** For example, if you have a component that implements ``IDisposable`` and you resolve it from a lifetime scope, the scope will hold onto it and dispose of it for you so your service consumers don't have to know about the underlying implementation. :doc:`You have the ability to control this behavior or add new disposal behavior if you choose. <disposal>`
+- **生命周期范围是可嵌套的并且它们控制了组件如何共享.** 例如, 一个 "单例" 服务也许会从根生命周期解析因为每个独立的工作单元会需要它们各自的服务实例. 你可以通过 :doc:`注册时设置实例范围 <instance-scope>` 决定组件如何共享.
+- **生命周期范围追踪可释放对象并且当生命周期范围被释放同时释放它们.** 例如, 如果你有个实现 ``IDisposable`` 的组件并且你从生命周期中解析了它, 生命周期范围将会保持住它并且替你释放它, 这样你的服务消费者就不必知道它的内在具体实现. :doc:`你有能力选择控制该行为或者添加一个新的释放行为. <disposal>`
 
-As you work in your application, it's good to remember these concepts so you make the most efficient use of your resources.
+在你的应用中, 最好记住以下概念这样就能有效使用你的资源.
 
-    **It is important to always resolve services from a lifetime scope and not the root container.** Due to the disposal tracking nature of lifetime scopes, if you resolve a lot of disposable components from the container (the "root lifetime scope"), you may inadvertently cause yourself a memory leak. The root container will hold references to those disposable components for as long as it lives (usually the lifetime of the application) so it can dispose of them. :doc:`You can change disposal behavior if you choose <disposal>`, but it's a good practice to only resolve from a scope. If Autofac detects usage of a singleton or shared component, it will automatically place it in the appropriate tracking scope.
+    **永远从一个生命周期范围而不是从根容器中解析服务.** 由于生命周期范围有追踪可释放资源的性质, 如果你从一个容器 ("根生命周期范围") 中解析了太多组件, 无意间也许你就会造成内存泄露. 根生命周期会在它存在的时间 (通常是应用的生命周期) 内保持住可释放组件因此它也能释放它们. :doc:`你可以选择性的改变释放行为 <disposal>`, 但从范围内解析是个良好的实践. 如果Autofac检测到使用单例或共享组件, 它会自动把它们安放在一个合适的追踪范围之内.
 
-Let's look at a web application as a more concrete example to illustrate lifetime scope usage. Say you have the following scenario:
+让我们看下web类应用, 把它作为一个更好阐述生命周期范围的具体例子. 假设有以下场景:
 
-- You have a global singleton logging service.
-- Two simultaneous requests come in to the web application.
-- Each request is a logical "unit of work" and each requires its own order processing service.
-- Each order processing service needs to log information to the logging service.
+- 你有一个全局的单例logging服务.
+- 两个请求同时进入到web应用中.
+- 每个请求是一个逻辑上的 "工作单元" 并且每个请求需要它们各自的order processing service.
+- 每个order processing service 要用 logging service 记录信息.
 
-In this scenario, you'd have a root lifetime scope that contains the singleton logging service and you'd have one child lifetime scope per request, each with its own order processing service::
+在这种场景中, 你有一个根范围, 包含单例的logging service并且每个请求有一个子生命周期, 每个有它们自己的order processing service::
 
     +---------------------------------------------------+
     |                 Autofac Container                 |
@@ -44,12 +44,12 @@ In this scenario, you'd have a root lifetime scope that contains the singleton l
     | +----------------------+ +----------------------+ |
     +---------------------------------------------------+
 
-When each request ends, the request lifetime scope ends and the respective order processor gets disposed. The logging service, as a singleton, stays alive for sharing by future requests.
+每个请求结束时, 请求的生命周期也结束并且各自的订单处理程序得到释放. logging service作为一个单例, 将会保持存在并以备后续请求共享.
 
-You can dive deeper on lifetime scopes in `Nick Blumhardt's Autofac lifetime primer <http://nblumhardt.com/2011/01/an-autofac-lifetime-primer/>`_.
+你可以通过 `Nick Blumhardt's Autofac lifetime primer <http://nblumhardt.com/2011/01/an-autofac-lifetime-primer/>`_ 一文深入了解生命周期范围相关内容.
 
 
-**Additional lifetime scope topics to explore:**
+**更多生命周期范围相关章节:**
 
 .. toctree::
 
