@@ -1,25 +1,25 @@
 ==============
-Instance Scope
+实例作用域
 ==============
 
-Instance scope determines how an instance is shared between requests for the same service. Note that you should be familiar with :doc:`the concept of lifetime scopes <index>` to better understand what's happening here.
+实例作用域决定了对于相同的服务解析出的实例如何在请求之间被共享. 注意你最好是了解 :doc:`生命周期作用域的概念 <index>` 这样才能更好地理解下面的内容.
 
-When a request is made for a service, Autofac can return a single instance (single instance scope), a new instance (per dependency scope), or a single instance within some kind of context, e.g. a thread or an HTTP request (per lifetime scope).
+当一个请求出现并且需要某个服务, Autofac可以返回一个单一实例 (单一实例作用域), 也可以返回一个新的实例 (每个依赖的作用域), 或者返回一个在某种上下文中的单一实例, 例如, 一个线程或者一个HTTP请求 (每个生命周期作用域).
 
-This applies to instances returned from an explicit ``Resolve()`` call as well as instances created internally by the container to satisfy the dependencies of another component.
+这种行为既可以发生于显式调用 ``Resolve()`` 返回的实例, 也可以发生于容器为了满足另一个组件的依赖而在内部创建的实例.
 
 .. note::
-  Choosing the right lifetime scope will help you avoid :doc:`captive dependencies <captive-dependencies>` and other pitfalls where a component lives too long or not long enough. It is up to the developer to make the correct choice for each of their application components.
+  选择一个正确的生命周期作用域可以帮助你避免 :doc:`被捕获依赖 <captive-dependencies>` 和其他一些因为组件保持时间过长或不足造成的陷阱. 这取决于开发者如何对他们的每个组件作出正确的选择.
 
 .. contents::
   :local:
 
-Instance Per Dependency
+每个依赖一个实例
 =======================
 
-Also called 'transient' or 'factory' in other containers. Using per-dependency scope, **a unique instance will be returned from each request for a service.**
+在其他容器中也被称为 'transient' 或者 'factory' . 使用每个依赖的作用域, **对于一个服务每次请求都会返回一个唯一的实例.**
 
-**This is the default** if no other option is specified.
+如果没有指定特定的选项, **它将是默认的**.
 
 .. sourcecode:: csharp
 
@@ -31,7 +31,7 @@ Also called 'transient' or 'factory' in other containers. Using per-dependency s
     // ...is the same as this:
     builder.RegisterType<Worker>().InstancePerDependency();
 
-When you resolve a component that is instance per dependency, you get a new one each time.
+当你解析一个每个依赖一个实例的组件时, 你每次获得一个新的实例.
 
 .. sourcecode:: csharp
 
@@ -46,17 +46,17 @@ When you resolve a component that is instance per dependency, you get a new one 
       }
     }
 
-Single Instance
+单一实例
 ===============
 
-This is also known as 'singleton.' Using single instance scope, **one instance is returned from all requests in the root and all nested scopes**.
+它也被称为 '单例.' 使用单一实例作用域, **在根容器和所有嵌套作用域内所有的请求都将会返回同一个实例**.
 
 .. sourcecode:: csharp
 
     var builder = new ContainerBuilder();
     builder.RegisterType<Worker>().SingleInstance();
 
-When you resolve a single instance component, you always get the same instance no matter where you request it.
+当你解析一个单一实例组件时, 无论你从哪里请求它, 你都讲获得相同的实例.
 
 .. sourcecode:: csharp
 
@@ -84,19 +84,19 @@ When you resolve a single instance component, you always get the same instance n
       }
     }
 
-Instance Per Lifetime Scope
+每个生命周期作用域一个实例
 ===========================
 
-This scope applies to nested lifetimes. **A component with per-lifetime scope will have at most a single instance per nested lifetime scope.**
+这种作用域应用于嵌套生命周期. **每个生命周期作用域的组件在每个嵌套的生命周期作用域中最多只会有一个单一实例.**
 
-This is useful for objects specific to a single unit of work that may need to nest additional logical units of work. Each nested lifetime scope will get a new instance of the registered dependency.
+它对于单个独立工作单元特定的对象非常有用, 该工作单元需要嵌套额外的逻辑工作单元. 每个内嵌的生命周期作用域将会得到一个已注册依赖的新的实例.
 
 .. sourcecode:: csharp
 
     var builder = new ContainerBuilder();
     builder.RegisterType<Worker>().InstancePerLifetimeScope();
 
-When you resolve the instance per lifetime scope component, you get a single instance per nested scope (e.g., per unit of work).
+当你解析每个生命周期作用域的组件时, 每个内嵌的作用域之内你都会得到一个单一的实例 (例如, 每个工作单元).
 
 .. sourcecode:: csharp
 
@@ -122,23 +122,23 @@ When you resolve the instance per lifetime scope component, you get a single ins
       }
     }
 
-Instance Per Matching Lifetime Scope
+每个匹配的生命周期作用域一个实例
 ====================================
 
-This is similar to the 'instance per lifetime scope' concept above, but allows more precise control over instance sharing.
+这和上面的 '每个生命周期作用域一个实例' 的概念类似, 但可以对实例的共享有更加精准的控制.
 
-When you create a nested lifetime scope, you have the ability to "tag" or "name" the scope. **A component with per-matching-lifetime scope will have at most a single instance per nested lifetime scope that matches a given name.** This allows you to create a sort of "scoped singleton" where other nested lifetime scopes can share an instance of a component without declaring a global shared instance.
+当你创建一个嵌套的生命周期作用域时, 你可以给作用域 "打标签" 或者 "命名" . **每个匹配生命周期作用域的组件在每个名称匹配的嵌套生命周期作用域中最多只会有一个单一实例.** 这就允许了你创建一系列 "有作用域的单例" , 其他嵌套的生命周期可以在不声明一个共享实例的情况下共享这种组件的实例.
 
-This is useful for objects specific to a single unit of work, e.g. an HTTP request, as a nested lifetime can be created per unit of work. If a nested lifetime is created per HTTP request, then any component with per-lifetime scope will have an instance per HTTP request. (More on per-request lifetime scope below.)
+它对于单个独立工作单元特定的对象非常有用, 例如, 一个 HTTP 请求, 它作为一个嵌套的生命周期在每个工作单元内都会被创建. 如果一个嵌套的生命周期每个 HTTP 请求创建一次, 那么任何每个生命周期作用域的组件在每个 HTTP 请求内都将只有一个实例. (下面还有更多详细解释.)
 
-In most applications, only one level of container nesting will be sufficient for representing the scope of units of work. If more levels of nesting are required (e.g. something like global->request->transaction) components can be configured to be shared at a particular level in the hierarchy using tags.
+大多数的应用中, 只需一层的容器嵌套就足以表示工作单元的作用域. 如果需要更多的嵌套层级 (例如, 全局->请求->事务) 组件可以考虑使用标签来在层级关系中特定的层级共享.
 
 .. sourcecode:: csharp
 
     var builder = new ContainerBuilder();
     builder.RegisterType<Worker>().InstancePerMatchingLifetimeScope("myrequest");
 
-The supplied tag value is associated with a lifetime scope when you start it. **You will get an exception if you try to resolve a per-matching-lifetime-scope component when there's no correctly named lifetime scope.**
+当你开始一个生命周期时, 提供的标签值和它就关联起来了. **如果你尝试从一个名称并不匹配的生命周期中解析一个每个匹配生命周期作用域的组件你会得到一个异常.**
 
 .. sourcecode:: csharp
 
@@ -188,28 +188,28 @@ The supplied tag value is associated with a lifetime scope when you start it. **
       var fail = noTagScope.Resolve<Worker>();
     }
 
-Instance Per Request
+每个请求一个实例
 ====================
 
-Some application types naturally lend themselves to "request" type semantics, for example ASP.NET :doc:`web forms <../integration/webforms>` and :doc:`MVC <../integration/mvc>` applications. In these application types, it's helpful to have the ability to have a sort of "singleton per request."
+一些应用本身就适合 "request" 类型的语法, 例如 ASP.NET :doc:`web forms <../integration/webforms>` 和 :doc:`MVC <../integration/mvc>` 应用. 在这些应用类型中, 拥有一组 "每个请求一个" 的单例非常有用."
 
-**Instance per request builds on top of instance per matching lifetime scope** by providing a well-known lifetime scope tag, a registration convenience method, and integration for common application types. Behind the scenes, though, it's still just instance per matching lifetime scope.
+**每个请求一个实例建立于每个匹配生命周期一个实例之上** , 通过另外提供了一个众所周知的作用域标签, 一个方便注册的方法, 和对一些普通应用类型的集成. 而在这些背后, 其实它本质上还是一个每个匹配生命周期一个实例.
 
-What this means is that if you try to resolve components that are registered as instance-per-request but there's no current request... you're going to get an exception.
+这就意味着如果你试图解析一个注册为每个请求一个实例的组件但是并没有当前请求... 你将会得到一个异常.
 
-:doc:`There is a detailed FAQ outlining how to work with per-request lifetimes. <../faq/per-request-scope>`
+:doc:`这边有一章问答详细的介绍了如何使用每个请求的生命周期. <../faq/per-request-scope>`
 
 .. sourcecode:: csharp
 
     var builder = new ContainerBuilder();
     builder.RegisterType<Worker>().InstancePerRequest();
 
-**ASP.NET Core uses Instance Per Lifetime Scope rather than Instance Per Request.** See the :doc:`ASP.NET Core integration doc for more <../integration/aspnetcore>`.
+**ASP.NET Core 使用的是每个生命周期一个实例而不是每个请求一个实例.** 详情见 :doc:`ASP.NET Core 集成 <../integration/aspnetcore>`.
 
-Instance Per Owned
+每次被拥有一个实例
 ==================
 
-The `Owned<T>` :doc:`implicit relationship type <../resolve/relationships>` creates new nested lifetime scopes. It is possible to scope dependencies to the owned instance using the instance-per-owned registrations.
+`Owned<T>` :doc:`隐式关系类型 <../resolve/relationships>` 创建了一个嵌套的生命周期作用域. 使用每次被拥有一个实例注册, 可以把该依赖的作用域绑定到拥有它的实例上.
 
 .. sourcecode:: csharp
 
@@ -217,7 +217,7 @@ The `Owned<T>` :doc:`implicit relationship type <../resolve/relationships>` crea
     builder.RegisterType<MessageHandler>();
     builder.RegisterType<ServiceForHandler>().InstancePerOwned<MessageHandler>();
 
-In this example the ``ServiceForHandler`` service will be scoped to the lifetime of the owned ``MessageHandler`` instance.
+示例中 ``ServiceForHandler`` 服务将会绑定上它拥有的 ``MessageHandler`` 示例的生命周期.
 
 .. sourcecode:: csharp
 
@@ -232,10 +232,10 @@ In this example the ``ServiceForHandler`` service will be scoped to the lifetime
       h1.Dispose();
     }
 
-Thread Scope
+线程作用域
 ============
 
-Autofac can enforce that objects bound to one thread will not satisfy the dependencies of a component bound to another thread. While there is not a convenience method for this, you can do it using lifetime scopes.
+Autofac可以强制使绑定到一个线程的对象无法成为绑定到另一线程的组件的依赖. 如果没有合适的方法, 你可以使用生命周期作用域完成这一操作.
 
 .. sourcecode:: csharp
 
@@ -244,7 +244,7 @@ Autofac can enforce that objects bound to one thread will not satisfy the depend
            .InstancePerLifetimeScope();
     var container = builder.Build();
 
-Then, each thread gets its own lifetime scope:
+这样, 每个线程就有了它各自的生命周期作用域:
 
 .. sourcecode:: csharp
 
@@ -256,11 +256,11 @@ Then, each thread gets its own lifetime scope:
       }
     }
 
-**IMPORTANT: Given the multithreaded scenario, you must be very careful that the parent scope doesn't get disposed out from under the spawned thread.** You can get into a bad situation where components can't be resolved if you spawn the thread and then dispose the parent scope.
+**IMPORTANT: 在这种多线程场景中, 你必须得注意父级作用域不能在派生出的线程下被释放了.** 否则你就会碰到一个很糟糕的情况, 如果你派生了一个子线程并在其中释放了父级作用域, 组件就不能解析了.
 
-Each thread executing through ``ThreadStart()`` will then get its own instance of ``MyThreadScopedComponent`` - which is essentially a "singleton" in the lifetime scope. Because scoped instances are never provided to outer scopes, it is easier to keep thread components separated.
+每个线程通过执行 ``ThreadStart()`` 将会得到它独立的 ``MyThreadScopedComponent`` 实例- 这个实例在生命周期作用域本质上是一个 "单例" . 因为被划分作用域的实例不会暴露给外在的作用域, 很容易就能保证线程组件是独立的.
 
-You can inject a parent lifetime scope into the code that spawns the thread by taking an ``ILifetimeScope`` parameter. Autofac knows to automatically inject the current lifetime scope and you can create a nested scope from that.
+你可以通过传入一个 ``ILifetimeScope`` 参数把父级的生命周期作用域注入到派生线程的代码中. Autofac会自动注入当前的生命周期作用域然后你就可以从其中创建嵌套的作用域了.
 
 .. sourcecode:: csharp
 
@@ -282,8 +282,8 @@ You can inject a parent lifetime scope into the code that spawns the thread by t
       }
     }
 
-If you would like to enforce this even more heavily, use instance per matching lifetime scope (see above) to associate the thread-scoped components with the inner lifetime (they'll still have dependencies from the factory/singleton components in the outer container injected.) The result of this approach looks something like:
+如果你想要指定的更严格一些, 可以使用每个匹配的生命周期作用域一个实例 (见上) 在内在生命周期中和线程作用域的组件连通 (它们仍然可以拥有外部容器注入的工厂/单例组件的依赖.) 这样做的结果如下:
 
 .. image:: threadedcontainers.png
 
-The 'contexts' in the diagram are the containers created with ``BeginLifetimeScope()``.
+图表中的 'contexts' 指的是用 ``BeginLifetimeScope()`` 创建的容器.
