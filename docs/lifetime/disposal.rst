@@ -1,14 +1,14 @@
 ========
-Disposal
+释放
 ========
-Resources obtained within a unit of work - database connections, transactions, authenticated sessions, file handles etc. - should be disposed of when that work is complete. .NET provides the ``IDisposable`` interface to aid in this more deterministic notion of disposal.
+一个工作单元中包含的资源 - 数据库连接, 事务, 认证sessions, 文件句柄等. - 当工作完成时应该被释放. .NET 提供了 ``IDisposable`` 接口来帮助释放的概念更加地明确.
 
-Some IoC containers need to be told explicitly to dispose of a particular instance, through a method like ``ReleaseInstance()``. This makes it very difficult to guarantee that the correct disposal semantics are used.
+如果想要释放特定对象的, 一些 IoC 容器需要被显式地告知, 通过类似 ``ReleaseInstance()`` 这样的方法. 这样就使得保证使用正确的释放语法变得非常困难.
 
-* Switching implementations from a non-disposable to a disposable component can mean modifying client code.
-* Client code that may have ignored disposal when using shared instances will almost certainly fail to clean up when switched to non-shared instances.
+* 从实现非可释放代码转换到实现可释放组件意味着需要修改客户端代码.
+* 本来客户端代码使用共享实例时也许已经忽略了对象释放, 当切换到非共享实例时基本上也不会去做释放/清理.
 
-:doc:`Autofac solves these problems using lifetime scopes <index>` as a way of disposing of all of the components created during a unit of work.
+:doc:`Autofac使用生命周期作用域解决了这些问题 <index>` , 作为一种在工作单元中释放所有已创建组件的方法.
 
 .. sourcecode:: csharp
 
@@ -21,21 +21,21 @@ Some IoC containers need to be told explicitly to dispose of a particular instan
       // itself is disposed.
     }
 
-A lifetime scope is created when a unit of work begins, and when that unit of work is complete the nested container can dispose all of the instances within it that are out of scope.
+当工作单元开始时生命周期作用域被创建, 当工作单元完成时, 嵌套的容器可以释放其中所有的实例.
 
-Registering Components
+注册组件
 ======================
 
-Autofac can automatically dispose of some components, but you have the ability to manually specify a disposal mechanism, too.
+Autofac可以自动释放一些组件, 但你也可以手动指定释放机制.
 
-Components must be registered as ``InstancePerDependency()`` (the default) or some variation of ``InstancePerLifetimeScope()`` (e.g., ``InstancePerMatchingLifetimeScope()`` or ``InstancePerRequest()``).
+组件注册为 ``InstancePerDependency()`` (默认) 或者 ``InstancePerLifetimeScope()`` 的一些变形 (如, ``InstancePerMatchingLifetimeScope()`` 或 ``InstancePerRequest()``).
 
-If you have singleton components (registered as ``SingleInstance()``) **they will live for the life of the container**. Since container lifetimes are usually the application lifetime, it means the component won't be disposed until the end of the application.
+如果你有一个单例组件 (注册为 ``SingleInstance()``) **他们将会存在于容器的整个生命周期内**. 由于容器的生命周期通常就是应用的生命周期, 这就意味着组件直到应用结束将不会被释放.
 
-Automatic Disposal
+自动释放
 ------------------
 
-To take advantage of automatic deterministic disposal, your component must implement ``IDisposable``. You can then register your component as needed and at the end of each lifetime scope in which the component is resolved, the ``Dispose()`` method on the component will be called.
+为了充分利用自动的明确性释放, 你的组件必须实现 ``IDisposable``. 你可以按需注册你的组件然后在组件解析的生命周期的结尾, 组件的 ``Dispose()`` 方法将会被调用.
 
 .. sourcecode:: csharp
 
@@ -46,10 +46,10 @@ To take advantage of automatic deterministic disposal, your component must imple
     // the component, and dispose of the scopes.
     // Your component will be disposed with the scope.
 
-Specified Disposal
+特定释放
 ------------------
 
-If your component doesn't implement ``IDisposable`` but still requires some cleanup at the end of a lifetime scope, you can use :doc:`the OnRelease lifetime event <events>`.
+如果你的组件不实现 ``IDisposable`` 但仍然需要在生命周期作用域的结尾完成一些释放工作, 你可以使用 :doc:`释放生命周期事件 <events>`.
 
 .. sourcecode:: csharp
 
@@ -62,20 +62,20 @@ If your component doesn't implement ``IDisposable`` but still requires some clea
     // Your component's "CleanUp()" method will be
     // called when the scope is disposed.
 
-Note that ``OnRelease()`` overrides the default handling of ``IDisposable.Dispose()``. If your component both implements ``IDisposable`` *and* requires some other cleanup method, you will either need to manually call ``Dispose()`` in ``OnRelease()`` or you will need to update your class so the cleanup method gets called from inside ``Dispose()``.
+注意 ``OnRelease()`` 重写 ``IDisposable.Dispose()`` 的处理逻辑. 如果你的组件同时实现 ``IDisposable`` *并且* 需要一些其他的释放方法, 你需要手动在 ``OnRelease()`` 中调用 ``Dispose()`` 或者你可以更新你的类让释放方法在 ``Dispose()`` 内部被调用.
 
-Disabling Disposal
+禁止释放
 ------------------
 
-Components are owned by the container by default and will be disposed by it when appropriate. To disable this, register a component as having external ownership:
+组件默认被容器拥有并且会在适当的时候被它释放掉. 想要禁止这个行为, 注册组件为拥有外部所有权:
 
 .. sourcecode:: csharp
 
     builder.RegisterType<SomeComponent>().ExternallyOwned();
 
-The container will never call ``Dispose()`` on an object registered with external ownership. It is up to you to dispose of components registered in this fashion.
+容器不会调用以外部所有注册的对象的 ``Dispose()`` 方法. 以这种方式注册的组件何时释放取决于你.
 
-Another alternative for disabling disposal is to use the :doc:`implicit relationship <../resolve/relationships>` ``Owned<T>`` and :doc:`owned instances <../advanced/owned-instances>`. In this case, rather than putting a dependency ``T`` in your consuming code, you put a dependency on ``Owned<T>``. Your consuming code will then be responsible for disposal.
+另一种可以禁用释放的方法是使用 :doc:`隐式关系类型 <../resolve/relationships>` ``Owned<T>`` 和 :doc:`被拥有的实例 <../advanced/owned-instances>`. 这种情况下, 在你的消费代码中并不是传入一个依赖 ``T`` , 而是一个依赖 ``Owned<T>``. 你的消费代码需要负责释放.
 
 .. sourcecode:: csharp
 
@@ -99,12 +99,12 @@ Another alternative for disabling disposal is to use the :doc:`implicit relation
       }
     }
 
-You can read more about ``Owned<T>`` :doc:`in the owned instances topic <../advanced/owned-instances>`.
+你可以在 :doc:`被拥有的实例章节 <../advanced/owned-instances>` 阅读更多关于 ``Owned<T>`` 的内容.
 
-Resolve Components from Lifetime Scopes
+从生命周期作用域解析组件
 =======================================
 
-Lifetime scopes are created by calling ``BeginLifetimeScope()``. The simplest way is in a ``using`` block. Use the lifetime scopes to resolve your components and then dispose of the scope when the unit of work is complete.
+生命周期作用域通过调用 ``BeginLifetimeScope()`` 创建. 最简单的是在 ``using`` 块中. 使用生命周期作用域来解析你的组件然后当工作单元完成后释放作用域.
 
 .. sourcecode:: csharp
 
@@ -115,18 +115,18 @@ Lifetime scopes are created by calling ``BeginLifetimeScope()``. The simplest wa
       // be disposed of when the using block completes
     }
 
-Note that with :doc:`Autofac integration libraries <../integration/index>` standard unit-of-work lifetime scopes will be created and disposed for you automatically. For example, in Autofac's :doc:`ASP.NET MVC integration <../integration/mvc>`, a lifetime scope will be created for you at the beginning of a web request and all components will generally be resolved from there. At the end of the web request, the scope will automatically be disposed - no additional scope creation is required on your part. If you are using :doc:`one of the integration libraries <../integration/index>`, you should be aware of what automatically-created scopes are available for you.
+注意使用 :doc:`Autofac 集成库 <../integration/index>` , 基础的工作单元生命周期作用域将会被创建并且自动替你释放. 例如,  Autofac's :doc:`ASP.NET MVC 集成 <../integration/mvc>`, 一个生命周期作用域将会在web请求开始时被创建然后所有的组件将会从中解析. 在请求结束时, 作用域会被自动释放 - 你自己不需要额外创建作用域. 如果你使用 :doc:`这些集成库的其中之一 <../integration/index>`, 你应该清楚它为你自动创建了什么作用域.
 
-You can :doc:`read more about creating lifetime scopes here <working-with-scopes>`.
+你可以 :doc:`阅读更多关于创建生命周期作用域的内容 <working-with-scopes>`.
 
-Child Scopes are NOT Automatically Disposed
+子作用域不会被自动释放
 ===========================================
 
-While lifetime scopes themselves implement ``IDisposable``, the lifetime scopes that you create are **not automatically disposed for you.** If you create a lifetime scope, you are responsible for calling ``Dispose()`` on it to clean it up and trigger the automatic disposal of components. This is done easily with a ``using`` statement, but if you create a scope without a ``using``, don't forget to dispose of it when you're done with it.
+如果生命周期作用域本身实现 ``IDisposable``, 你创建的生命周期作用域 **不会自动地释放.** 如果你创建了一个生命周期作用域, 你需要负责调用它的 ``Dispose()`` 来释放资源并且触发组件的自动释放. 通过 ``using`` 块可以轻松完成这一步, 但如果你没有使用 ``using`` 创建作用域, 当你不再使用时别忘了释放它.
 
-It's important to distinguish between scopes **you create** and scopes the **integration libraries create for you**. You don't have to worry about managing integration scopes (like the ASP.NET request scope) - those will be done for you. However, if you manually create your own scope, you will be responsible for cleaning it up.
+区分 **你创建的** 生命周期作用域和 **集成库替你创建** 的生命周期作用域是非常重要的. 你不用担心管理集成的作用域 (如 ASP.NET 请求作用域) - 这些会自动完成. 然而, 如果你手动创建了你自己的作用域, 你需要负责它的释放.
 
-Advanced Hierarchies
+更复杂的层级结构
 ====================
 
-The simplest and most advisable resource management scenario, demonstrated above, is two-tiered: there is a single 'root' container and a lifetime scope is created from this for each unit of work. It is possible to create more complex hierarchies of containers and components, however, using :doc:`tagged lifetime scopes <working-with-scopes>`.
+最简单且最推荐的资源管理方案, 综上, 是两层: 一个 '根' 容器和一个为了各个工作单元而从中创建的生命周期作用域. 如果有可能要使用更复杂的容器和组件层级结构, 使用 :doc:`标记的生命周期作用域 <working-with-scopes>`.
