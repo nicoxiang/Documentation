@@ -1,45 +1,45 @@
 ====================
-Captive Dependencies
+被囚禁依赖
 ====================
 
-A "captive dependency" occurs when a component intended to live for a *short* amount of time gets held by a component that lives for a *long* time. `This blog article from Mark Seemann <http://blog.ploeh.dk/2014/06/02/captive-dependency/>`_ does a good job of explaining the concept.
+当一个想要存在 *短* 时间的组件被另一个存在 *长* 时间的组件持有过长时间时, "被囚禁依赖" 就发生了. `这篇 Mark Seemann 的博客 <http://blog.ploeh.dk/2014/06/02/captive-dependency/>`_ 很好地阐述了这个概念.
 
-**Autofac does not necessarily prevent you from creating captive dependencies.** You may find times when you get a resolution exception because of the way a captive is set up, but you won't always. Stopping captive dependencies is the responsibility of the developer.
+**Autofac不一定会阻止你创建被囚禁依赖.** 你有时候会发现你会因为囚禁的发生而得到一个解析异常, 但不会总是这样. 阻止被囚禁依赖是开发者的责任.
 
-General Rule
+一般的准则
 ============
 
-The general rule to avoid captive dependencies:
+避免被囚禁依赖一般的准则:
 
-**The lifetime of the consuming component should be less than or equal to the lifetime of the service being consumed.**
+**消费组件的生命周期应该小于或等于服务被消费的生命周期.**
 
-Basically, don't let a singleton take an instance-per-request dependency because it'll be held too long.
+基本地来说, 不能允许传入一个每个请求一个实例类型的依赖到一个单例中因为它将被持有太长时间了.
 
-Simple Example
+简单示例
 ==============
 
-Say you have a web application that uses some information from the inbound request to determine the right database to which a connection should be made. You might have the following components:
+假设你有一个 web 应用, 使用一些传入请求中的信息来决定应该连接到哪个正确的数据库. 你应该会有以下组件:
 
-- A *repository* that takes in the current request and a database connection factory.
-- The *current request* like an ``HttpContext`` that could be used to help decide the business logic.
-- The *database connection factory* that takes some sort of parameter and returns the right database connection.
+- 一个传入当前请求和一个数据库连接工厂的 *仓库(repository)* .
+- 类似 ``HttpContext`` 的 *current request* ,可以被用于决定业务逻辑.
+- *数据库连接工厂* , 接受一系列参数并返回正确的数据库连接.
 
-In this example, consider the :doc:`lifetime scope <instance-scope>` that you'd want to use for each component. The current request context is an obvious one - you want *instance-per-request*. What about the others?
+在这个示例中, 考虑下每个组件的 :doc:`生命周期作用域 <instance-scope>` . 明显是当前的请求上下文 - 你会选 *每个请求一个实例*. 那其他的呢?
 
-For the *repository*, say you choose "singleton." A singleton gets created one time and cached for the life of the application. If you choose "singleton," the request context will be passed in and held for the life of the application - even after that current request is over, the stale request context will be held. The repository is long-lived, but holds on to a shorter-life component. **That's a captive dependency.**
+对于 *仓库* 来说, 假设你选择 "单例" . 一个单例只创建一次并会缓存在应用的整个生存期内. 如果你选择 "单例" , 请求上下文会被传入并被在应用的整个生存期内一直被持有着 - 即使当前请求已经结束, 旧的请求依然会被持有. 仓库是长期的, 但一直持有着一个更小生存期的组件. **这就是被囚禁依赖.**
 
-However, say you make the repository "instance-per-request" - now it lives as long as the current request and no longer. That's exactly as long as the request context it needs, so now it's not a captive. Both the repository and the request context will be released at the same time (at the end of the request) and everything will be fine.
+然而, 假设你让仓库成为 "每个请求一个实例" - 那么现在它将和当前请求存在一样长的时间并且不会超过. 和它需要的请求上下文一样, 因此现在不是被囚禁的. 仓库和请求上下文将会在同一时间 (请求结尾) 被释放, 万事大吉.
 
-Taking it a step further, say you make the repository "instance-per-dependency" so you get a new one every time. This is still OK because it is intended to live for a *shorter* time than the current request. It won't hold onto the request for too long, so there's no captive.
+再进一步地, 假设你让仓库成为 "每个依赖一个实例" , 你每次将会得到一个新的实例. 这样也是OK的因为它想要存在比当前请求 *更短* 的时间. 它不会持有请求过长时间, 所以也不是被囚禁的.
 
-The database connection factory goes through a similar thought process, but may have some different considerations. Maybe the factory is expensive to instantiate or needs to maintain some internal state to work correctly. You may not want it to be "instance-per-request" or "instance-per-dependency." You may actually need it to be a singleton.
+数据库连接工厂的思考过程类似, 但会有些许不同. 因为也许工厂实例化比较耗资源或者需要维护一些内在的状态来保持正常运作. 你应该不会希望它是 "每个请求一个实例" 或 "每个依赖一个实例." 实际上你应该需要它是一个单例.
 
-**It's OK for shorter-lived dependencies to take on longer-lived dependencies.** If your repository is "instance-per-request" or "instance-per-dependency" you'll still be good. The database connection factory intentionally lives longer.
+**短生存期的依赖来持有更长生存期的依赖是没问题的.** 如果你的仓库是 "每个请求一个实例" 或 "每个依赖一个实例" , 这样依然可以. 数据库连接工厂是有意存在更长时间的.
 
-Code Example
+代码示例
 ============
 
-Here's a unit test that shows what it looks like to forcibly create a captive dependency. In this example, a "rule manager" is used to deal with a set of "rules" that get used through an application.
+这里有个单元测试展示了强制创建一个被囚禁依赖是什么样的. 示例中, "rule manager" 用于处理一系列被用在应用中的 "rules" .
 
 .. sourcecode:: csharp
 
@@ -98,9 +98,9 @@ Here's a unit test that shows what it looks like to forcibly create a captive de
             }
         }
 
-Note the example above doesn't directly show it, but if you were to dynamically add registrations for rules in the ``container.BeginLifetimeScope()`` call, those dynamic registrations *would not be included* in the resolved ``RuleManager``. The ``RuleManager``, being a singleton, gets resolved from the root container where the dynamically added registrations don't exist.
+注意上面的示例并没有直接地展示, 但是如果你想要在调用 ``container.BeginLifetimeScope()`` 时动态地为这些rules添加注册, 这些动态的注册 *将不会被包含* 在被解析的 ``RuleManager`` 中. ``RuleManager``, 作为一个单例, 是从根容器中被解析的, 这时动态添加的注册还不存在.
 
-Another code example shows how you may get an exception when creating a captive dependency that ties incorrectly to a child lifetime scope.
+下面的另一个示例展示了, 当创建一个错误绑定到一个子生命周期作用域的被囚禁依赖时, 你将得到一个异常.
 
 .. sourcecode:: csharp
 
@@ -160,11 +160,11 @@ Another code example shows how you may get an exception when creating a captive 
         }
 
 
-Exception to the Rule
+例外
 =====================
 
-Given the developer of the application is ultimately responsible for determining whether captives are OK or not, the developer may determine that it's acceptable for a singleton, for example, to take an "instance-per-dependency" service.
+应用的开发者有责任决定是否被囚禁依赖是否是可以接受的, 开发者也许会决定例如, 让单例去接受传入一个 "每个依赖一个实例" 服务, 是能够接受的.
 
-For example, maybe you have a caching class that is intentionally set up to cache things for only the lifetime of the consuming component. If the consumer is a singleton, the cache can be used to store things for the whole app lifetime; if the consumer is "instance-per-request" then it only stores data for a single web request. In a case like that, you may end up with a longer-lived component taking a dependency on a shorter-lived component *intentionally*.
+例如, 也许你有一个缓存类, 用于创建后有意地只缓存消费组件的这段生命周期内的东西. 如果消费者是单例的, 缓存能被用于在应用整个生命周期内存储数据; 如果消费者是 "每个请求一个实例" 那么它只在单个web请求内存储数据. 在这样的示例中, 你也许会 *有意地* 让一个长生存期的组件传入依赖到一个更短生存期的组件中.
 
-This is acceptable as long as the application developer understands the consequences of setting things up with such lifetimes. Which is to say, if you're going to do it, do it intentionally rather than accidentally.
+这是可以接受的, 只要应用的开发者理解用这样的生命周期创建对象的后果. 也就是说, 如果你打算这么做, 要是有意的而不是无意的.
