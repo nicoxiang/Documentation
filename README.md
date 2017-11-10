@@ -75,7 +75,7 @@ The contents of `artifacts\doc\Website` is what gets copied to the `autofac.gith
   * Instance Scope ![Progress](http://progressed.io/bar/100)
   * Captive Dependencies ![Progress](http://progressed.io/bar/100)
   * Disposal ![Progress](http://progressed.io/bar/100)
-  * Lifetime Events
+  * Lifetime Events ![Progress](http://progressed.io/bar/100)
   * Running Code at Startup 
   
 * Configuration  
