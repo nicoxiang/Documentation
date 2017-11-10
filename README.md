@@ -69,14 +69,7 @@ The contents of `artifacts\doc\Website` is what gets copied to the `autofac.gith
   * Passing Parameters to Resolve
   * Implicit Relationship Types ![Progress](http://progressed.io/bar/70)
 
-* Controlling Scope and Lifetime
-  * index ![Progress](http://progressed.io/bar/100)
-  * Working with Lifetime Scopes ![Progress](http://progressed.io/bar/100)
-  * Instance Scope ![Progress](http://progressed.io/bar/100)
-  * Captive Dependencies ![Progress](http://progressed.io/bar/100)
-  * Disposal ![Progress](http://progressed.io/bar/100)
-  * Lifetime Events ![Progress](http://progressed.io/bar/100)
-  * Running Code at Startup 
+* Controlling Scope and Lifetime ![Progress](http://progressed.io/bar/100)
   
 * Configuration  
   * JSON/XML Configuration
