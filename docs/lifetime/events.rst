@@ -1,22 +1,22 @@
 ===============
-Lifetime Events
+生命周期事件
 ===============
 
-Autofac exposes events that can be hooked at various stages in instance lifecycle. These are subscribed to during component registration (or alternatively by attaching to the ``IComponentRegistration`` interface.
+Autofac暴露了一些能在实例生命周期多个阶段拦截到的事件. 这些事件在组件注册时被订阅 (或者也可以通过附加到 ``IComponentRegistration`` 接口.
 
 .. contents::
   :local:
 
-OnActivating
+激活时
 ============
 
-The ``OnActivating`` event is raised before a component is used. Here you can:
+``激活时`` 事件在组件被使用前触发. 你可以:
 
-* Switch the instance for another or wrap it in a proxy
-* :doc:`Do property injection or method injection <../register/prop-method-injection>`
-* Perform other initialization tasks
+* 修改实例成另一个或者把实例包裹在代理对象中
+* :doc:`进行属性注入或方法注入 <../register/prop-method-injection>`
+* 进行其他的初始化工作
 
-In some cases, such as with ``RegisterType<T>()``, the concrete type registered is used for type resolution and used by ``ActivatingEventArgs``. For example, the following will fail with a class cast exception:
+在一些情况下, 比如用 ``RegisterType<T>()``, 注册的具体类型会被用于类型解析并被 ``ActivatingEventArgs`` 使用. 例如, 下面的实例将会抛一个类型转换的异常:
 
 .. sourcecode:: csharp
 
@@ -24,7 +24,7 @@ In some cases, such as with ``RegisterType<T>()``, the concrete type registered 
            .As<TInterface>()          // to type TConcrete
            .OnActivating(e => e.ReplaceInstance(new TInterfaceSubclass()));
 
-A simple workaround is to do the registration in two steps:
+简单的解决方案是通过两步完成注册:
 
 .. sourcecode:: csharp
 
@@ -32,12 +32,12 @@ A simple workaround is to do the registration in two steps:
     builder.Register<TInterface>(c => c.Resolve<TConcrete>())
            .OnActivating(e => e.ReplaceInstance(new TInterfaceSubclass()));
 
-OnActivated
+激活后
 ===========
 
-The ``OnActivated`` event is raised once a component is fully constructed. Here you can perform application-level tasks that depend on the component being fully constructed - *these should be rare*.
+``激活后`` 事件在组件完全构造完成后触发. 你可以完成一些应用级别的需要基于组件已构建完成为前提的任务 - *这种情况较少*.
 
-OnRelease
+释放时
 =========
 
-The ``OnRelease`` event replaces :doc:`the standard cleanup behavior for a component <disposal>`. The standard cleanup behavior of components that implement ``IDisposable`` and that are not marked as ``ExternallyOwned()`` is to call the ``Dispose()`` method. The standard cleanup behavior for components that do not implement ``IDisposable`` or are marked as externally owned is a no-op - to do nothing. ``OnRelease`` overrides this behavior with the provided implementation.
+``释放时`` 事件替换了 :doc:`原始的组件释放行为 <disposal>`. 组件需要实现 ``IDisposable`` 接口且不是被标记为 ``ExternallyOwned()`` , 它的原始的组件释放行为会调用 ``Dispose()`` 方法. 而未实现 ``IDisposable`` 接口或是被标记为外部拥有的组件,  它的原始的组件释放行为不会做任何事. ``OnRelease`` 用提供的实现方法替换这一释放行为.
