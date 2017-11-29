@@ -1,73 +1,73 @@
 =======
-Modules
+模块
 =======
 
-Introduction
+介绍
 ============
 
-IoC uses :doc:`components <../glossary>` as the basic building blocks of an application. Providing access to the constructor parameters and properties of components is very commonly used as a means to achieve :doc:`deployment-time configuration <xml>`.
+IoC 使用 :doc:`组件 <../glossary>` 作为应用的基础构件. 为了达到 :doc:`部署时配置 <xml>` 的目的, 提供访问组件的构造方法参数和属性的能力是一种非常常用的做法.
 
-This is generally a dubious practice for the following reasons:
+这种做法是值得怀疑的, 原因如下:
 
- * **Constructors can change**: Changes to the constructor signature or properties of a component can break deployed ``App.config`` files - these problems can appear very late in the development process.
- * **JSON/XML gets hard to maintain**: Configuration files for large numbers of components can become unwieldy to maintain.
- * **"Code" starts showing up in configuration**: Exposing the properties and constructor parameters of classes is an unpleasant breach of the 'encapsulation' of the application's internals - these details don't belong in configuration files.
+ * **构造方法是可以改变的**: 改变组件的构造方法参数和属性将会破坏已部署的 ``App.config`` 文件 - 这些问题将会在开发进程的后期体现出来.
+ * **JSON/XML 会变得不易维护**: 大量组件的配置文件会变得不便维护.
+ * **"代码" 开始出现在配置中**: 暴露组件的构造方法参数和属性违背了应用内部 '封装' 的理念 - 这些细节的东西不应存在于配置文件中.
 
-This is where modules can help.
+这时就要用到模块.
 
-**A module is a small class that can be used to bundle up a set of related components behind a 'facade' to simplify configuration and deployment.** The module exposes a deliberate, restricted set of configuration parameters that can vary independently of the components used to implement the module.
+**模块能简化配置和发布, 而说白了, 它就是一个能用于绑定一系列相关组件的类.** 模块暴露了一组深思熟虑的, 有限制的配置参数, 这些参数可以独立于实现模块的组件而单独变化.
 
-The components within a module still make use dependencies at the component/service level to access components from other modules.
+模块中的组件仍然使用在组件/服务级别的依赖来从其他模块访问组件.
 
-**Modules do not, themselves, go through dependency injection.** They are used to configure the container, they are not actually registered and resolved like other components. If your module takes a constructor parameter, for example, you need to pass that in yourself. It won't come from the container.
+**模块本身不通过依赖注入.** 它们是用于配置容器的, 事实上不会像其他组件那样被注册和解析. 例如, 如果你的模块接收一个构造方法参数, 你需要自己传入它. 它不能来自容器中.
 
-Advantages of Modules
+模块的优势
 =====================
 
-Decreased Configuration Complexity
+降低配置复杂度
 ----------------------------------
 
-When configuring an application by IoC it is often necessary to set the parameters spread between multiple components. Modules group related configuration items into one place to reduce the burden of looking up the correct component for a setting.
+用 IoC 配置应用时, 通常要给一些参数赋值, 而这些参数在不同的组件之间传递. 模块把相关的配置项分组到一个地方以降低为了赋值寻找正确组件的压力.
 
-The implementer of a module determines how the module's configuration parameters map to the properties and constructor parameters of the components inside.
+模块的实现决定了在内部模块的配置参数如何映射组件的构造方法参数和属性.
 
-Configuration Parameters are Explicit
+配置参数是显式的
 -------------------------------------
 
-Configuring an application directly through its components creates a large surface area that will need to be considered when upgrading the application. When it is possible to set potentially any property of any class through a configuration file that will differ at every site, refactoring is no longer safe.
+直接通过组件配置的应用在升级时会需要考虑很多方面. 因为我们有可能通过一个每个网站都不同的配置文件来给任何类的任何属性设值, 所以重构将会不再安全.
 
-Creating modules limits the configuration parameters that a user can configure, and makes it explicit to the maintenance programmer which parameters these are.
+创建模块限制了用户可配置的配置参数, 使得对于维护的程序员来说这些参数变得是显式的.
 
-You can also avoid a trade-off between what makes a good program element and what makes a good configuration parameter.
+你也可以避免在一个好的程序元素和一个好的配置参数之间的权衡.
 
-Abstraction from the Internal Application Architecture
+对内部应用架构的抽象
 ------------------------------------------------------
 
-Configuring an application through its components means that the configuration needs to differ depending on things like, for example, the use of an ``enum`` vs. creation of strategy classes. Using modules hides these details of the application's structure, keeping configuration succinct.
+通过组件配置应用意味着配置会根据这些东西不同, 例如, 使用 ``enum`` vs. 创建策略类(strategy classes). 使用模块隐藏了应用架构的这些细节, 保证了配置文件简洁.
 
-Better Type Safety
+更加的类型安全
 ------------------
 
-A small reduction in type safety will always exist when the classes making up the application can vary based on deployment. Registering large numbers of components through XML configuration, however, exacerbates this problem.
+当组成应用的类会根据部署环境变得多样的时候, 类型安全也会有所下降. 而通过XML配置文件注册大量的组件, 反而也会加剧这个问题.
 
-Modules are constructed programmatically, so all of the component registration logic within them can be checked at compile time.
+模块以编程的方式构建, 因此里面所有的组件注册逻辑都能在编译时期被检查到.
 
-Dynamic Configuration
+动态注册
 ---------------------
 
-Configuring components within modules is dynamic: the behaviour of a module can vary based on the runtime environment. This is hard, if not impossible, with purely component-based configuration.
+在模块中配置的组件是动态的: 模块的行为基于运行时环境而不一样. 而如果用纯粹的基于组件的配置, 即使并非不可能, 这也并非易事.
 
-Advanced Extensions
+高级拓展
 -------------------
 
-Modules can be used for more than just simple type registrations - you can also attach to component resolution events and extend how parameters are resolved or perform other extensions. The :doc:`log4net integration module example <../examples/log4net>` shows one such module.
+模块不仅仅可以用于简单的类型注册 - 你也可以附加到组件解析事件和扩展参数如何解析或者执行些其他的拓展. :doc:`log4net 集成模块示例 <../examples/log4net>` 展示了这样的一个模块.
 
-Example
+示例
 =======
 
-In Autofac, modules implement the ``Autofac.Core.IModule`` interface. Generally they will derive from the ``Autofac.Module`` abstract class.
+Autofac中, 模块实现 ``Autofac.Core.IModule`` 接口. 通常继承于 ``Autofac.Module`` 抽象类.
 
-This module provides the ``IVehicle`` service:
+这个模块提供了 ``IVehicle`` 服务:
 
 .. sourcecode:: csharp
 
@@ -86,10 +86,10 @@ This module provides the ``IVehicle`` service:
       }
     }
 
-Encapsulated Configuration
+封装配置
 --------------------------
 
-Our ``CarTransportModule`` provides the ``ObeySpeedLimit`` configuration parameter without exposing the fact that this is implemented by choosing between a sane or a crazy driver. Clients using the module can use it by declaring their intentions:
+我们的 ``CarTransportModule`` 提供了 ``ObeySpeedLimit`` 配置参数, 而没有暴露它的实现其实是在理智的(sane)和疯狂的(carzy)司机之间选择的. 使用模块的客户端可以通过这样做来表明它的意图:
 
 .. sourcecode:: csharp
 
@@ -97,7 +97,7 @@ Our ``CarTransportModule`` provides the ``ObeySpeedLimit`` configuration paramet
         ObeySpeedLimit = true
     });
 
-or in ``Microsoft.Extensions.Configuration`` :doc:`configuration format <xml>`:
+或以 ``Microsoft.Extensions.Configuration`` :doc:`配置格式 <xml>`:
 
 .. sourcecode:: json
 
@@ -110,23 +110,21 @@ or in ``Microsoft.Extensions.Configuration`` :doc:`configuration format <xml>`:
       }]
     }
 
-This is valuable because the implementation of the module can vary without a flow on effect. That's the idea of encapsulation, after all.
+这非常有用因为模块的实现可以变化同时无需连锁变动. 毕竟, 这就是封装的思想.
 
-Flexibility to Override
+灵活的重写
 -----------------------
 
-Although clients of the ``CarTransportModule`` are probably primarily concerned with the ``IVehicle`` service, the module registers its ``IDriver`` dependency with the container as well. This ensures that the configuration is still able to be overridden at deployment time in the same way as if the components that make up the module had been registered independently.
+虽然 ``CarTransportModule`` 的客户端主要关心 ``IVehicle`` 服务, 但模块也用容器注册 ``IDriver`` 依赖. 这确保了配置仍然能在部署时期被重写因为组成模块的组件是被独立注册的.
 
-It is a 'best practice' when using Autofac to add any XML configuration *after* programmatic configuration, e.g.:
+使用Autofac时在以编程方式配置 *后* 添加XML配置是一种 '最佳做法' , 如:
 
 .. sourcecode:: csharp
 
     builder.RegisterModule(new CarTransportModule());
     builder.RegisterModule(new ConfigurationSettingsReader());
 
-In this way, 'emergency' overrides can be made in :doc:`a configuration file <xml>`:
-
-.. sourcecode:: xml
+这样的话, '紧急情况' 重写可以在 :doc:`配置文件 <xml>` 中完成:
 
 .. sourcecode:: json
 
@@ -139,14 +137,14 @@ In this way, 'emergency' overrides can be made in :doc:`a configuration file <xm
       }]
     }
 
-So, modules increase encapsulation but don't preclude you from tinkering with their innards if you have to.
+因此, 模块增加了封装性但不阻止你调整内部结构, 如果必须的话.
 
-Adapting to the Deployment Environment
+适应部署环境
 ======================================
 
-Modules can be dynamic - that is, they can configure themselves to their execution environment.
+模块可以是动态的 - 这就意味着, 它们可以根据执行环境进行自我配制.
 
-When a module is loaded, it can do nifty things like check the environment:
+当模块Load的时候, 它可以做一些类似检查环境这样很棒的事:
 
 .. sourcecode:: csharp
 
@@ -158,11 +156,11 @@ When a module is loaded, it can do nifty things like check the environment:
         RegisterWindowsPathFormatter(builder);
     }
 
-Common Use Cases for Modules
+模块常用场景
 ============================
 
- * Configure related services that provide a subsystem, e.g. data access with NHibernate
- * Package optional application features as 'plug-ins'
- * Provide pre-built packages for integration with a system, e.g. an accounting system
- * Register a number of similar services that are often used together, e.g. a set of file format converters
- * New or customised mechanisms for configuring the container, e.g. JSON/XML configuration is implemented using a module; configuration using attributes could be added this way
+ * 配置相关的服务以提供一个子系统, 如, NHibernate数据访问
+ * 打包的可选应用功能 '插件'
+ * 提供集成进系统的预构建的包, 如, 一个账户系统
+ * 把常用的一组类似的服务注册在一起, 如, 一组 file format converters
+ * 新建或自定义容器配置的机制, e.g. JSON/XML配置是用模块实现的; 使用特性配置也可以通过这种方式添加

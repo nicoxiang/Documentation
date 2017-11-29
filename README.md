@@ -73,7 +73,7 @@ The contents of `artifacts\doc\Website` is what gets copied to the `autofac.gith
   
 * Configuration  
   * JSON/XML Configuration
-  * Modules
+  * Modules ![Progress](http://progressed.io/bar/100)
   
 * Application Integration
   * ASP.NET
