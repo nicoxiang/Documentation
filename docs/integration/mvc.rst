@@ -2,20 +2,20 @@
 MVC
 ===
 
-Autofac is always kept up to date to support the latest version of ASP.NET MVC, so documentation is also kept up with the latest. Generally speaking, the integration remains fairly consistent across versions.
+Autofac一直保持更新以支持最新版本的ASP.NET MVC, 因此文档也是保持最新. 总的来说, 集成在跨版本之间依然是相当一致的.
 
-MVC integration requires the `Autofac.Mvc5 NuGet package <http://www.nuget.org/packages/Autofac.Mvc5/>`_.
+MVC集成需要 `Autofac.Mvc5 NuGet package <http://www.nuget.org/packages/Autofac.Mvc5/>`_.
 
-MVC integration provides dependency injection integration for controllers, model binders, action filters, and views. It also adds :doc:`per-request lifetime support <../faq/per-request-scope>`.
+MVC集成提供了controllers, model binders, action filters, 和views的依赖注入. 它同样添加 :doc:`每个请求生命周期支持 <../faq/per-request-scope>`.
 
-**This page explains ASP.NET classic MVC integration.** If you are using ASP.NET Core, :doc:`see the ASP.NET Core integration page <aspnetcore>`.
+**本章节解释了ASP.NET classic MVC集成.** 如果你使用ASP.NET Core, :doc:`见ASP.NET Core集成章节 <aspnetcore>`.
 
 .. contents::
   :local:
 
-Quick Start
+入门
 ===========
-To get Autofac integrated with MVC you need to reference the MVC integration NuGet package, register your controllers, and set the dependency resolver. You can optionally enable other features as well.
+为了把Autofac集成进MVC你需要引用 MVC integration NuGet package, 注册控制器, 设置依赖解析器(Dependency Resolver). 你可以选择性地启用其他功能.
 
 .. sourcecode:: csharp
 
@@ -48,12 +48,12 @@ To get Autofac integrated with MVC you need to reference the MVC integration NuG
       DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
     }
 
-The sections below go into further detail about what each of these features do and how to use them.
+下面的内容进一步详细解释了其他功能和如何使用它们.
 
-Register Controllers
+注册控制器
 ====================
 
-At application startup, while building your Autofac container, you should register your MVC controllers and their dependencies. This typically happens in an OWIN startup class or in the ``Application_Start`` method in ``Global.asax``.
+在应用startup的地方, 当你创建Autofac容器时, 你应该注册你的MVC控制器和它们的依赖. 这通常发生在OWIN startup类或在 ``Global.asax`` 的 ``Application_Start`` 方法中.
 
 .. sourcecode:: csharp
 
@@ -65,31 +65,31 @@ At application startup, while building your Autofac container, you should regist
     // ...or you can register individual controlllers manually.
     builder.RegisterType<HomeController>().InstancePerRequest();
 
-Note that ASP.NET MVC requests controllers by their concrete types, so registering them ``As<IController>()`` is incorrect. Also, if you register controllers manually and choose to specify lifetimes, you must register them as ``InstancePerDependency()`` or ``InstancePerRequest()`` - **ASP.NET MVC will throw an exception if you try to reuse a controller instance for multiple requests**.
+注意ASP.NET MVC通过控制器具体类型来判断请求哪个控制器, 因此把它们以 ``As<IController>()`` 注册是不正确的. 同时, 如果你人为注册控制器并且选择特定的生命周期, 你必须以 ``InstancePerDependency()`` 或 ``InstancePerRequest()`` 注册 - **如果你尝试对多个请求复用同一个控制器实例, ASP.NET MVC会报错**.
 
-Set the Dependency Resolver
-===========================
+设置依赖解析器(Dependency Resolver)
+========================================
 
-After building your container pass it into a new instance of the ``AutofacDependencyResolver`` class. Use the static ``DependencyResolver.SetResolver`` method to let ASP.NET MVC know that it should locate services using the ``AutofacDependencyResolver``. This is Autofac's implementation of the ``IDependencyResolver`` interface.
+创建完你的容器后, 把它传入到一个新建的 ``AutofacDependencyResolver`` 类的实例中. 使用静态的 ``DependencyResolver.SetResolver`` 方法来让ASP.NET MVC知道它应该用 ``AutofacDependencyResolver`` 来定位服务. 这是Autofac对于 ``IDependencyResolver`` 接口的实现.
 
 .. sourcecode:: csharp
 
     var container = builder.Build();
     DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
 
-Register Model Binders
+注册Model Binders
 ======================
 
-An optional step you can take is to enable dependency injection for model binders. Similar to controllers, model binders (classes that implement ``IModelBinder``) can be registered in the container at application startup. You can do this with the ``RegisterModelBinders()`` method. You must also remember to register the ``AutofacModelBinderProvider`` using the ``RegisterModelBinderProvider()`` extension method. This is Autofac's implementation of the ``IModelBinderProvider`` interface.
+你可以选择性地允许对model binders的依赖注入. 和控制器类似, model binders (实现 ``IModelBinder`` 的类) 也可以在应用startup的地方被注册进容器. 你可以用 ``RegisterModelBinders()`` 方法来做. 千万记住要用 ``RegisterModelBinderProvider()`` 扩展方法注册 ``AutofacModelBinderProvider``. 这是Autofac对于 ``IModelBinderProvider`` 接口的实现.
 
 .. sourcecode:: csharp
 
     builder.RegisterModelBinders(Assembly.GetExecutingAssembly());
     builder.RegisterModelBinderProvider();
 
-Because the ``RegisterModelBinders()`` extension method uses assembly scanning to add the model binders you need to specify what type(s) the model binders (``IModelBinder`` implementations) are to be registered for.
+因为 ``RegisterModelBinders()`` 扩展方法使用程序集扫描来添加你需要的model binders, 来指定model binders (``IModelBinder`` 的实现) 注册了哪些类.
 
-This is done by using the ``Autofac.Integration.Mvc.ModelBinderTypeAttribute``, like so:
+而这些通过使用 ``Autofac.Integration.Mvc.ModelBinderTypeAttribute`` 完成, 如:
 
 .. sourcecode:: csharp
 
@@ -102,14 +102,14 @@ This is done by using the ``Autofac.Integration.Mvc.ModelBinderTypeAttribute``, 
       }
     }
 
-Multiple instances of the ``ModelBinderTypeAttribute`` can be added to a class if it is to be registered for multiple types.
+如果它是为了多个类型而被注册的, 那么可以给类添加多个 ``ModelBinderTypeAttribute`` 实例.
 
-Register Web Abstractions
+注册Web抽象对象
 =========================
 
-The MVC integration includes an Autofac module that will add :doc:`HTTP request lifetime scoped <../faq/per-request-scope>` registrations for the web abstraction classes. This will allow you to put the web abstraction as a dependency in your class and get the correct value injected at runtime.
+MVC集成包括一个Autofac模块, 该模块会为web抽象类添加 :doc:`HTTP请求生命周期作用域的 <../faq/per-request-scope>` 注册. 它将允许你把web抽象对象作为一个依赖放进你的类中并且在运行时注入正确的值.
 
-The following abstract classes are included:
+包括以下抽象类:
 
 * ``HttpContextBase``
 * ``HttpRequestBase``
@@ -124,22 +124,22 @@ The following abstract classes are included:
 * ``VirtualPathProvider``
 * ``UrlHelper``
 
-To use these abstractions add the ``AutofacWebTypesModule`` to the container using the standard ``RegisterModule()`` method.
+想要使用这些抽象对象, 使用基础的 ``RegisterModule()`` 方法添加 ``AutofacWebTypesModule`` 进容器.
 
 .. sourcecode:: csharp
 
     builder.RegisterModule<AutofacWebTypesModule>();
 
-Enable Property Injection for View Pages
+启用视图页(View Pages)的属性注入
 ========================================
 
-You can make :doc:`property injection <../register/prop-method-injection>` available to your MVC views by adding the ``ViewRegistrationSource`` to your ``ContainerBuilder`` before building the application container.
+你可以通过在创建应用容器前添加 ``ViewRegistrationSource`` 到你的 ``ContainerBuilder`` 来启用你的MVC视图 :doc:`属性注入 <../register/prop-method-injection>`.
 
 .. sourcecode:: csharp
 
     builder.RegisterSource(new ViewRegistrationSource());
 
-Your view page must inherit from one of the base classes that MVC supports for creating views. When using the Razor view engine this will be the ``WebViewPage`` class.
+你的视图页必须继承自某个MVC支持的创建视图的类. 使用Razor视图引擎时它是 ``WebViewPage`` 类.
 
 .. sourcecode:: csharp
 
@@ -148,7 +148,7 @@ Your view page must inherit from one of the base classes that MVC supports for c
       public IDependency Dependency { get; set; }
     }
 
-The ``ViewPage``, ``ViewMasterPage`` and ``ViewUserControl`` classes are supported when using the web forms view engine.
+使用web forms视图引擎时 ``ViewPage``, ``ViewMasterPage`` 和 ``ViewUserControl`` 类都是支持的.
 
 .. sourcecode:: csharp
 
@@ -157,30 +157,30 @@ The ``ViewPage``, ``ViewMasterPage`` and ``ViewUserControl`` classes are support
       public IDependency Dependency { get; set; }
     }
 
-Ensure that your actual view page inherits from your custom base class. This can be achieved using the ``@inherits`` directive inside your ``.cshtml`` file for the Razor view engine::
+确保你真实视图页继承自你的自定义基础类. 对于Razor视图引擎可以通过 ``.cshtml`` 文件内部的 ``@inherits`` 指令完成::
 
     @inherits Example.Views.Shared.CustomViewPage
 
-When using the web forms view engine you set the ``Inherits`` attribute on the ``@ Page`` directive inside your ``.aspx`` file instead.
+使用web forms视图引擎时你可以在 ``.aspx`` 文件的 ``@ Page`` 指令上设置 ``Inherits`` 属性.
 
 .. sourcecode:: aspx-cs
 
     <%@ Page Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="Example.Views.Shared.CustomViewPage"%>
 
-**Due to an issue with ASP.NET MVC internals, dependency injection is not available for Razor layout pages.** Razor views will work, but layout pages won't. `See issue #349 for more information. <https://github.com/autofac/Autofac/issues/349#issuecomment-33025529>`_
+**因为ASP.NET MVC内部的问题, 对于Razor布局页(layout pages) 依赖注入不可用.** Razor视图可以, 但是布局页不可以. `详情见 issue #349. <https://github.com/autofac/Autofac/issues/349#issuecomment-33025529>`_
 
-Enable Property Injection for Action Filters
+启用Action Filters的属性注入
 ============================================
 
-To make use of property injection for your filter attributes call the ``RegisterFilterProvider()`` method on the ``ContainerBuilder`` before building your container and providing it to the ``AutofacDependencyResolver``.
+想要启用Action Filters的属性注入, 在创建容器前调用 ``ContainerBuilder`` 的 ``RegisterFilterProvider()`` 方法并把它传给 ``AutofacDependencyResolver``.
 
 .. sourcecode:: csharp
 
     builder.RegisterFilterProvider();
 
-This allows you to add properties to your filter attributes and any matching dependencies that are registered in the container will be injected into the properties.
+这允许你给filter attributes添加属性, 容器中所有匹配的已注册的依赖将被注入进这些属性中.
 
-For example, the action filter below will have the ``ILogger`` instance injected from the container (assuming you register an ``ILogger``. Note that **the attribute itself does not need to be registered in the container**.
+例如, 下面的action filter将会从容器中拿到 ``ILogger`` 实例 (假设你注册了 ``ILogger``. 注意 **特性(attribute)本身不需要注册进容器中**.
 
 .. sourcecode:: csharp
 
@@ -194,7 +194,7 @@ For example, the action filter below will have the ``ILogger`` instance injected
       }
     }
 
-The same simple approach applies to the other filter attribute types such as authorization attributes.
+对于其他filter attribute类型例如authorization attributes同样处理.
 
 .. sourcecode:: csharp
 
@@ -209,7 +209,7 @@ The same simple approach applies to the other filter attribute types such as aut
       }
     }
 
-After applying the attributes to your actions as usual your work is done.
+把特性应用到actions上, 整个工作就完成了.
 
 .. sourcecode:: csharp
 
@@ -219,10 +219,10 @@ After applying the attributes to your actions as usual your work is done.
     {
     }
 
-Enable Injection of Action Parameters
+启用Action参数的注入
 =====================================
 
-While not common, some folks want to have Autofac populate parameters in action methods when they're called. **It is recommended you use constructor injection on your controller rather than action method injection** but you can enable action method injection if you desire:
+尽管不普遍, 还是有些人想要在action方法调用时让Autofac给参数填充值. **我们推荐你使用控制器的构造方法注入而不是action方法注入** 但如果你想要的话你还是可以启用action参数的注入:
 
 .. sourcecode:: csharp
 
@@ -232,22 +232,22 @@ While not common, some folks want to have Autofac populate parameters in action 
     builder.RegisterType<ExtensibleActionInvoker>().As<IActionInvoker>();
     builder.InjectActionInvoker();
 
-Note you can use the ``InjectActionInvoker()`` mechanism with your own custom invoker, too.
+注意在使用 ``InjectActionInvoker()`` 机制时你也可以使用自定义的invoker.
 
 .. sourcecode:: csharp
 
     builder.RegisterType<MyCustomActionInvoker>().As<IActionInvoker>();
     builder.InjectActionInvoker();
 
-OWIN Integration
+OWIN集成
 ================
 
-If you are using MVC :doc:`as part of an OWIN application <owin>`, you need to:
+如果你使用MVC :doc:`作为OWIN应用的一部分时 <owin>`, 你需要:
 
-* Do all the stuff for standard MVC integration - register controllers, set the dependency resolver, etc.
-* Set up your app with the :doc:`base Autofac OWIN integration <owin>`.
-* Add a reference to the `Autofac.Mvc5.Owin <http://www.nuget.org/packages/Autofac.Mvc5.Owin/>`_ NuGet package.
-* In your application startup class, register the Autofac MVC middleware after registering the base Autofac middleware.
+* 完成基础MVC集成要做的所有事 - 注册控制器, 设置依赖解析器等.
+* 用 :doc:`基础的Autofac OWIN集成 <owin>` 创建你的应用.
+* 添加 `Autofac.Mvc5.Owin <http://www.nuget.org/packages/Autofac.Mvc5.Owin/>`_ 引用NuGet package.
+* 应用startup类中, 在注册基础Autofac中间件后注册Autofac MVC中间件.
 
 .. sourcecode:: csharp
 
@@ -276,7 +276,7 @@ If you are using MVC :doc:`as part of an OWIN application <owin>`, you need to:
       }
     }
 
-**Minor gotcha: MVC doesn't run 100% in the OWIN pipeline.** It still needs ``HttpContext.Current`` and some other non-OWIN things. At application startup, when MVC registers routes, it instantiates an ``IControllerFactory`` that ends up creating two request lifetime scopes. It only happens during app startup at route registration time, not once requests start getting handled, but it's something to be aware of. This is an artifact of the two pipelines being mangled together. `We looked into ways to try working around it <https://github.com/autofac/Autofac.Mvc/issues/5>`_ but were unable to do so in a clean fashion.
+**次要问题: MVC并不是100%运行在OWIN管道中.** 它仍然需要 ``HttpContext.Current`` 和其他一些非OWIN的东西. 在应用startup的地方, 当MVC注册路由时, 它实例化了一个 ``IControllerFactory`` 随后创建了两个请求生命周期作用域. 它只发生在应用startup的路由注册时期, 而并非每个请求处理时, 但这仍然需要被知晓. 这是一个两个管道错乱的构件. `我们尝试解决 <https://github.com/autofac/Autofac.Mvc/issues/5>`_ 但并没有找到一个清楚合理的方法.
 
 Using "Plugin" Assemblies
 =========================

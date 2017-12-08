@@ -77,6 +77,11 @@ The contents of `artifacts\doc\Website` is what gets copied to the `autofac.gith
   
 * Application Integration
   * ASP.NET
+    * OWIN
+    * MVC ![Progress](http://progressed.io/bar/60)
+    * Web API
+    * SignaIR
+    * Web Forms
   * .NET Core
   * ASP.NET Core
   * Windows Communication Foundation (WCF)
