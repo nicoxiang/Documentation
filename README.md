@@ -83,11 +83,5 @@ The contents of `artifacts\doc\Website` is what gets copied to the `autofac.gith
     * SignaIR
     * Web Forms
   * .NET Core
-  * ASP.NET Core
-  * Windows Communication Foundation (WCF)
-  * Managed Extensibility Framework (MEF)
-  * Common Service Locator
-  * Enterprise Library 5
-  * NHibernate
-  * Moq
-  * FakeItEasy
+  * ASP.NET Core ![Progress](http://progressed.io/bar/70)
+  
