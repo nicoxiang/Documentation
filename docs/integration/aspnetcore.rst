@@ -2,26 +2,26 @@
 ASP.NET Core
 ============
 
-ASP.NET Core (previously ASP.NET 5) changes the way dependency injection frameworks have previously integrated into ASP.NET execution. Previously, each functionality - MVC, Web API, etc. - had its own "dependency resolver" mechanism and just slightly different ways to hook in. ASP.NET Core introduces a `conforming container <http://blog.ploeh.dk/2014/05/19/conforming-container/>`_ mechanism via `Microsoft.Extensions.DependencyInjection <https://github.com/aspnet/DependencyInjection>`_, including a unified notion of request lifetime scope, service registration, and so forth.
+ASP.NET Core (previously ASP.NET 5) 改变了以前依赖注入框架集成进ASP.NET的方法. 以前, 每个功能 - MVC, Web API, 等. - 都有它自己的 "依赖解析器(dependency resolver)" 机制并且只是'钩子'钩住的方式有些轻微的区别. ASP.NET Core 通过 `Microsoft.Extensions.DependencyInjection <https://github.com/aspnet/DependencyInjection>`_ 引入了 `(conforming container) <http://blog.ploeh.dk/2014/05/19/conforming-container/>`_ 机制, 包含了请求生命周期作用域, 服务注册等等的同一概念.
 
-**This page explains ASP.NET Core integration.** If you are using ASP.NET classic, :doc:`see the ASP.NET classic integration page <aspnet>`.
+**本章节解释了ASP.NET Core集成.** 如果你正在使用传统的ASP.NET, :doc:`请见传统ASP.NET集成章节 <aspnet>`.
 
-If you're using .NET Core without ASP.NET Core, :doc:`there's a simpler example here <netcore>` showing that integration.
+如果你只是使用.NET Core而没有用ASP.NET Core, :doc:`这里有一个更简单的示例 <netcore>` 展示了它的集成.
 
 .. contents::
   :local:
 
-Quick Start (With ConfigureContainer)
+入门 (With ConfigureContainer)
 =====================================
 
-ASP.NET Core 1.1 introduced the ability to have strongly-typed container configuration. It provides a ``ConfigureContainer`` method where you register things with Autofac separately from registering things with the ``ServiceCollection``.
+ASP.NET Core 1.1 引入了强类型容器配置的能力. 它提供了 ``ConfigureContainer`` 方法, 你可以在方法内注册Autofac的东西, 这样可以和 ``ServiceCollection`` 注册东西分开.
 
-* Reference the ``Autofac.Extensions.DependencyInjection`` package from NuGet.
-* In your ``Program.Main`` method, where you configure the ``WebHostBuilder``, call ``AddAutofac`` to hook Autofac into the startup pipeline.
-* In the ``ConfigureServices`` method of your ``Startup`` class register things into the ``IServiceCollection`` using extension methods provided by other libraries.
-* In the ``ConfigureContainer`` method of your ``Startup`` class register things directly into an Autofac ``ContainerBuilder``.
+* Nuget引入 ``Autofac.Extensions.DependencyInjection`` 包.
+* 在你的 ``Program.Main`` 方法内, 配置 ``WebHostBuilder`` 的地方, 调用 ``AddAutofac`` 把Autofac挂到startup管道中.
+* 在 ``Startup`` 类的 ``ConfigureServices`` 方法中先用其他库提供的扩展方法注册东西到 ``IServiceCollection`` .
+* 在 ``Startup`` 类的 ``ConfigureContainer`` 方法中直接注册东西到Autofac ``ContainerBuilder``.
 
-The ``IServiceProvider`` will automatically be created for you, so there's nothing you have to do but *register things*.
+``IServiceProvider`` 会自动替你创建, 因此你无需做任何事只要 *注册东西* 即可.
 
 .. sourcecode:: csharp
 
@@ -92,20 +92,20 @@ The ``IServiceProvider`` will automatically be created for you, so there's nothi
       }
     }
 
-Quick Start (Without ConfigureContainer)
+入门 (Without ConfigureContainer)
 ========================================
 
-If you need more flexibility over how your container is built or if you need to actually store a reference to the built container (e.g. so you can dispose of the container yourself at app shutdown), you will need to skip using ``ConfigureContainer`` and register everything during ``ConfigureServices``. This is also the path you'd take for ASP.NET Core 1.0.
+如果你在创建你的容器时需要更多的灵活性或者你需要存储所创建容器的引用 (如, 这样你就可以在应用停止时自己释放容器), 你需要跳过 ``ConfigureContainer`` 并且在 ``ConfigureServices`` 中注册所有东西. 这也是你在ASP.NET Core 1.0中需要采取的方式.
 
-* Reference the ``Autofac.Extensions.DependencyInjection`` package from NuGet.
-* In the ``ConfigureServices`` method of your ``Startup`` class...
+* Nuget引入 ``Autofac.Extensions.DependencyInjection`` 包.
+* 在你的 ``Startup`` 类的 ``ConfigureServices`` 方法中...
 
-  - Register services from the ``IServiceCollection`` into the ``ContainerBuilder`` via ``Populate``.
-  - Register services into the ``ContainerBuilder`` directly.
-  - Build your container.
-  - Create an ``AutofacServiceProvider`` using the container and return it.
+  - 通过 ``Populate`` 把注册的服务从 ``IServiceCollection`` 填充到 ``ContainerBuilder`` .
+  - 直接注册服务到 ``ContainerBuilder`` .
+  - 创建容器.
+  - 使用容器创建 ``AutofacServiceProvider`` 并返回.
 
-* In the ``Configure`` method of your ``Startup`` class, you can optionally register with the ``IApplicationLifetime.ApplicationStopped`` event to dispose of the container at app shutdown.
+* 在你的 ``Startup`` 类的 ``Configure`` 方法中, 你可以选择性地在应用停止时注册 ``IApplicationLifetime.ApplicationStopped`` 事件释放容器.
 
 .. sourcecode:: csharp
 
@@ -175,12 +175,12 @@ If you need more flexibility over how your container is built or if you need to 
       }
     }
 
-Configuration Method Naming Conventions
+配置方法命名约定
 =======================================
 
-The ``Configure``, ``ConfigureServices``, and ``ConfigureContainer`` methods all support environment-specific naming conventions based on the ``IHostingEnvironment.EnvironmentName`` in your app. By default, the names are ``Configure``, ``ConfigureServices``, and ``ConfigureContainer``. If you want environment-specific setup you can put the environment name after the ``Configure`` part, like ``ConfigureDevelopment``, ``ConfigureDevelopmentServices``, and ``ConfigureDevelopmentContainer``. If a method isn't present with a name matching the environment it'll fall back to the default.
+``Configure``, ``ConfigureServices``, 和 ``ConfigureContainer`` 方法都支持基于你应用中 ``IHostingEnvironment.EnvironmentName`` 参数的环境特定命名约定. 默认地, 名称为 ``Configure``, ``ConfigureServices``, 和 ``ConfigureContainer``. 如果你想要环境特定设置, 你可以把环境名称放在 ``Configure`` 部分后面, 类似 ``ConfigureDevelopment``, ``ConfigureDevelopmentServices``, 和 ``ConfigureDevelopmentContainer``. 如果方法并不以匹配的环境名称显示, 它会回到默认方法.
 
-This means you don't necessarily have to use :doc:`Autofac configuration <../configuration/index>` to switch configuration between a development and production environment; you can set it up programmatically in ``Startup``.
+这意味着你不必使用 :doc:`Autofac配置 <../configuration/index>` 在生产环境和开发环境之间切换; 你可以在 ``Startup`` 中以编程形式设置.
 
 .. sourcecode:: csharp
 
@@ -235,14 +235,14 @@ This means you don't necessarily have to use :doc:`Autofac configuration <../con
       }
     }
 
-The `StartupLoader class in ASP.NET Core <https://github.com/aspnet/Hosting/blob/rel/1.1.0/src/Microsoft.AspNetCore.Hosting/Internal/StartupLoader.cs>`_ is what locates the methods to call during app startup. Check that class out if you want a more in-depth understanding of how this works.
+`ASP.NET Core中的StartupLoader类 <https://github.com/aspnet/Hosting/blob/rel/1.1.0/src/Microsoft.AspNetCore.Hosting/Internal/StartupLoader.cs>`_ 是在应用启动时定位调用方法的. 如果你想更深层次地了解它是如何运作的, 可以看下该类.
 
-Dependency Injection Hooks
+依赖注入钩子
 ==========================
 
-Unlike :doc:`ASP.NET classic integration <aspnet>`, ASP.NET Core is designed specifically with dependency injection in mind. What that means is if you're trying to figure out, say, `how to inject services into MVC views <https://docs.asp.net/en/latest/mvc/views/dependency-injection.html>`_ that's now controlled by (and documented by) ASP.NET Core - there's not anything Autofac-specific you need to do other than set up your service provider as outlined above.
+不像 :doc:`传统ASP.NET集成 <aspnet>`, ASP.NET Core的设计秉承依赖注入的理念. 这意味着如果你想知道, `如何注入服务到MVC views <https://docs.asp.net/en/latest/mvc/views/dependency-injection.html>`_ 它现在是ASP.NET Core控制(记录)的  - 除了像上面那样设置你的服务提供者(service provider)你还需要一些Autofac特定的操作.
 
-Here are some helpful links into the ASP.NET Core documentation with specific insight into DI integration:
+这里有一些特别关注DI集成的ASP.NET Core文档链接:
 
 * `ASP.NET Core dependency injection fundamentals <https://docs.asp.net/en/latest/fundamentals/dependency-injection.html>`_
 * `Controller injection <https://docs.asp.net/en/latest/mvc/controllers/dependency-injection.html>`_
@@ -254,29 +254,29 @@ Here are some helpful links into the ASP.NET Core documentation with specific in
 * `Middleware 'Invoke' method injection <https://docs.asp.net/en/latest/fundamentals/middleware.html>`_
 * `Wiring up EF 6 with ASP.NET Core <https://docs.asp.net/en/latest/data/entity-framework-6.html#setup-connection-strings-and-dependency-injection>`_
 
-Differences From ASP.NET Classic
+与传统ASP.NET的区别
 ================================
 
-If you've used Autofac's other :doc:`ASP.NET integration <aspnet>` then you may be interested in the key differences as you migrate to using ASP.NET Core.
+如果你使用Autofac其他的 :doc:`ASP.NET集成 <aspnet>` 你应该对它们和迁移至ASP.NET Core的关键区别感兴趣.
 
-* **Use InstancePerLifetimeScope instead of InstancePerRequest.** In previous ASP.NET integration you could register a dependency as ``InstancePerRequest`` which would ensure only one instance of the dependency would be created per HTTP request. This worked because Autofac was in charge of :doc:`setting up the per-request lifetime scope <../faq/per-request-scope>`. With the introduction of ``Microsoft.Extensions.DependencyInjection``, the creation of per-request and other child lifetime scopes is now part of the `conforming container <http://blog.ploeh.dk/2014/05/19/conforming-container/>`_ provided by the framework, so all child lifetime scopes are treated equally - there's no special "request level scope" anymore. Instead of registering your dependencies ``InstancePerRequest``, use ``InstancePerLifetimeScope`` and you should get the same behavior. Note if you are creating *your own lifetime scopes* during web requests, you will get a new instance in these child scopes.
-* **No more DependencyResolver.** Other ASP.NET integration mechanisms required setting up a custom Autofac-based dependency resolver in various locations. With ``Microsoft.Extensions.DependencyInjection`` and the ``Startup.ConfigureServices`` method, you now just return the ``IServiceProvider`` and "magic happens." Within controllers, classes, etc. if you need to manually do service location, get an ``IServiceProvider``.
-* **No special middleware.** The :doc:`OWIN integration <owin>` previously required registration of a special Autofac middleware to manage the request lifetime scope. ``Microsoft.Extensions.DependencyInjection`` does the heavy lifting now, so there's no additional middleware to register.
-* **No manual controller registration.** You used to be required to register all of your controllers with Autofac so DI would work. The ASP.NET Core framework now automatically passes all controllers through service resolution so you don't have to do that.
-* **No extensions for invoking middleware via dependency injection.** The :doc:`OWIN integration <owin>` had extensions like ``UseAutofacMiddleware()`` to allow DI into middleware. This happens automatically now through a combination of `auto-injected constructor parameters and dynamically resolved parameters to the Invoke method of middleware <http://docs.asp.net/en/latest/fundamentals/middleware.html>`_. The ASP.NET Core framework takes care of it all.
-* **MVC and Web API are one thing.** There used to be different ways to hook into DI based on whether you were using MVC or Web API. These two things are combined in ASP.NET Core so there's only one dependency resolver to set up, only one configuration to maintain.
-* **Controllers aren't resolved from the container; just controller constructor parameters.** That means controller lifecycles, property injection, and other things aren't managed by Autofac - they're managed by ASP.NET Core. You can change that using ``AddControllersAsServices()`` - see the discussion below.
+* **使用InstancePerLifetimeScope(每个生命周期作用域一个实例)而不是InstancePerRequest(每个请求一个实例).** 以前的ASP.NET集成你可以注册依赖为 ``InstancePerRequest`` , 能保证每次HTTP请求只有唯一的依赖实例被创建. 这是有用的因为Autofac负责 :doc:`建立每个请求生命周期作用域 <../faq/per-request-scope>`. 随着 ``Microsoft.Extensions.DependencyInjection`` 的引入, 每个请求和其他子生命周期作用域的创建现在是框架提供的 `conforming container <http://blog.ploeh.dk/2014/05/19/conforming-container/>`_ 的一部分, 因此所有的子生命周期作用域是被同等对待的 - 现在已经不再有特别的 "请求级别作用" . 不再是注册你的依赖为 ``InstancePerRequest``, 而使用 ``InstancePerLifetimeScope`` , 你也可以得到相同的行为. 注意如果你在web请求中创建 *你自己的生命周期作用域* , 你将会在这些子作用域中得到新的实例.
+* **不再需要依赖解析器(DependencyResolver).** 其他ASP.NET集成机制在许多地方需要创建基于Autofac的自定义依赖解析器. 使用 ``Microsoft.Extensions.DependencyInjection`` 和 ``Startup.ConfigureServices`` 方法, 你现在只要返回 ``IServiceProvider`` , "神奇的事就发生了." 在控制器, 类等内部. 如果你需要手动定位服务, 拿 ``IServiceProvider`` 即可.
+* **没有特殊的中间件.** 以前的 :doc:`OWIN集成 <owin>` 需要特殊的Autofac中间件的注册, 用来管理请求生命周期作用域. ``Microsoft.Extensions.DependencyInjection`` 现在做了这些繁重的工作, 因此现在不需要注册额外的中间件了.
+* **不再需要手动注册控制器.** 你以前需要用Autofac手动注册所有的控制器这样DI才会work. ASP.NET Core框架现在自动传入所有控制器给服务解析因此你不必手动注册.
+* **没有通过依赖注入触发中间件的扩展方法.** :doc:`OWIN集成 <owin>` 有类似 ``UseAutofacMiddleware()`` 的扩展方法来允许依赖注入进入中间件内. 这些现在都将自动发生, 通过组合 `自动注入构造方法参数和动态解析中间件Invoke方法的参数 <http://docs.asp.net/en/latest/fundamentals/middleware.html>`_. ASP.NET Core框架负责了所有的这些事.
+* **MVC 和 Web API 现在是一个东西了.** 以前根据你是使用 MVC 还是 Web API ,有不同的方法hook进DI. 这两件东西在ASP.NET Core中被整合了, 因此只需构建一处依赖解析器, 只需维护一份配置.
+* **控制器不再从容器中解析; 只有控制器构造方法.** 这意味着控制器生命周期, 属性注入, 和其他的事不再归Autofac管理 - 它们归ASP.NET Core管理. 你可以使用 ``AddControllersAsServices()`` 改变 - 见下面的讨论.
 
-Controllers as Services
+控制器作为服务
 =======================
 
-By default, ASP.NET Core will resolve the controller *parameters* from the container but doesn't actually resolve *the controller* from the container. This usually isn't an issue but it does mean:
+默认地, ASP.NET Core 会从容器中解析控制器 *参数* 但不会从中解析 *控制器* . 这不是个问题但它意味着:
 
-* The lifecycle of the *controller* is handled by the framework, not the request lifetime.
-* The lifecycle of *controller constructor parameters* is handled by the request lifetime.
-* Special wiring that you may have done during registration of the controller (like setting up property injection) won't work.
+* *控制器* 的生命周期归框架管理, 而非请求生命周期.
+* *控制器构造方法参数* 归请求生命周期管理.
+* 在控制器注册时做的特别的连结 (如属性注入) 将不会生效.
 
-You can change this by specifying ``AddControllersAsServices()`` when you register MVC with the service collection. Doing that will automatically register controller types into the ``IServiceCollection`` when you call ``builder.Populate(services)``.
+你可以通过在用service collection注册MVC时指定 ``AddControllersAsServices()`` 来改变. 这么做可以在调用 ``builder.Populate(services)`` 时自动注册控制器类型到 ``IServiceCollection`` .
 
 .. sourcecode:: csharp
 
@@ -303,7 +303,7 @@ You can change this by specifying ``AddControllersAsServices()`` when you regist
       }
     }
 
-There is a more detailed article `with a walkthrough on Filip Woj's blog <http://www.strathweb.com/2016/03/the-subtle-perils-of-controller-dependency-injection-in-asp-net-core-mvc/>`_. Note one of the commenters there `found some changes based on how RC2 handles controllers as services <http://www.strathweb.com/2016/03/the-subtle-perils-of-controller-dependency-injection-in-asp-net-core-mvc/#comment-2702995712>`_.
+这里有一篇更详尽的文章 `Filip Woj's blog <http://www.strathweb.com/2016/03/the-subtle-perils-of-controller-dependency-injection-in-asp-net-core-mvc/>`_. 注意其中的一位评论者 `发现RC2中把控制器作为服务时发生了一些改变 <http://www.strathweb.com/2016/03/the-subtle-perils-of-controller-dependency-injection-in-asp-net-core-mvc/#comment-2702995712>`_.
 
 Multitenant Support
 ===================
