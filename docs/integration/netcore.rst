@@ -2,26 +2,26 @@
 .NET Core
 ============
 
-.NET Core comes with a `conforming container <http://blog.ploeh.dk/2014/05/19/conforming-container/>`_ in the form of `Microsoft.Extensions.DependencyInjection <https://github.com/aspnet/DependencyInjection>`_. The ``Autofac.Extensions.DependencyInjection`` package implements the abstractions for this to provide DI via Autofac.
+.NET Core 通过 `Microsoft.Extensions.DependencyInjection <https://github.com/aspnet/DependencyInjection>`_ 引入了 `conforming container <http://blog.ploeh.dk/2014/05/19/conforming-container/>`_ . ``Autofac.Extensions.DependencyInjection`` 包实现了它的抽象以此来通过Autofac提供依赖注入.
 
-The integration with :doc:`ASP.NET Core <aspnetcore>` is very similar to this since the whole framework has unified the abstraction around dependency injection. Our :doc:`ASP.NET Core integration docs<aspnetcore>` have more info on specific topics relating to ASP.NET Core usage.
+集成 :doc:`ASP.NET Core <aspnetcore>` 和它非常相似因为整个框架统一了抽象和依赖注入. :doc:`ASP.NET Core 集成章节<aspnetcore>` 在ASP.NET Core使用的相关主题内容方面有更详细的信息.
 
 .. contents::
   :local:
 
-Quick Start
+入门
 ===========
 
-To take advantage of Autofac in your .NET Core application via the ``Microsoft.Extensions.DependencyInjection`` package:
+通过 ``Microsoft.Extensions.DependencyInjection`` 包在你的.NET Core应用中使用Autofac:
 
-* Reference the ``Autofac.Extensions.DependencyInjection`` package from NuGet.
-* During application startup (e.g., in the ``Program`` or  ``Startup`` class)...
+* 从NuGet引入 ``Autofac.Extensions.DependencyInjection`` 包.
+* 在应用startup处 (如, 在 ``Program`` 或  ``Startup`` 类)...
 
-  - Register services in an ``IServiceCollection`` using framework extensions.
-  - Populate those registered services into Autofac.
-  - Add Autofac registrations and overrides.
-  - Build your container.
-  - Create an ``AutofacServiceProvider`` using the container.
+  - 使用框架扩展方法注册服务进 ``IServiceCollection`` .
+  - 将这些服务填充到Autofac中.
+  - 添加Autofac注册并且重写.
+  - 创建容器.
+  - 使用容器创建 ``AutofacServiceProvider`` .
 
 .. sourcecode:: csharp
 
@@ -63,16 +63,16 @@ To take advantage of Autofac in your .NET Core application via the ``Microsoft.E
       }
     }
 
-**You don't have to use Microsoft.Extensions.DependencyInjection.** If you aren't writing a .NET Core app that requires it or if you're not using any of the DI extensions provided by other libraries you can consume Autofac directly. You also may only need to do the ``Populate()`` call and not need the ``AutofacServiceProvider``. Use the pieces that make sense for your app.
+**你并不是必须要使用Microsoft.Extensions.DependencyInjection.** 如果你在写一个不需要它的.NET Core应用或者你不在使用其他库提供的依赖注入扩展, 你可以直接Autofac. 也许你只需要调用 ``Populate()`` 而不需要 ``AutofacServiceProvider``. 使用对你的应用有用的模块.
 
-Using a Child Scope as a Root
+使用子作用域作为根作用域
 =============================
 
-In a complex application you may want to keep services registered using ``Populate()`` in a child lifetime scope. For example, an application that does some self-hosting of ASP.NET Core components may want to keep the MVC registrations and such isolated from the main container. The ``Populate()`` method offers an overload to allow you to specify a tagged child lifetime scope that should serve as the "container" for items.
+在一个复杂的应用中你也许会想要在子生命周期作用域中用 ``Populate()`` 注册服务. 例如, 一个有ASP.NET Core组件自托管的应用也许会想要使MVC注册等等和主容器独立起来. ``Populate()`` 方法提供了一个重载可以允许你指定一个带标签的子生命周期作用域, 让它成为MVC注册等等这些的 "容器".
 
 .. note::
 
-   If you use this, you will not be able to use the ASP.NET Core support for ``IServiceProviderFactory{TContainerBuilder}`` (the ``ConfigureContainer`` support). This is because ``IServiceProviderFactory{TContainerBuilder}`` assumes it's working at the root level.
+   如果这么做, 你将会无法使用ASP.NET Core ``IServiceProviderFactory{TContainerBuilder}`` 的支持 ( ``ConfigureContainer`` 支持). 因为 ``IServiceProviderFactory{TContainerBuilder}`` 假设它是工作在根级别的.
 
 .. sourcecode:: csharp
 
