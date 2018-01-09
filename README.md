@@ -82,6 +82,6 @@ The contents of `artifacts\doc\Website` is what gets copied to the `autofac.gith
     * Web API
     * SignaIR
     * Web Forms
-  * .NET Core
+  * .NET Core ![Progress](http://progressed.io/bar/100)
   * ASP.NET Core ![Progress](http://progressed.io/bar/70)
   
