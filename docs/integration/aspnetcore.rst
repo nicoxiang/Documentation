@@ -2,7 +2,7 @@
 ASP.NET Core
 ============
 
-ASP.NET Core (previously ASP.NET 5) 改变了以前依赖注入框架集成进ASP.NET的方法. 以前, 每个功能 - MVC, Web API, 等. - 都有它自己的 "依赖解析器(dependency resolver)" 机制并且只是'钩子'钩住的方式有些轻微的区别. ASP.NET Core 通过 `Microsoft.Extensions.DependencyInjection <https://github.com/aspnet/DependencyInjection>`_ 引入了 `(conforming container) <http://blog.ploeh.dk/2014/05/19/conforming-container/>`_ 机制, 包含了请求生命周期作用域, 服务注册等等的同一概念.
+ASP.NET Core (previously ASP.NET 5) 改变了以前依赖注入框架集成进ASP.NET的方法. 以前, 每个功能 - MVC, Web API, 等. - 都有它自己的 "依赖解析器(dependency resolver)" 机制并且只是'钩子'钩住的方式有些轻微的区别. ASP.NET Core 通过 `Microsoft.Extensions.DependencyInjection <https://github.com/aspnet/DependencyInjection>`_ 引入了 `conforming container <http://blog.ploeh.dk/2014/05/19/conforming-container/>`_ 机制, 包含了请求生命周期作用域, 服务注册等等的统一概念.
 
 **本章节解释了ASP.NET Core集成.** 如果你正在使用传统的ASP.NET, :doc:`请见传统ASP.NET集成章节 <aspnet>`.
 
