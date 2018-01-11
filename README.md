@@ -66,7 +66,7 @@ The contents of `artifacts\doc\Website` is what gets copied to the `autofac.gith
   * Assembly Scanning ![Progress](http://progressed.io/bar/90)
 * Resolving Services
   * index ![Progress](http://progressed.io/bar/100)
-  * Passing Parameters to Resolve
+  * Passing Parameters to Resolve ![Progress](http://progressed.io/bar/100)
   * Implicit Relationship Types ![Progress](http://progressed.io/bar/70)
 
 * Controlling Scope and Lifetime ![Progress](http://progressed.io/bar/100)
