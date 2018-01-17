@@ -308,16 +308,16 @@ Autofac Web API 集成提供了通过依赖注入解析model binders的功能, �
 Per-Controller-Type Services
 ============================
 
-Web API has an interesting feature that allows you to configure the set of Web API services (those such as ``IActionValueBinder``) that should be used per-controller-type by adding an attribute that implements the ``IControllerConfiguration`` interface to your controller.
+Web API有一个有趣的功能, 它允许你通过在controller上放置一个实现 ``IControllerConfiguration`` 接口的特性, 这样就能配置一系列的Web API服务(如 ``IActionValueBinder``)为per-controller-type的.
 
-Through the ``Services`` property on the ``HttpControllerSettings`` parameter passed to the ``IControllerConfiguration.Initialize`` method you can override the global set of services. This attribute-based approach seems to encourage you to directly instantiate service instances and then override the ones registered globally. Autofac allows these per-controller-type services to be configured through the container instead of being buried away in an attribute without dependency injection support.
+通过传递到 ``IControllerConfiguration.Initialize`` 方法中的 ``HttpControllerSettings`` 参数上的 ``Services`` 属性, 你可以重写全局的服务集合. 这种基于特性的方法意在鼓励你直接初始化服务实例并且重写全局注册的服务. Autofac允许通过容器来配置per-controller-type services而不会因为使用特性的缘故无法得到依赖注入的支持.
 
-Add the Controller Configuration Attribute
+添加Controller Configuration特性
 ------------------------------------------
 
-There is no escaping adding an attribute to the controller that the configuration should be applied to because that is the extension point defined by Web API. The Autofac integration includes an ``AutofacControllerConfigurationAttribute`` that you can apply to your Web API controllers to indicate that they require per-controller-type configuration.
+添加一个特性到应用配置的控制器上还是免不了的, 因为这是Web API定义的扩展点. Autofac集成包含 ``AutofacControllerConfigurationAttribute`` , 你可以把它应用到你的Web API控制器上来表明它们需要per-controller-type配置.
 
-The point to remember here is that **the actual configuration of what services should be applied will be done when you build your container** and there is no need to implement any of that in an actual attribute. In this case, the attribute can be considered as purely a marker that indicates that the container will define the configuration information and provide the service instances.
+这边需要记住的一点是, **配置到底哪些服务应该被应用的这件事, 将会在你创建容器的时候完成** , 我们并不需要在某个具体的特性中去完成这些事. 在这种情况下, 该特性其实可以被单纯的认为是一个标记, 用来表明容器将会定义配置信息并会提供服务实例.
 
 .. sourcecode:: csharp
 
@@ -327,12 +327,12 @@ The point to remember here is that **the actual configuration of what services s
       // Implementation...
     }
 
-Supported Services
-------------------
+支持的服务(Supported Services)
+---------------------------------
 
-The supported services can be divided into single-style or multiple-style services. For example, you can only have one ``IHttpActionInvoker`` but you can have multiple ``ModelBinderProvider`` services.
+支持的服务可以分为单一型或多重型. 例如, 你只可以有一个 ``IHttpActionInvoker`` 但你可以有用多个 ``ModelBinderProvider`` 服务.
 
-You can use dependency injection for the following single-style services:
+依赖注入支持下列单一型服务:
 
 - ``IHttpActionInvoker``
 - ``HttpActionSelector``
@@ -342,19 +342,19 @@ You can use dependency injection for the following single-style services:
 - ``IHttpControllerActivator``
 - ``ModelMetadataProvider``
 
-The following multiple style services are supported:
+支持下列多重型服务:
 
 - ``ModelBinderProvider``
 - ``ModelValidatorProvider``
 - ``ValueProviderFactory``
 - ``MediaTypeFormatter``
 
-In the list of the multiple-style services above the ``MediaTypeFormatter`` is actually the odd one out. Technically, it isn't actually a service and is added to the ``MediaTypeFormatterCollection`` on the ``HttpControllerSettings`` instance and not the ``ControllerServices`` container. We figured that there was no reason to exclude ``MediaTypeFormatter`` instances from dependency injection support and made sure that they could be resolved from the container per-controller type, too.
+在上面的多重型服务列表中, ``MediaTypeFormatter`` 实际上可以说是单独的. 从技术角度上说, 它并不是一个真正的服务, 它只是被添加到 ``HttpControllerSettings`` 实例上的 ``MediaTypeFormatterCollection`` 中而不是 ``ControllerServices`` 容器中. 我们觉得没理由从依赖注入支持的服务中中排除掉 ``MediaTypeFormatter`` 实例, 并且确保了它们也可以从容器per-controller type被解析出来.
 
-Service Registration
+服务注册
 --------------------
 
-Here is an example of registering a custom ``IHttpActionSelector`` implementation as ``InstancePerApiControllerType()`` for the ``ValuesController``. When applied to a controller type all derived controllers will also receive the same configuration; the ``AutofacControllerConfigurationAttribute`` is inherited by derived controller types and the same behavior applies to the registrations in the container. When you register a single-style service it will always replace the default service configured at the global level.
+这里有一个 ``ValuesController`` 注册自定义 ``IHttpActionSelector`` 实现为 ``InstancePerApiControllerType()`` 的例子. 应用到一个控制器的时候所有继承的控制器也会获得相同的配置; ``AutofacControllerConfigurationAttribute`` 被派生的控制器继承, 在容器注册中也会被应用相同的行为. 当你注册一个单一型服务时它总是会替换掉在全局层面配置的默认服务.
 
 .. sourcecode:: csharp
 
@@ -362,10 +362,10 @@ Here is an example of registering a custom ``IHttpActionSelector`` implementatio
            .As<IHttpActionSelector>()
            .InstancePerApiControllerType(typeof(ValuesController));
 
-Clearing Existing Services
+清除现存的服务
 --------------------------
 
-By default, multiple-style services are appended to the existing set of services configured at the global level. When registering multiple-style services with the container you can choose to clear the existing set of services so that only the ones you have registered as ``InstancePerApiControllerType()`` will be used. This is done by setting the ``clearExistingServices`` parameter to ``true`` on the ``InstancePerApiControllerType()`` method. Existing services of that type will be removed if any of the registrations for the multiple-style service indicate that they want that to happen.
+默认地, 多重型服务会被附加到在全局层面配置的现存服务集合上. 当你在容器上注册多重型服务时你可以选择清除现存的服务集合, 这样的话只有你注册为 ``InstancePerApiControllerType()`` 的服务才会被使用. 可以设置 ``InstancePerApiControllerType()`` 的 ``clearExistingServices`` 参数为 ``true`` 来完成. 任何多重型服务只要表明它们希望该类的现存服务被清除, 那么服务就会被清除.
 
 .. sourcecode:: csharp
 
@@ -375,27 +375,27 @@ By default, multiple-style services are appended to the existing set of services
               typeof(ValuesController),
               clearExistingServices: true);
 
-Per-Controller-Type Service Limitations
+Per-Controller-Type Service 局限性
 ---------------------------------------
 
-If you are using per-controller-type services, it is not possible to take dependencies on other services that are registered as ``InstancePerRequest()``. The problem is that Web API is caching these services and is not requesting them from the container each time a controller of that type is created. It is most likely not possible for Web API to easily add that support that without introducing the notion of a key (for the controller type) into the DI integration, which would mean that all containers would need to support keyed services.
+如果你在使用per-controller-type services, 不可以引用其他注册为 ``InstancePerRequest()`` 的服务. 问题在于Web API会缓存这些服务, 并且不会在每次该控制器类被创建时请求它们. Web API不太容易添加这样的支持, 除非引入key(for the controller type)的概念到DI集成中, 意味着所有的容器需要支持带键值的服务(keyed service).
 
-Batching
+批处理
 ========
 
-If you choose to use the `Web API batching functionality <https://blogs.msdn.microsoft.com/webdev/2013/11/01/introducing-batch-support-in-web-api-and-web-api-odata/>`_, be aware that the initial multipart request to the batch endpoint is where Web API creates the request lifetime scope. The child requests that are part of the batch all take place in-memory and will share that same request lifetime scope - you won't get a different scope for each child request in the batch.
+如果你选择使用 `Web API 批处理功能 <https://blogs.msdn.microsoft.com/webdev/2013/11/01/introducing-batch-support-in-web-api-and-web-api-odata/>`_, 要知道初始的multipart请求到达batch endpoint时Web API创建了请求生命周期. 批处理的子请求都发生在内存中并且会共享相同的请求生命周期 - 在一个批处理中对于每个子请求你不会得到不同的生命周期作用域.
 
-This is due to the way the batch handling is designed within Web API and copies properties from the parent request to the child request. One of the properties that is intentionally copied by the ASP.NET Web API framework from parent to children is the request lifetime scope. There is no workaround for this and is outside the control of Autofac.
+这是因为批处理(batch)的处理方式在Web API内部就设计好了, 会拷贝父请求的属性到子请求中. 这些属性中有一个就被ASP.NET Web API框架有意地从父请求拷贝到子请求, 它就是请求生命周期作用域. 这没办法解决, 它超出了Autofac的控制范围.
 
-OWIN Integration
+OWIN 集成
 ================
 
-If you are using Web API :doc:`as part of an OWIN application <owin>`, you need to:
+如果你正在使用Web API :doc:`作为OWIN应用的一部分 <owin>`, 你需要:
 
-* Do all the stuff for standard Web API integration - register controllers, set the dependency resolver, etc.
-* Set up your app with the :doc:`base Autofac OWIN integration <owin>`.
-* Add a reference to the `Autofac.WebApi2.Owin <http://www.nuget.org/packages/Autofac.WebApi2.Owin/>`_ NuGet package.
-* In your application startup class, register the Autofac Web API middleware after registering the base Autofac middleware.
+* 完成所有基础Web API集成的工作 - 注册控制器, 设置依赖解析器等.
+* 用 :doc:`基础的Autofac OWIN集成 <owin>` 创建你的应用.
+* 添加 `Autofac.WebApi2.Owin <http://www.nuget.org/packages/Autofac.WebApi2.Owin/>`_ 引用NuGet package.
+* 应用startup类中, 在注册基础Autofac中间件后注册Autofac Web API中间件.
 
 .. sourcecode:: csharp
 
@@ -430,16 +430,16 @@ If you are using Web API :doc:`as part of an OWIN application <owin>`, you need 
       }
     }
 
-A common error in OWIN integration is use of the ``GlobalConfiguration.Configuration``. **In OWIN you create the configuration from scratch.** You should not reference ``GlobalConfiguration.Configuration`` anywhere when using the OWIN integration.
+一个常见出现的错误是使用 ``GlobalConfiguration.Configuration``. **在OWIN中你会从头开始创建配置.** 在使用OWIN集成的时候你不应该在任何地方引用 ``GlobalConfiguration.Configuration`` .
 
-Unit Testing
+单元测试
 ============
 
-When unit testing an ASP.NET Web API app that uses Autofac where you have ``InstancePerRequest`` components registered, you'll get an exception when you try to resolve those components because there's no HTTP request lifetime during a unit test.
+当单元测试一个使用Autofac注册了 ``InstancePerRequest`` 组件的ASP.NET Web API应用时, 当你尝试解析这些组件时你会得到一个异常因为在单元测试中并没有HTTP请求生命周期.
 
-The :doc:`per-request lifetime scope <../faq/per-request-scope>` topic outlines strategies for testing and troubleshooting per-request-scope components.
+:doc:`per-request lifetime scope <../faq/per-request-scope>` 章节概述了测试和检查per-request-scope组件的对策.
 
-Example
+示例
 =======
 
-There is an example project showing Web API in conjunction with OWIN self hosting `in the Autofac examples repository <https://github.com/autofac/Examples/tree/master/src/WebApiExample.OwinSelfHost>`_.
+`Autofac示例代码仓库 <https://github.com/autofac/Examples/tree/master/src/WebApiExample.OwinSelfHost>`_ 里有一个展示了Web API结合OWIN自托管的示例项目.
