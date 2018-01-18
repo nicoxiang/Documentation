@@ -62,11 +62,7 @@ The contents of `artifacts\doc\Website` is what gets copied to the `autofac.gith
 > Any pull request will be accepted if bad translation exists or you have a better translation. Meanwhile you can provider translation of pages that are not in the list below.
 
 * Getting Started ![Progress](http://progressed.io/bar/100)
-* Registering Components
-  * Registration Concepts ![Progress](http://progressed.io/bar/100)
-  * Passing Parameters to Register ![Progress](http://progressed.io/bar/100)
-  * Property and Method Injection ![Progress](http://progressed.io/bar/100)
-  * Assembly Scanning ![Progress](http://progressed.io/bar/90)
+* Registering Components ![Progress](http://progressed.io/bar/100)
 * Resolving Services
   * index ![Progress](http://progressed.io/bar/100)
   * Passing Parameters to Resolve ![Progress](http://progressed.io/bar/100)
