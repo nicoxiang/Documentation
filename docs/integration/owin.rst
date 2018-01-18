@@ -2,20 +2,20 @@
 OWIN
 ====
 
-`OWIN (Open Web Interface for .NET) <http://owin.org/>`_ is a simpler model for composing web-based applications without tying the application to the web server. To do this, a concept of "middleware" is used to create a pipeline through which requests travel.
+`OWIN (Open Web Interface for .NET) <http://owin.org/>`_ 是一种更简单的构建web应用的模式, 它不需要将应用和web服务器捆绑在一起. 为了做到这一点, 我们引入了"中间件"的概念, 用来创建请求传输的管道.
 
-Due to the differences in the way OWIN handles the application pipeline (detecting when a request starts/ends, etc.) integrating Autofac into an OWIN application is slightly different than the way it gets integrated into more "standard" ASP.NET apps. `You can read about OWIN and how it works on this overview. <http://www.asp.net/aspnet/overview/owin-and-katana/an-overview-of-project-katana>`_
+由于OWIN处理应用管道(探测请求出入等)的方式有所不同, 它集成Autofac的方式和集成更"基础"的ASP.NET应用的方式也有所不同. `你可以在此阅读OWIN和它如何工作的内容. <http://www.asp.net/aspnet/overview/owin-and-katana/an-overview-of-project-katana>`_
 
-**The important thing to remember is that order of OWIN middleware registration matters.** Middleware gets processed in order of registration, like a chain, so you need to register foundational things (like Autofac middleware) first.
+**有个需要记住的关键点是OWIN中间件的注册顺序非常重要.** 中间件会以注册的顺序被处理, 就像一个链子一样, 因此你需要首先注册基础的东西(例如Autofac中间件).
 
-Quick Start
+入门
 ===========
 
-To take advantage of Autofac in your OWIN pipeline:
+在你的OWIN管道中使用Autofac, 你需要:
 
-* Reference the ``Autofac.Owin`` package from NuGet.
-* Build your Autofac container.
-* Register the Autofac middleware with OWIN and pass it the container.
+* 引入 ``Autofac.Owin`` NuGet包.
+* 创建你的Autofac容器.
+* 在OWIN中注册Autofac中间件并将容器传递给它.
 
 .. sourcecode:: csharp
 
@@ -36,14 +36,14 @@ To take advantage of Autofac in your OWIN pipeline:
       }
     }
 
-Check out the individual :doc:`ASP.NET integration library <aspnet>` pages for specific details on different app types and how they handle OWIN support.
+查看其他独立的 :doc:`ASP.NET集成库 <aspnet>` 页面, 了解不同应用类型和它们如何处理OWIN支持的详情.
 
-Dependency Injection in Middleware
+中间件的依赖注入
 ==================================
 
-Normally when you register OWIN middleware with your application, you use the extension methods that come with the middleware. For example :doc:`Web API <webapi>` has the ``app.UseWebApi(config);`` extension. Middleware registered in this fashion is statically defined and will not have dependencies injected.
+通常当你在应用中注册OWIN中间件时, 你会使用到中间件附带的扩展方法. 例如 :doc:`Web API <webapi>` 有 ``app.UseWebApi(config);`` 扩展方法. 这种中间件的注册方式都是定义为静态的, 将无法注入依赖.
 
-For custom middleware, you can allow Autofac to inject dependencies into the middleware by registering it with your application container rather than registering it with a static extension.
+对于自定义中间件, 你可以允许Autofa通过注册中间件到容器来注入依赖进中间件, 而不是用静态扩展方法注册中间件.
 
 .. sourcecode:: csharp
 
@@ -56,16 +56,16 @@ For custom middleware, you can allow Autofac to inject dependencies into the mid
     // registered in the container.
     app.UseAutofacMiddleware(container);
 
-When you call ``app.UseAutofacMiddleware(container);`` the Autofac middleware itself will be added to the pipeline, after which any ``Microsoft.Owin.OwinMiddleware`` classes registered with the container will also be added to the pipeline.
+当你调用 ``app.UseAutofacMiddleware(container);`` Autofac中间件本身将会被加入到管道中, 任何注册在容器中的 ``Microsoft.Owin.OwinMiddleware`` 类也会在它之后被加入到管道中.
 
-Middleware registered in this way will be resolved from the request lifetime scope for each request passing through the OWIN pipeline.
+这种方式注册的中间件, 在每次有请求经过OWIN管道时, 将会从请求生命周期作用域被解析.
 
-Controlling Middleware Order
+控制中间件顺序
 ============================
 
-For a simple scenario, ``app.UseAutofacMiddleware(container);`` will handle both adding an Autofac lifetime to the OWIN request scope as well as adding middleware that is registered with Autofac into the pipeline.
+对于简单的场景来说, ``app.UseAutofacMiddleware(container);`` 将会同时完成添加Autofac生命周期到OWIN请求作用域, 和添加以Autofac注册的中间件到管道中两件事.
 
-If you want more control over when DI-enabled middleware is added to the pipeline, you can use the ``UseAutofacLifetimeScopeInjector`` and ``UseMiddlewareFromContainer`` extensions.
+如果你想要对允许了依赖注入的(DI-enabled)中间件有更精确的控制, 你可以使用 ``UseAutofacLifetimeScopeInjector`` 和 ``UseMiddlewareFromContainer`` 扩展方法.
 
 .. sourcecode:: csharp
 
@@ -83,7 +83,7 @@ If you want more control over when DI-enabled middleware is added to the pipelin
     app.UseWebApi(config);
     app.UseMiddlewareFromContainer<MyCustomMiddleware>();
 
-Example
+示例
 =======
 
-There is an example project showing Web API in conjunction with OWIN self hosting `in the Autofac examples repository <https://github.com/autofac/Examples/tree/master/src/WebApiExample.OwinSelfHost>`_.
+`Autofac示例代码仓库 <https://github.com/autofac/Examples/tree/master/src/WebApiExample.OwinSelfHost>`_ 里有一个展示了Web API结合OWIN自托管的示例项目.
