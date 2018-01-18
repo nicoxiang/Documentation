@@ -57,7 +57,10 @@ Build output gets put in the `artifacts` folder.
 
 The contents of `artifacts\doc\Website` is what gets copied to the `autofac.github.com` repo.
 
-### ZH-CN Translation Progress
+## Chinese translations progress
+
+> Any pull request will be accepted if bad translation exists or you have a better translation. Meanwhile you can provider translation of pages that are not in the list below.
+
 * Getting Started ![Progress](http://progressed.io/bar/100)
 * Registering Components
   * Registration Concepts ![Progress](http://progressed.io/bar/100)
@@ -68,13 +71,10 @@ The contents of `artifacts\doc\Website` is what gets copied to the `autofac.gith
   * index ![Progress](http://progressed.io/bar/100)
   * Passing Parameters to Resolve ![Progress](http://progressed.io/bar/100)
   * Implicit Relationship Types ![Progress](http://progressed.io/bar/70)
-
-* Controlling Scope and Lifetime ![Progress](http://progressed.io/bar/100)
-  
+* Controlling Scope and Lifetime ![Progress](http://progressed.io/bar/100) 
 * Configuration  
   * JSON/XML Configuration
   * Modules ![Progress](http://progressed.io/bar/100)
-  
 * Application Integration
   * ASP.NET
     * OWIN ![Progress](http://progressed.io/bar/100)
@@ -84,4 +84,7 @@ The contents of `artifacts\doc\Website` is what gets copied to the `autofac.gith
     * Web Forms
   * .NET Core ![Progress](http://progressed.io/bar/100)
   * ASP.NET Core ![Progress](http://progressed.io/bar/70)
+* Best Practices and Recommendations
+* Examples
+* Glossary
   
