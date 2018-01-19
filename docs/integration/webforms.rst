@@ -2,20 +2,20 @@
 Web Forms
 =========
 
-ASP.NET web forms integration requires the `Autofac.Web NuGet package <http://www.nuget.org/packages/Autofac.Web/>`_.
+ASP.NET web forms集成需要 `Autofac.Web NuGet package <http://www.nuget.org/packages/Autofac.Web/>`_.
 
-Web forms integration provides dependency injection integration for code-behind classes. It also adds :doc:`per-request lifetime support <../faq/per-request-scope>`.
+Web forms集成为后台代码(code-behind)类提供了依赖注入. 它同样添加 :doc:`每个请求生命周期支持 <../faq/per-request-scope>`.
 
-**This page explains ASP.NET classic web forms integration.** If you are using ASP.NET Core, :doc:`see the ASP.NET Core integration page <aspnetcore>`.
+**本章节解释了ASP.NET classic web forms集成.** 如果你使用ASP.NET Core, :doc:`见ASP.NET Core集成章节 <aspnetcore>`.
 
 .. contents::
   :local:
 
-Quick Start
+入门
 ===========
-To get Autofac integrated with web forms you need to reference the web forms integration NuGet package, add the modules to ``web.config``, and implement ``IContainerProviderAccessor`` on your ``Global`` application class.
+为了把Autofac集成进web forms你需要引入web forms集成NuGet包, 添加模块到 ``web.config``, 并让你应用的 ``Global`` 类实现 ``IContainerProviderAccessor`` 接口.
 
-Add the modules to ``web.config``:
+添加模块到 ``web.config``:
 
 .. sourcecode:: xml
 
@@ -46,7 +46,7 @@ Add the modules to ``web.config``:
       </system.webServer>
     </configuration>
 
-Implement ``IContainerProviderAccessor``:
+实现 ``IContainerProviderAccessor``:
 
 .. sourcecode:: csharp
 
@@ -75,14 +75,14 @@ Implement ``IContainerProviderAccessor``:
       }
     }
 
-The sections below go into further detail about what each of these features do and how to use them.
+下面的内容进一步详细解释了这些功能做了什么和如何使用它们.
 
-Add Modules to Web.config
+添加模块到Web.config
 =========================
 
-The way that Autofac manages component lifetimes and adds dependency injection into the ASP.NET pipeline is through the use of `IHttpModule <http://msdn.microsoft.com/en-us/library/system.web.ihttpmodule.aspx>`_ implementations. You need to configure these modules in ``web.config``.
+Autofac管理组件生命周期和添加依赖注入到ASP.NET管道的方法是实现 `IHttpModule <http://msdn.microsoft.com/en-us/library/system.web.ihttpmodule.aspx>`_ . 你需要在 ``web.config`` 中进行配置.
 
-The following snippet config shows the modules configured.
+下面的配置片段展示了配置的模块.
 
 .. sourcecode:: xml
 
@@ -113,17 +113,17 @@ The following snippet config shows the modules configured.
       </system.webServer>
     </configuration>
 
-Note that while there are two different sections the modules appear in - one each for IIS6 and IIS7 - **it is recommended that you have both in place**. The ASP.NET Developer Server uses the IIS6 settings even if your target deployment environment is IIS7. If you use IIS Express it will use the IIS7 settings.
+注意有两块不同模块出现 - IIS6和IIS7各一块 - **建议同时采用两者**. ASP.NET开发者服务器(ASP.NET Developer Server)会使用IIS6配置, 即使你的目标发布环境是IIS7. 如果你使用IIS Express, 他会使用IIS7配置.
 
-The modules you see there do some interesting things:
+你看到的模块做了以下有趣的事:
 
-- **The ContainerDisposalModule** lets Autofac dispose of any components created during request processing as soon as the request completes.
-- **The PropertyInjectionModule** injects dependencies into pages before the page lifecycle executes. An alternative ``UnsetPropertyInjectionModule`` is also provided which will only set properties on web forms/controls that have null values. (Use only one or the other, but not both.)
+- **ContainerDisposalModule** 只要请求完成, 就会让Autofac释放掉所有在处理请求过程中创建的组件.
+- **PropertyInjectionModule** 在页面生命周期开始前注入依赖. Autofac提供了另一个可替换的模块 ``UnsetPropertyInjectionModule`` , 它只会设置web forms/controls上值为null的属性. (两者只能用其一.)
 
-Implement IContainerProviderAccessor in Global.asax
+Global.asax实现IContainerProviderAccessor
 ===================================================
 
-The dependency injection modules expect that the ``HttpApplication`` instance supports ``IContainerProviderAccessor``. A complete global application class is shown below:
+依赖注入模块需要 ``HttpApplication`` 实例支持 ``IContainerProviderAccessor``. 下面是一个完整的global类:
 
 .. sourcecode:: csharp
 
@@ -152,20 +152,20 @@ The dependency injection modules expect that the ``HttpApplication`` instance su
       }
     }
 
-``Autofac.Integration.Web.IContainerProvider`` exposes two useful properties: ``ApplicationContainer`` and ``RequestLifetime``.
+``Autofac.Integration.Web.IContainerProvider`` 暴露了两个有用的属性: ``ApplicationContainer`` 和 ``RequestLifetime``.
 
-- ``ApplicationContainer`` is the root container that was built at application start-up.
-- ``RequestLifetime`` is a component :doc:`lifetime scope <../lifetime/index>` based on the application container that will be disposed of at the end of the current web request. It can be used whenever manual dependency resolution/service lookup is required. The components that it contains (apart from any singletons) will be specific to the current request (this is where :doc:`per-request lifetime dependencies <../faq/per-request-scope>` are resolved).
+- ``ApplicationContainer`` 是在应用启动时创建的根容器.
+- ``RequestLifetime`` 是一个建立在应用容器上的组件 :doc:`生命周期作用域 <../lifetime/index>` , 它将会在当前web请求结束时释放. 无论是手动依赖解析还是服务查找, 它都会被用到. 它包含的组件(单例除外)对于当前请求是特有的(即是 :doc:`每个请求生命周期依赖 <../faq/per-request-scope>` 解析的地方).
 
-Tips and Tricks
+小贴士
 ===============
 
-Structuring Pages and User Controls for DI
+构造页面及控件以支持DI
 ------------------------------------------
 
-In order to inject dependencies into web forms pages (``System.Web.UI.Page`` instances) or user controls (``System.Web.UI.UserControl`` instances) **you must expose their dependencies as public properties that allow setting**. This enables the ``PropertyInjectionModule`` to populate those properties for you.
+为了把依赖注入进web forms pages (``System.Web.UI.Page`` 实例) 或用户控件 (``System.Web.UI.UserControl`` 实例) **你必须把这些依赖暴露为公有的并允许设置**. 这样才能让 ``PropertyInjectionModule`` 为你填充这些属性.
 
-Be sure to register the dependencies you'll need at application startup.
+确保在应用启动时注册你需要的依赖.
 
 .. sourcecode:: csharp
 
@@ -175,7 +175,7 @@ Be sure to register the dependencies you'll need at application startup.
     // container provider...
     _containerProvider = new ContainerProvider(builder.Build());
 
-Then in your page codebehind, create public get/set properties for the dependencies you'll need:
+然后在你页面的后台代码中, 为你需要的依赖创建公有的get/set属性:
 
 .. sourcecode:: csharp
 
@@ -192,21 +192,21 @@ Then in your page codebehind, create public get/set properties for the dependenc
       }
     }
 
-This same process of public property injection will work for user controls, too - just register the components at application startup and provide public get/set properties for the dependencies.
+公有属性注入的处理对于用户控件同样也是有用的 - 只要在应用启动时注册依赖并为依赖提供公有的get/set属性.
 
-It is important to note **in the case of user controls that properties will only be automatically injected if the control is created and added to the page's Controls collection by the PreLoad step of the page request lifecycle**. Controls created dynamically either in code or through templates like the Repeater will not be visible at this point and must have their properties manually injected.
+务必要注意 **只有当用户控件是在页面请求生命周期的PreLoad阶段被创建并加入到页面控件集合的情况下, 属性才会被自动注入**. 动态创建的控件, 无论是在代码中创建还是通过类似Repeater这样的模板创建, 此时都无法拿到依赖并且必需手动注入属性.
 
-Manual Property Injection
+手动依赖注入
 -------------------------
 
-In some cases, like in programmatic creation of user controls or other objects, you may need to manually inject properties on an object. To do this, you need to:
+在有些情况下, 例如程序创建用户控件或其它对象时, 你需要手动注入到该对象的属性上. 为此, 你需要:
 
-- Get the current application instance.
-- Cast it to ``Autofac.Integration.Web.IContainerProviderAccessor``.
-- Get the container provider from the application instance.
-- Get the ``RequestLifetime`` from the ``IContainerProvider`` and use the ``InjectProperties()`` method to inject the properties on the object.
+- 获取当前应用实例.
+- 转化成 ``Autofac.Integration.Web.IContainerProviderAccessor``.
+- 从应用实例中获取容器提供者(container provider).
+- 从 ``IContainerProvider`` 获取 ``RequestLifetime`` 并且使用 ``InjectProperties()`` 方法注入到该对象的属性上.
 
-In code, that looks like this:
+代码应该是这样的:
 
 .. sourcecode:: csharp
 
@@ -214,16 +214,16 @@ In code, that looks like this:
     var cp = cpa.ContainerProvider;
     cp.RequestLifetime.InjectProperties(objectToSet);
 
-Note you need both the ``Autofac`` and ``Autofac.Integration.Web`` namespaces in there to make property injection work because ``InjectProperties()`` is an extension method in the ``Autofac`` namespace.
+注意你需要 ``Autofac`` 和 ``Autofac.Integration.Web`` 命名空间来让属性注入有效因为 ``InjectProperties()`` 是 ``Autofac`` 命名空间下的扩展方法.
 
-Explicit Injection via Attributes
+通过特性显式注入
 ---------------------------------
 
-When adding dependency injection to an existing application, it is sometimes desirable to distinguish between web forms pages that will have their dependencies injected and those that will not. The ``InjectPropertiesAttribute`` in ``Autofac.Integration.Web``, coupled with the ``AttributedInjectionModule`` help to achieve this.
+当添加依赖注入到一个已经存在的应用中时, 有时候要区分有些web forms页面需要注入它们的依赖, 而有些不需要. ``Autofac.Integration.Web`` 中的 ``InjectPropertiesAttribute``, 搭配 ``AttributedInjectionModule`` 能够达到这一目的.
 
-**If you choose to use the AttributedInjectionModule, no dependencies will be automatically injected into public properties unless they're marked with a special attribute.**
+**如果你选择使用AttributedInjectionModule, 那么除非你用特殊的特性标记, 否则依赖将不会自动注入到公有属性上.**
 
-First, remove the ``PropertyInjectionModule`` from your ``web.config`` file and replace it with the ``AttributedInjectionModule``:
+首先, 从你的 ``web.config`` 文件中移除 ``PropertyInjectionModule`` 并且使用 ``AttributedInjectionModule`` 替换:
 
 .. sourcecode:: xml
 
@@ -254,10 +254,10 @@ First, remove the ``PropertyInjectionModule`` from your ``web.config`` file and 
       </system.webServer>
     </configuration>
 
-Once this is in place, pages and controls will not have their dependencies injected by default. Instead, they must be marked with the ``Autofac.Integration.Web.Forms.InjectPropertiesAttribute`` or ``Autofac.Integration.Web.Forms.InjectUnsetPropertiesAttribute``. The difference:
+完成后, 页面和控件将默认不会注入依赖. 它们必须被标记为 ``Autofac.Integration.Web.Forms.InjectPropertiesAttribute`` 或 ``Autofac.Integration.Web.Forms.InjectUnsetPropertiesAttribute``. 区别在于:
 
-- ``InjectPropertiesAttribute`` will always set public properties on the page/control if there are associated components registered with Autofac.
-- ``InjectUnsetPropertiesAttribute`` will only set the public properties on the page/control if they are null and the associated components are registered.
+- ``InjectPropertiesAttribute`` 只要相关的组件用Autofac注册了, 它总会设置页面或控件上的公有属性.
+- ``InjectUnsetPropertiesAttribute`` 如果相关的组件用Autofac注册了且页面或控件上的公有属性为null, 它才会去设值.
 
 .. sourcecode:: csharp
 
@@ -270,12 +270,12 @@ Once this is in place, pages and controls will not have their dependencies injec
       // ...use the property later as needed.
     }
 
-Dependency Injection via Base Page Class
+通过基础页(Base Page)类完成依赖注入
 ----------------------------------------
 
-If you would rather not automatically inject properties using a module (e.g., the ``AttributedInjectionModule`` or ``PropertyInjectionModule`` as mentioned earlier), you can integrate Autofac in a more manual manner by creating a base page class that does manual property injection during the ``PreInit`` phase of the page request lifecycle.
+如果你不想使用模块来自动注入依赖 (如, 上面提到的 ``AttributedInjectionModule`` 或 ``PropertyInjectionModule`` ), 你通过创建一个基础页这种更为手动的方式来集成Autofac, 在页面请求的 ``PreInit`` 阶段完成手动注入依赖.
 
-This option allows you to derive pages that require dependency injection from a common base page class. Doing this may be desirable if you have only a very few pages that require dependency injection and you don't want the ``AttributedInjectionModule`` in the pipeline. (You still need the ``ContainerDisposalModule``.) If you have more than a small few pages it may be beneficial to consider explicit injection via attributes.
+这种方法允许你让那些需要注入依赖的页面继承自一个基础页类. 如果你只有一小部分页面需要依赖注入并且你不想要管道中存在 ``AttributedInjectionModule`` , 这种方法非常棒. (你依然需要 ``ContainerDisposalModule``.) 如果你不只是只有一小部分页面, 考虑通过特性来显式注入依赖非常有利.
 
 .. sourcecode:: csharp
 
@@ -286,20 +286,20 @@ This option allows you to derive pages that require dependency injection from a 
       cp.RequestLifetime.InjectProperties(this);
     }
 
-Custom Dependency Injection Modules
+自定义依赖注入模块
 -----------------------------------
 
-If the provided *Property*, *Unset Property*, and *Attributed* dependency injection models are unsuitable, it is very easy to create a custom injection behavior. Simply subclass ``Autofac.Integration.Web.DependencyInjectionModule`` and use the result in ``Web.config``.
+如果提供的 *Property*, *Unset Property* 和 *Attributed* 依赖注入的模式都不合适, 创建一个自定义注入行为也很容易. 只要继承 ``Autofac.Integration.Web.DependencyInjectionModule`` 并在 ``Web.config`` 中使用结果.
 
-There is one abstract member to implement:
+这是要实现的一个抽象成员:
 
 .. sourcecode:: csharp
 
     protected abstract IInjectionBehaviour GetInjectionBehaviourForHandlerType(Type handlerType);
 
-The returned ``IInjectionBehaviour`` can be one of the predefined ``NoInjection``, ``PropertyInjection``, or ``UnsetPropertyInjection`` properties; or a custom implementation of the ``IInjectionBehaviour`` interface.
+返回的 ``IInjectionBehaviour`` 可以是预定义的 ``NoInjection``, ``PropertyInjection`` 或 ``UnsetPropertyInjection`` 属性中一个; 或者是 ``IInjectionBehaviour`` 接口的一个自定义实现.
 
-Example
+示例
 =======
 
-There is an example project showing ASP.NET web forms integration `in the Autofac examples repository <https://github.com/autofac/Examples/tree/master/src/WebFormsExample>`_.
+`Autofac示例代码仓库 <https://github.com/autofac/Examples/tree/master/src/WebFormsExample>`_ 里有一个展示了ASP.NET web forms集成的示例项目.
