@@ -259,18 +259,18 @@ ASP.NET Core 1.1 引入了强类型容器配置的能力. 它提供了 ``Configu
 
 如果你使用Autofac其他的 :doc:`ASP.NET集成 <aspnet>` 你应该对它们和迁移至ASP.NET Core的关键区别感兴趣.
 
-* **使用InstancePerLifetimeScope(每个生命周期作用域一个实例)而不是InstancePerRequest(每个请求一个实例).** 以前的ASP.NET集成你可以注册依赖为 ``InstancePerRequest`` , 能保证每次HTTP请求只有唯一的依赖实例被创建. 这是有用的因为Autofac负责 :doc:`建立每个请求生命周期作用域 <../faq/per-request-scope>`. 随着 ``Microsoft.Extensions.DependencyInjection`` 的引入, 每个请求和其他子生命周期作用域的创建现在是框架提供的 `conforming container <http://blog.ploeh.dk/2014/05/19/conforming-container/>`_ 的一部分, 因此所有的子生命周期作用域是被同等对待的 - 现在已经不再有特别的 "请求级别作用" . 不再是注册你的依赖为 ``InstancePerRequest``, 而使用 ``InstancePerLifetimeScope`` , 你也可以得到相同的行为. 注意如果你在web请求中创建 *你自己的生命周期作用域* , 你将会在这些子作用域中得到新的实例.
+* **使用InstancePerLifetimeScope(每个生命周期作用域一个实例)而不是InstancePerRequest(每个请求一个实例).** 以前的ASP.NET集成你可以注册依赖为 ``InstancePerRequest`` , 能保证每次HTTP请求只有唯一的依赖实例被创建. 这是有用的因为Autofac负责 :doc:`建立每个请求生命周期作用域 <../faq/per-request-scope>`. 随着 ``Microsoft.Extensions.DependencyInjection`` 的引入, 每个请求和其他子生命周期作用域的创建现在是框架提供的 `conforming container <http://blog.ploeh.dk/2014/05/19/conforming-container/>`_ 的一部分, 因此所有的子生命周期作用域是被同等对待的 - 现在已经不再有特别的 "请求级别作用" . 现在不再注册你的依赖为 ``InstancePerRequest``, 而使用 ``InstancePerLifetimeScope`` , 你也可以得到相同的行为. 注意如果你在web请求中创建 *你自己的生命周期作用域* , 你将会在这些子作用域中得到新的实例.
 * **不再需要依赖解析器(DependencyResolver).** 其他ASP.NET集成机制在许多地方需要创建基于Autofac的自定义依赖解析器. 使用 ``Microsoft.Extensions.DependencyInjection`` 和 ``Startup.ConfigureServices`` 方法, 你现在只要返回 ``IServiceProvider`` , "神奇的事就发生了." 在控制器, 类等内部. 如果你需要手动定位服务, 拿 ``IServiceProvider`` 即可.
 * **没有特殊的中间件.** 以前的 :doc:`OWIN集成 <owin>` 需要特殊的Autofac中间件的注册, 用来管理请求生命周期作用域. ``Microsoft.Extensions.DependencyInjection`` 现在做了这些繁重的工作, 因此现在不需要注册额外的中间件了.
-* **不再需要手动注册控制器.** 你以前需要用Autofac手动注册所有的控制器这样DI才会work. ASP.NET Core框架现在自动传入所有控制器给服务解析因此你不必手动注册.
-* **没有通过依赖注入触发中间件的扩展方法.** :doc:`OWIN集成 <owin>` 有类似 ``UseAutofacMiddleware()`` 的扩展方法来允许依赖注入进入中间件内. 这些现在都将自动发生, 通过组合 `自动注入构造方法参数和动态解析中间件Invoke方法的参数 <http://docs.asp.net/en/latest/fundamentals/middleware.html>`_. ASP.NET Core框架负责了所有的这些事.
+* **不再需要手动注册控制器.** 你以前需要用Autofac手动注册所有的控制器这样DI才会work. ASP.NET Core框架现在在服务解析过程中将自动传入所有控制器, 因此你不必手动注册.
+* **没有通过依赖注入触发中间件的扩展方法.** :doc:`OWIN集成 <owin>` 有类似 ``UseAutofacMiddleware()`` 的扩展方法来允许依赖注入进入中间件内. 现在这些通过结合 `自动注入构造方法参数和动态解析中间件Invoke方法的参数 <http://docs.asp.net/en/latest/fundamentals/middleware.html>`_ , 都能自动完成, . ASP.NET Core框架负责了所有的这些事.
 * **MVC 和 Web API 现在是一个东西了.** 以前根据你是使用 MVC 还是 Web API ,有不同的方法hook进DI. 这两件东西在ASP.NET Core中被整合了, 因此只需构建一处依赖解析器, 只需维护一份配置.
 * **控制器不再从容器中解析; 只有控制器构造方法.** 这意味着控制器生命周期, 属性注入, 和其他的事不再归Autofac管理 - 它们归ASP.NET Core管理. 你可以使用 ``AddControllersAsServices()`` 改变 - 见下面的讨论.
 
 控制器作为服务
 =======================
 
-默认地, ASP.NET Core 会从容器中解析控制器 *参数* 但不会从中解析 *控制器* . 这不是个问题但它意味着:
+默认地, ASP.NET Core 会从容器中解析控制器 *参数* 但不会从中解析 *控制器* . 这并不是个问题但它意味着:
 
 * *控制器* 的生命周期归框架管理, 而非请求生命周期.
 * *控制器构造方法参数* 归请求生命周期管理.
@@ -370,18 +370,18 @@ Here's an example of what you do in ``Program.Main``:
     }
 
 
-Using a Child Scope as a Root
+把子作用域作为根作用域
 =============================
 
-In a complex application you may want to keep services registered using ``Populate()`` in a child lifetime scope. For example, an application that does some self-hosting of ASP.NET Core components may want to keep the MVC registrations and such isolated from the main container. The ``Populate()`` method offers an overload to allow you to specify a tagged child lifetime scope that should serve as the "container" for items.
+在一个复杂的应用中你也许会想要在子生命周期作用域中用 ``Populate()`` 注册服务. 例如, 一个有ASP.NET Core组件自托管的应用也许会想要使MVC注册等等和主容器独立起来. ``Populate()`` 方法提供了一个重载可以允许你指定一个带标签的子生命周期作用域, 让它成为MVC注册等等这些的 "容器".
 
 .. note::
 
-   If you use this, you will not be able to use the ASP.NET Core support for ``IServiceProviderFactory{TContainerBuilder}`` (the ``ConfigureContainer`` support). This is because ``IServiceProviderFactory{TContainerBuilder}`` assumes it's working at the root level.
+   如果这么做, 你将会无法使用ASP.NET Core ``IServiceProviderFactory{TContainerBuilder}`` 的支持 ( ``ConfigureContainer`` 支持). 因为 ``IServiceProviderFactory{TContainerBuilder}`` 假设它是工作在根级别的.
 
-:doc:`The .NET Core integration documentation shows an example of using a child lifetime scope as a root. <netcore>`
+:doc:`.NET Core集成文档里有一个展示了把子作用域作为根作用域的示例. <netcore>`
 
-Example
+示例
 =======
 
-There is an example project showing ASP.NET Core integration `in the Autofac examples repository <https://github.com/autofac/Examples/tree/master/src/AspNetCoreExample>`_.
+`Autofac示例代码仓库 <https://github.com/autofac/Examples/tree/master/src/WebApiExample.OwinSelfHost>`_ 里有一个展示了ASP.NET Core集成的示例项目.
