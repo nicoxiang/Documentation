@@ -2,9 +2,9 @@
 ASP.NET
 =======
 
-Autofac offers integration into several ASP.NET application types. The integration libraries provide features like easy connection of your Autofac container to the application lifecycle as well as support for things like :doc:`per-request component lifetime <../lifetime/instance-scope>`.
+Autofac提供了多种ASP.NET应用类型的集成. 集成库提供了如轻松地连接Autofac容器和应用生命周期的功能, 同时支持如 :doc:`每个请求(per-request)组件生命周期 <../lifetime/instance-scope>`.
 
-**These pages explain ASP.NET classic integration.** If you are using ASP.NET Core, :doc:`see the ASP.NET Core integration page <aspnetcore>`.
+**本章节解释了经典ASP.NET集成.** 如果你使用ASP.NET Core, :doc:`见ASP.NET Core集成章节 <aspnetcore>`.
 
 .. toctree::
 
