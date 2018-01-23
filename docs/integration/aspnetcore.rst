@@ -384,4 +384,4 @@ Here's an example of what you do in ``Program.Main``:
 示例
 =======
 
-`Autofac示例代码仓库 <https://github.com/autofac/Examples/tree/master/src/WebApiExample.OwinSelfHost>`_ 里有一个展示了ASP.NET Core集成的示例项目.
+`Autofac示例代码仓库 <https://github.com/autofac/Examples/tree/master/src/AspNetCoreExample>`_ 里有一个展示了ASP.NET Core集成的示例项目.
