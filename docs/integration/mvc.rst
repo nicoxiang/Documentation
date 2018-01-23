@@ -278,14 +278,14 @@ OWIN集成
 
 **次要问题: MVC并不是100%运行在OWIN管道中.** 它仍然需要 ``HttpContext.Current`` 和其他一些非OWIN的东西. 在应用startup的地方, 当MVC注册路由时, 它实例化了一个 ``IControllerFactory`` 随后创建了两个请求生命周期作用域. 它只发生在应用startup的路由注册时期, 而并非每个请求处理时, 但这仍然需要被知晓. 这是一个两个管道错乱的构件. `我们尝试解决 <https://github.com/autofac/Autofac.Mvc/issues/5>`_ 但并没有找到一个清楚合理的方法.
 
-Using "Plugin" Assemblies
+使用 "插件型" 程序集
 =========================
 
-If you have controllers in a "plugin assembly" that isn't referenced by the main application `you'll need to register your controller plugin assembly with the ASP.NET BuildManager <http://www.paraesthesia.com/archive/2013/01/21/putting-controllers-in-plugin-assemblies-for-asp-net-mvc.aspx>`_.
+如果你的控制器在并不是主应用直接引用的 "插件型程序集" 中, `你需要用ASP.NET BuildManager注册你的控制器插件程序集 <http://www.paraesthesia.com/archive/2013/01/21/putting-controllers-in-plugin-assemblies-for-asp-net-mvc.aspx>`_.
 
-You can do this through configuration or programmatically.
+你可以通过配置或以编程形式完成.
 
-**If you choose configuration**, you need to add your plugin assembly to the ``/configuration/system.web/compilation/assemblies`` list. If your plugin assembly isn't in the ``bin`` folder, you also need to update the ``/configuration/runtime/assemblyBinding/probing`` path.
+**如果你选择通过配置**, 你需要添加你的插件程序集到 ``/configuration/system.web/compilation/assemblies`` 列表. 如果你的插件程序集不在 ``bin`` 文件夹中, 你还需要修改 ``/configuration/runtime/assemblyBinding/probing`` 路劲.
 
 .. sourcecode:: xml
 
@@ -308,9 +308,9 @@ You can do this through configuration or programmatically.
       </system.web>
     </configuration>
 
-**If you choose programmatic registration**, you need to do it during pre-application-start before the ASP.NET ``BuildManager`` kicks in.
+**如果你选择通过编程形式**, 你需要在pre-application-start阶段, ASP.NET ``BuildManager`` 开始生效前去做.
 
-Create an initializer class to do the assembly scanning/loading and registration with the ``BuildManager``:
+创建一个initializer类, 用 ``BuildManager`` 来做程序集扫描/加载和注册的工作:
 
 .. sourcecode:: csharp
 
@@ -335,35 +335,35 @@ Create an initializer class to do the assembly scanning/loading and registration
       }
     }
 
-Then be sure to register your pre-application-start code with an assembly attribute:
+确保用一个程序集特性来注册你的pre-application-start代码:
 
 .. sourcecode:: csharp
 
     [assembly: PreApplicationStartMethod(typeof(Initializer), "Initialize")]
 
-Using the Current Autofac DependencyResolver
+使用Current Autofac DependencyResolver
 ============================================
 
-Once you set the MVC ``DependencyResolver`` to an ``AutofacDependencyResolver``, you can use ``AutofacDependencyResolver.Current`` as a shortcut to getting the current dependency resolver and casting it to an ``AutofacDependencyResolver``.
+只要你设置了MVC的 ``DependencyResolver`` 为 ``AutofacDependencyResolver``, 你就可以使用 ``AutofacDependencyResolver.Current`` 作为获取当前依赖解析器的快捷方法并且把它转换为 ``AutofacDependencyResolver``.
 
-Unfortunately, there are some gotchas around the use of ``AutofacDependencyResolver.Current`` that can result in things not working quite right. Usually these issues arise by using a product like `Glimpse <http://getglimpse.com/>`_ or `Castle DynamicProxy <http://www.castleproject.org/projects/dynamicproxy/>`_ that "wrap" or "decorate" the dependency resolver to add functionality. If the current dependency resolver is decorated or otherwise wrapped/proxied, you can't cast it to ``AutofacDependencyResolver`` and there's no single way to "unwrap it" or get to the actual resolver.
+不幸的是, 在使用 ``AutofacDependencyResolver.Current`` 会存在一些问题导致无法正常运行. 通常问题由使用 `Glimpse <http://getglimpse.com/>`_ 或 `Castle DynamicProxy <http://www.castleproject.org/projects/dynamicproxy/>`_ 这类会 "包装(wrap)" 或 "修饰(decorate)" 依赖解析器来添加功能的产品导致. 如果当前依赖解析器被修饰或包装/被代理(proxied), 你不可以将它转换成 ``AutofacDependencyResolver`` 也无法 "解开包装" 或获得真实的解析器.
 
-Prior to version 3.3.3 of the Autofac MVC integration, we tracked the current dependency resolver by dynamically adding it to the request lifetime scope. This got us around issues where we couldn't unwrap the ``AutofacDependencyResolver`` from a proxy... but it meant that ``AutofacDependencyResolver.Current`` would only work during a request lifetime - you couldn't use it in background tasks or at application startup.
+Autofac MVC 集成 3.3.3 版本之前, 我们通过把当前依赖解析器动态地添加到请求生命周期作用域来跟踪它. 这就让我们遇到了问题因为我们不能从代理中解开 ``AutofacDependencyResolver`` 的包装... 但它也意味着 ``AutofacDependencyResolver.Current`` 只能在请求生命周期内有效 - 你无法在后台任务或应用启动时使用它.
 
-Starting with version 3.3.3, the logic for locating ``AutofacDependencyResolver.Current`` changed to first attempt to cast the current dependency resolver; then to specifically look for signs it was wrapped using `Castle DynamicProxy <http://www.castleproject.org/projects/dynamicproxy/>`_ and unwrap it via reflection. Failing that... we can't find the current ``AutofacDependencyResolver`` so we throw an ``InvalidOperationException`` with a message like:
+从 3.3.3 版本开始, 定位 ``AutofacDependencyResolver.Current`` 的逻辑修改为首先尝试转换当前依赖解析器; 如果转换失败会去特意地查找解析器被 `Castle DynamicProxy <http://www.castleproject.org/projects/dynamicproxy/>`_ 包装了的一个标识并且通过反射解开包装. 这个时候如果我们还是... 我们无法找到当前 ``AutofacDependencyResolver`` 因此我们会抛出 ``InvalidOperationException`` 异常信息如下:
 
     The dependency resolver is of type 'Some.Other.DependencyResolver' but was expected to be of type 'Autofac.Integration.Mvc.AutofacDependencyResolver'. It also does not appear to be wrapped using DynamicProxy from the Castle Project. This issue could be the result of a change in the DynamicProxy implementation or the use of a different proxy library to wrap the dependency resolver.
 
-The typical place where this is seen is when using the action filter provider via ``ContainerBuilder.RegisterFilterProvider()``. The filter provider needs to access the Autofac dependency resolver and uses ``AutofacDependencyResolver.Current`` to do it.
+这通常会出现在通过 ``ContainerBuilder.RegisterFilterProvider()`` 使用action filter provider时. Filter provider 会用到Autofac依赖解析器并使用 ``AutofacDependencyResolver.Current`` .
 
-If you see this, it means you're decorating the resolver in a way that can't be unwrapped and functions that rely on ``AutofacDependencyResolver.Current`` will fail. The current solution is to not decorate the dependency resolver.
+如果你看到该错误, 这意味着你正在以一种无法解开的方式修饰解析器, 那些依赖 ``AutofacDependencyResolver.Current`` 的方法将会失败. 目前的解决方案是不要修饰解析器.
 
-Glimpse Integration
+Glimpse 集成
 ===================
 
-Integration of an MVC application with Glimpse when using Autofac is pretty much the same as with any other integration. **However, if you use action method parameter injection** (e.g., with ``builder.InjectActionInvoker()``) then Glimpse execution inspection will fail.
+使用Autofac时, MVC应用和Glimpse的集成和其它的集成大体上一致. **然而, 如果你在使用action方法参数注入** (如, 使用 ``builder.InjectActionInvoker()``) 那么Glimpse运行时检查将会失败.
 
-You can work around this by adding the following to your Glimpse configuration:
+可以通过添加如下Glimpse配置解决:
 
 .. sourcecode:: xml
 
@@ -380,18 +380,18 @@ You can work around this by adding the following to your Glimpse configuration:
       </tabs>
   </glimpse>
 
-Again, you **only need to do this if you're using the action parameter injection**. This is one of the many reasons it's recommended to use controller constructor injection instead of action method parameter injection.
+再次提醒, 你 **只需要在使用action方法参数注入时这么做**. 这也是我们推荐使用控制器构造方法参数注入而不是action方法参数注入的众多原因之一.
 
-For more info on why this is (including links to the associated info from Glimpse), `check out this issue <https://github.com/autofac/Autofac.Mvc/issues/7>`_.
+更多关于为什么这样的原因 (包括Glimpse相关信息的链接), `请查看此 issue <https://github.com/autofac/Autofac.Mvc/issues/7>`_.
 
-Unit Testing
+单元测试
 ============
 
-When unit testing an ASP.NET MVC app that uses Autofac where you have ``InstancePerRequest`` components registered, you'll get an exception when you try to resolve those components because there's no HTTP request lifetime during a unit test.
+当单元测试一个使用Autofac注册了 ``InstancePerRequest`` 组件的ASP.NET MVC应用时, 当你尝试解析这些组件时你会得到一个异常因为在单元测试中并没有HTTP请求生命周期.
 
-The :doc:`per-request lifetime scope <../faq/per-request-scope>` topic outlines strategies for testing and troubleshooting per-request-scope components.
+:doc:`per-request lifetime scope <../faq/per-request-scope>` 章节概述了测试和检查per-request-scope组件的对策.
 
-Example
+示例
 =======
 
-There is an example project showing ASP.NET MVC integration `in the Autofac examples repository <https://github.com/autofac/Examples/tree/master/src/MvcExample>`_.
+`Autofac示例代码仓库 <https://github.com/autofac/Examples/tree/master/src/MvcExample>`_ 里有一个展示了ASP.NET MVC集成的示例项目.
