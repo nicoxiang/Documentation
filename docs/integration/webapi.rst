@@ -243,7 +243,7 @@ Autofac引入了新的接口, 允许你集中注意实现filter的代码而不�
 
 .. sourcecode:: csharp
 
-    public interface ServiceCallActionFilterAttribute : ActionFilterAttribute
+    public class ServiceCallActionFilterAttribute : ActionFilterAttribute
     {
       public override void OnActionExecuting(HttpActionContext actionContext)
       {
