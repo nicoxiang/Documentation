@@ -1,6 +1,10 @@
-## Chinese translations progress
+## Autofac Chinese Documentation
 
- This is an unofficial chinese translation documents of Autofac. Any pull request will be accepted if bad translation exists or you have a better translation. Meanwhile you can provide translation of pages that are not in my translating plan.
+  This is an unofficial chinese translation documentation of Autofac. Any pull request will be accepted if bad translation exists or you have a better translation. Meanwhile you can provide translation of pages that are not in my translating plan.
+  
+  [README in English](https://github.com/nicoxiang/Documentation/blob/cn/README.en.md)
+
+## Chinese translations progress
 
 * Getting Started ![Progress](http://progressed.io/bar/100)
 * What's New *(not in the plan)* ![Progress](http://progressed.io/bar/0)
