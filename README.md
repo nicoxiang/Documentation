@@ -1,67 +1,9 @@
-# Autofac Documentation
-Usage and API documentation for Autofac and integration libraries.
-
-[![Documentation Status](https://readthedocs.org/projects/autofac/badge/?version=latest)](https://readthedocs.org/projects/autofac/?badge=latest)
-
-**[Check out the Autofac documentation at docs.autofac.org!](http://docs.autofac.org/)**
-
-## Updating the User Documentation Site
-
-User documentation is viewable at [https://docs.autofac.org](https://docs.autofac.org)
-(a CNAME to [https://autofac.readthedocs.org](https://autofac.readthedocs.org)).
-It is stored in the `/docs` folder in this source repo.
-
-To build the docs and see them locally, you need to follow the
-[Getting Started](https://docs.readthedocs.org/en/latest/getting_started.html)
-docs on Read The Docs so you get Python and Sphinx installed.
-
-The docs are written in [reStructuredText](http://sphinx-doc.org/rest.html),
-which is very similar to Markdown but not quite. References below.
-
-Updates to the documentation checked into the `/docs` folder will automatically
-propagate to Read The Docs. No build or separate push is required.
-
-### Building
-
-1. Install [Python 2.7](https://www.python.org/download/)
-2. Install Sphinx: `pip install sphinx sphinx-autobuild`
-3. Build the docs after you edit them. There should be NO errors or warnings: `make.bat html`
-
-### References
-
-* [ReStructured Text Quick Start](http://docutils.sourceforge.net/docs/user/rst/quickstart.html)
-* [ReStructured Text Quick Reference](http://docutils.sourceforge.net/docs/user/rst/quickref.html)
-* [ReStructured Text Cheat Sheet](http://docutils.sourceforge.net/docs/user/rst/cheatsheet.txt)
-* [ReStructured Text Primer](http://sphinx-doc.org/rest.html)
-* [Sphinx Markup Constructs](http://sphinx-doc.org/markup/index.html)
-* [ReadTheDocs Getting Started](https://docs.readthedocs.org/en/latest/getting_started.html)
-
-## Updating API Documentation
-
-The API documentation is hosted on `autofac.github.com` and the rendered/built docs are in there. This repository has the project that enables _building_ the doc (a manual process) but publishing is a separate step.
-
-The `Placeholder` project holds references to the various Autofac packages to document. Use that as the basis for gathering the list of doc sources.
-
-### Adding/Updating Doc Sources
-
-1. Add or update the NuGet package to the `Placeholder` project.
-2. Open the `app.config` for the `Placeholder` project and copy the assembly binding redirects to the appropriate location in `Documentation.shfbproj`. These are required for the documentation project to obey redirects.
-
-### Building the Documentation
-
-Run `msbuild Documentation.proj` to kick off the build. This will restore required NuGet packages, build the `Placeholder` project, and run documentation on the Autofac referenced assemblies.
-
-The build generates a lot of warnings. These indicate where we're missing documentation. (If you're looking to submit a PR, better API docs is a good thing...)
-
-Build output gets put in the `artifacts` folder.
-
-The contents of `artifacts\doc\Website` is what gets copied to the `autofac.github.com` repo.
-
 ## Chinese translations progress
 
-> Any pull request will be accepted if bad translation exists or you have a better translation. Meanwhile you can provider translation of pages that are not in the list below.
+ This is an unofficial chinese translation documents of Autofac. Any pull request will be accepted if bad translation exists or you have a better translation. Meanwhile you can provide translation of pages that are not in my translating plan.
 
 * Getting Started ![Progress](http://progressed.io/bar/100)
+* What's New *(not in the plan)* ![Progress](http://progressed.io/bar/0)
 * Registering Components ![Progress](http://progressed.io/bar/100)
 * Resolving Services
   * index ![Progress](http://progressed.io/bar/100)
@@ -69,7 +11,7 @@ The contents of `artifacts\doc\Website` is what gets copied to the `autofac.gith
   * Implicit Relationship Types ![Progress](http://progressed.io/bar/70)
 * Controlling Scope and Lifetime ![Progress](http://progressed.io/bar/100) 
 * Configuration  
-  * JSON/XML Configuration
+  * JSON/XML Configuration ![Progress](http://progressed.io/bar/0)
   * Modules ![Progress](http://progressed.io/bar/100)
 * Application Integration
   * ASP.NET 
@@ -77,9 +19,20 @@ The contents of `artifacts\doc\Website` is what gets copied to the `autofac.gith
     * MVC ![Progress](http://progressed.io/bar/100)
     * Web API ![Progress](http://progressed.io/bar/100)
     * Web Forms ![Progress](http://progressed.io/bar/100)
+    * RIA / Domain Services *(not in the plan)* ![Progress](http://progressed.io/bar/0)
   * .NET Core ![Progress](http://progressed.io/bar/100)
   * ASP.NET Core ![Progress](http://progressed.io/bar/80)
-* Best Practices and Recommendations
-* Examples
-* Glossary
+  * Windows Communication Foundation (WCF) *(not in the plan)* ![Progress](http://progressed.io/bar/0)
+  * Service Fabric ![Progress](http://progressed.io/bar/0)
+  * Managed Extensibility Framework (MEF) *(not in the plan)* ![Progress](http://progressed.io/bar/0)
+  * Common Service Locator *(not in the plan)* ![Progress](http://progressed.io/bar/0)
+  * Enterprise Library 5 *(not in the plan)* ![Progress](http://progressed.io/bar/0)
+  * NHibernate *(not in the plan)* ![Progress](http://progressed.io/bar/0)
+  * Moq *(not in the plan)* ![Progress](http://progressed.io/bar/0)
+  * FakeItEasy *(not in the plan)* ![Progress](http://progressed.io/bar/0)
+* Best Practices and Recommendations ![Progress](http://progressed.io/bar/0)
+* Advance Topics *(not in the plan)* ![Progress](http://progressed.io/bar/0)
+* Examples ![Progress](http://progressed.io/bar/0)
+* Frequently Asked Questions *(not in the plan)* ![Progress](http://progressed.io/bar/0)
+* Glossary ![Progress](http://progressed.io/bar/0)
   
