@@ -313,9 +313,9 @@ Relationship                                        Type                        
 
 所以当你使用这种关系类型注入些东西时, 也许会觉得 "我懂了, 可能会得到一个null值" . 然而, 你只是会得到一个空列表.
 
-Metadata Interrogation (Meta<B>, Meta<B, X>)
---------------------------------------------
-The :doc:`Autofac metadata feature <../advanced/metadata>` lets you associate arbitrary data with services that you can use to make decisions when resolving. If you want to make those decisions in the consuming component, use the ``Meta<B>`` relationship, which will provide you with a string/object dictionary of all the object metadata:
+元数据审查(Metadata Interrogation (Meta<B>, Meta<B, X>))
+-------------------------------------------------------------
+:doc:`Autofac元数据功能 <../advanced/metadata>` 允许你将任何数据和服务连接起来, 在解析时就可以用这些数据做出选择. 如果想在消费的组件中用这些数据做选择, 使用 ``Meta<B>`` 关联, 它提供给你一个所有元数据对象的string/object dictionary:
 
 .. sourcecode:: csharp
 
@@ -334,7 +334,7 @@ The :doc:`Autofac metadata feature <../advanced/metadata>` lets you associate ar
       }
     }
 
-You can use :doc:`strongly-typed metadata <../advanced/metadata>` as well, by specifying the metadata type in the ``Meta<B, X>`` relationship:
+你也可以通过在 ``Meta<B, X>`` 关联中指定元数据类型来使用 :doc:`强类型元数据 <../advanced/metadata>` :
 
 .. sourcecode:: csharp
 
@@ -353,11 +353,11 @@ You can use :doc:`strongly-typed metadata <../advanced/metadata>` as well, by sp
       }
     }
 
-If you have a lazy dependency for which you also need metadata, you can use ``Lazy<B,M>`` instead of the longer ``Meta<Lazy<B>, M>``.
+如果你有个延迟依赖也需要元数据, 可以使用 ``Lazy<B,M>`` 而不是更长的 ``Meta<Lazy<B>, M>``.
 
-Keyed Service Lookup (IIndex<X, B>)
------------------------------------
-In the case where you have many of a particular item (like the ``IEnumerable<B>`` relationship) but you want to pick one based on :doc:`service key <../advanced/keyed-services>`, you can use the ``IIndex<X, B>`` relationship. First, register your services with keys:
+键控服务的查找(Keyed Service Lookup (IIndex<X, B>))
+-----------------------------------------------------
+有时, 对于某个特定的服务你有很多实现 (类似 ``IEnumerable<B>`` 关系) 但你想要根据某个 :doc:`服务键 <../advanced/keyed-services>` 挑选其一, 你可以使用 ``IIndex<X, B>`` 关系. 首先, 通过键注册你的服务:
 
 .. sourcecode:: csharp
 
@@ -367,7 +367,7 @@ In the case where you have many of a particular item (like the ``IEnumerable<B>`
     builder.RegisterType<A>();
     var container = builder.Build();
 
-Then consume the ``IIndex<X, B>`` to get a dictionary of keyed services:
+然后消费 ``IIndex<X, B>`` 来得到一个键控服务的字典集合:
 
 .. sourcecode:: csharp
 
@@ -385,26 +385,26 @@ Then consume the ``IIndex<X, B>`` to get a dictionary of keyed services:
     }
 
 
-Composing Relationship Types
+组合关系类型
 ============================
 
-Relationship types can be composed, so:
+关系类型是可以被组合起来的, 因此:
 
 .. sourcecode:: csharp
 
     IEnumerable<Func<Owned<ITask>>>
 
-Is interpreted correctly to mean:
+可以解释为:
 
  * All implementations, of
  * Factories, that return
  * :doc:`Lifetime-controlled<../advanced/owned-instances>`
  * ``ITask`` services
 
-Relationship Types and Container Independence
+关系类型和容器独立性
 =============================================
-The custom relationship types in Autofac based on standard .NET types don't force you to bind your application more tightly to Autofac. They give you a programming model for container configuration that is consistent with the way you write other components (vs. having to know a lot of specific container extension points and APIs that also potentially centralize your configuration).
+Autofac中基于标准.NET类型的自定义关系类型不会强迫你把应用和Autofac过于紧密地绑定在一起. 它们使你可以通过编程模式来进行容器配置, 就像你写其他普通组件一样 (相比之下, 你需要知道很多容器扩展点和API, 通过这些也就潜在地集中化了你的配置).
 
-For example, you can still create a custom ``ITaskFactory`` in your core model, but provide an ``AutofacTaskFactory`` implementation based on ``Func<Owned<ITask>>`` if that is desirable.
+例如, 你仍然可以在核心的model中创建一个自定义的 ``ITaskFactory`` , 但是可以在需要时提供一个基于 ``Func<Owned<ITask>>`` 的 ``AutofacTaskFactory`` 实现.
 
-Note that some relationships are based on types that are in Autofac (e.g., ``IIndex<X, B>``). Using those relationship types do tie you to at least having a reference to Autofac, even if you choose to use a different IoC container for the actual resolution of services.
+注意有些关系类型基于Autofac中的类型 (如 ``IIndex<X, B>``). 使用这些关系类型的确会束缚你, 至少你得有一个对于Autofac的引用, 即使你在实际解析服务时选择一个不同的Ioc容器.
