@@ -12,7 +12,7 @@
 * Resolving Services
   * index ![Progress](http://progressed.io/bar/100)
   * Passing Parameters to Resolve ![Progress](http://progressed.io/bar/100)
-  * Implicit Relationship Types ![Progress](http://progressed.io/bar/70)
+  * Implicit Relationship Types ![Progress](http://progressed.io/bar/100)
 * Controlling Scope and Lifetime ![Progress](http://progressed.io/bar/100) 
 * Configuration  
   * JSON/XML Configuration ![Progress](http://progressed.io/bar/0)
