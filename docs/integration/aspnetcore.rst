@@ -305,22 +305,22 @@ ASP.NET Core 1.1 引入了强类型容器配置的能力. 它提供了 ``Configu
 
 这里有一篇更详尽的文章 `Filip Woj's blog <http://www.strathweb.com/2016/03/the-subtle-perils-of-controller-dependency-injection-in-asp-net-core-mvc/>`_. 注意其中的一位评论者 `发现RC2中把控制器作为服务时发生了一些改变 <http://www.strathweb.com/2016/03/the-subtle-perils-of-controller-dependency-injection-in-asp-net-core-mvc/#comment-2702995712>`_.
 
-Multitenant Support
+多租户支持
 ===================
 
-Due to the way ASP.NET Core is eager about generating the request lifetime scope it causes multitenant support to not quite work out of the box. Sometimes the ``IHttpContextAccessor``, commonly used in tenant identification, also isn't set up in time. The `Autofac.AspNetCore.Multitenant <https://github.com/autofac/Autofac.AspNetCore.Multitenant>`_ package was added to fix that.
+由于ASP.NET Core想要早早地生成请求生命周期作用域, 这会导致多租户支持无法达到开箱即用的效果. 有时用于识别租户身份的 ``IHttpContextAccessor`` , 也无法被及时地构建. `Autofac.AspNetCore.Multitenant <https://github.com/autofac/Autofac.AspNetCore.Multitenant>`_ 包就是用于解决这个问题的.
 
-To enable multitenant support:
+为了启用多租户支持:
 
-* Add a reference to the ``Autofac.AspNetCore.Multitenant`` NuGet package.
-* In your ``Program.Main`` when building the web host...
+* 添加 ``Autofac.AspNetCore.Multitenant`` NuGet包引用.
+* 在 ``Program.Main`` 中构建web host时...
 
-  * Include a call to the ``UseAutofacMultitenantRequestServices`` extension and let Autofac know how to locate your multitenant container.
-  * **Do not use** the ``ConfigureContainer`` support listed above. You can't do that because it won't give you a chance to create your multitenant container.
+  * 调用 ``UseAutofacMultitenantRequestServices`` 扩展方法来让Autofac知道如何找到你的多租户容器(multitenant container).
+  * **不要使用上面提到的** ``ConfigureContainer`` . 因为它不会让你有机会创建你的多租户容器.
 
-* Change your ``Startup.ConfigureServices`` method to return ``IServiceProvider``, create your multitenant container, and return an ``AutofacServiceProvider`` using that container.
+* 修改 ``Startup.ConfigureServices`` 方法让它返回 ``IServiceProvider``, 创建你的多租户容器, 并用该容器返回 ``AutofacServiceProvider`` .
 
-Here's an example of what you do in ``Program.Main``:
+下面是 ``Program.Main`` 的一个示例:
 
 .. sourcecode:: csharp
 
@@ -345,7 +345,7 @@ Here's an example of what you do in ``Program.Main``:
       }
     }
 
-...and here's what ``Startup`` looks like:
+... ``Startup`` 类似这样:
 
 .. sourcecode:: csharp
 
