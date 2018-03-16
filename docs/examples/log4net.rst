@@ -1,12 +1,12 @@
 ==========================
-log4net Integration Module
+log4net集成模块
 ==========================
 
-While there is no specific assembly for log4net support, you can easily inject ``log4net.ILog`` values using a very small custom module.
+尽管没有特定的程序集支持log4net, 但你可以使用一个很小的自定义模块来轻松注入 ``log4net.ILog`` .
 
-This module is also a good example of how to use :doc:`Autofac modules <../configuration/modules>` for more than simple configuration - they're also helpful for doing some more advanced extensions.
+该模块也是一个使用 :doc:`Autofac模块 <../configuration/modules>` 很好的示例, 它不仅仅只是简单的配置 - 它们对于做一些高级的扩展很有帮助.
 
-Here's a sample module that configures Autofac to inject ``ILog`` parameters based on the type of the component being activated. This sample module will handle both constructor and property injection.
+下面就是这么个示例模块, 它配置了Autofac让它在组件被激活时, 将上面的 ``ILog`` 参数进行注入. 这个示例模块同时处理了构造方法注入和属性注入.
 
 .. sourcecode:: csharp
 
@@ -52,6 +52,6 @@ Here's a sample module that configures Autofac to inject ``ILog`` parameters bas
       }
     }
 
-**Performance Note**: At the time of this writing, calling ``LogManager.GetLogger(type)`` has a slight performance hit as the internal log manager locks the collection of loggers to retrieve the appropriate logger. An enhancement to the module would be to add caching around logger instances so you can reuse them without the lock hit in the ``LogManager`` call.
+**性能提醒**: 在写这篇文章的时候, 我们发现调用 ``LogManager.GetLogger(type)`` 会有一些轻微的性能下降因为内部的log manager锁住了loggers集合, 使它没法直接拿到合适的logger. 可以对该模块进行一些改性, 添加对logger实例的缓存, 这样你就能重复使用它们而不会在调用 ``LogManager`` 时有锁冲突了.
 
-Thanks for the original idea/contribution by Rich Tebb/Bailey Ling where the idea was posted `on the Autofac newsgroup <https://groups.google.com/forum/#!msg/autofac/Qb-dVPMbna0/s-jLeWeST3AJ>`_.
+感谢Rich Tebb/Bailey Ling的原始想法和所做的贡献, 发布于 `Autofac newsgroup <https://groups.google.com/forum/#!msg/autofac/Qb-dVPMbna0/s-jLeWeST3AJ>`_.

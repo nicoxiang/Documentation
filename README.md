@@ -33,7 +33,7 @@
   * FakeItEasy *(not in the plan)* ![Progress](http://progressed.io/bar/0)
 * Best Practices and Recommendations ![Progress](http://progressed.io/bar/0)
 * Advance Topics *(not in the plan)* ![Progress](http://progressed.io/bar/0)
-* Examples ![Progress](http://progressed.io/bar/0)
+* Examples ![Progress](http://progressed.io/bar/100)
 * Frequently Asked Questions *(not in the plan)* ![Progress](http://progressed.io/bar/0)
 * Glossary ![Progress](http://progressed.io/bar/0)
   
