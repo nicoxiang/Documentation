@@ -25,7 +25,7 @@
     * Web Forms ![Progress](http://progressed.io/bar/100)
     * RIA / Domain Services *(not in the plan)* ![Progress](http://progressed.io/bar/0)
   * .NET Core ![Progress](http://progressed.io/bar/100)
-  * ASP.NET Core ![Progress](http://progressed.io/bar/80)
+  * ASP.NET Core ![Progress](http://progressed.io/bar/100)
   * Windows Communication Foundation (WCF) *(not in the plan)* ![Progress](http://progressed.io/bar/0)
   * Service Fabric ![Progress](http://progressed.io/bar/0)
   * Managed Extensibility Framework (MEF) *(not in the plan)* ![Progress](http://progressed.io/bar/0)
