@@ -12,14 +12,11 @@ Autofac允许容器创建完成时通知组件或者自动激活组件.
 
 所有三种情况, **都是在容器创建完成时, 组件就被激活了**.
 
-<<<<<<< HEAD
 **尽量少使用启动时运行代码.** 你有可能会因为过度使用它而陷入困境. 更多信息见 "Tips" 章节.
 
 .. contents::
   :local:
 
-=======
->>>>>>> 64f8901eccf98f2d356bd8e835f455cc1637b28c
 可启动组件
 ====================
 
@@ -29,7 +26,7 @@ Autofac允许容器创建完成时通知组件或者自动激活组件.
 
 **对于每个组件的每一个实例, 这只会发生一次, 在容器第一次被创建的时候.** 手动解析可启动组件不会造成它们 ``Start()`` 方法被调用. 我们不推荐可启动组件实现其他服务, 或者以除 ``SingleInstance()`` 之外的形式被注册.
 
-如果一个组件需要类似 ``Start()`` 的方法 *每次被激活时* 都被调用, 应该使用类似 ``OnActivated(激活后)`` 这样的 :doc:`生命周期事件 <events>` 替代.
+如果一个组件需要 ``Start()`` 的方法 *每次被激活时* 都被调用, 应该使用类似 ``OnActivated(激活后)`` 这样的 :doc:`生命周期事件 <events>` 替代.
 
 想要创建可启动组件, 实现 ``Autofac.IStartable``:
 
@@ -123,7 +120,7 @@ Will output the following:
 容器创建回调
 =========================
 
-你可以通过容器创建回调在容器创建时注册任何动作. 创建回调指的是一个 ``Action<IContainer>`` 并且会在容器 ``ContainerBuilder.Build`` 返回之前得到已创建完成的容器. 创建回调以他们注册的顺序执行:
+你可以通过容器创建回调在容器创建时注册任何动作. 创建回调指的是一个 ``Action<IContainer>`` 并且能在容器 ``ContainerBuilder.Build`` 返回之前得到已创建完成的容器. 创建回调以他们注册的顺序执行:
 
 .. sourcecode:: csharp
 
@@ -264,25 +261,16 @@ Will output the following:
     Dependency4.Initialize
 
 你会从输出中注意到回调和 ``OnActivated`` 方法是以依赖顺序执行的. 如果你想让激活 *和* 启动都是以依赖顺序执行 (不只是激活/解析), 这是一个解决方案.
-<<<<<<< HEAD
 
-<<<<<<< HEAD
-Note if you don't use ``SingleInstance`` then ``OnActivated`` will be called for *every new instance of the dependency*. Since "warm start" objects are usually singletons and are expensive to create, this is generally what you want anyway.
+注意如果你不调用 ``SingleInstance`` 那么 ``OnActivated`` 方法将会在 *每个依赖的新实例* 创建时被调用. 由于 "热启动" 对象通常是单例且创建需要消耗较大资源, 所以还是以单例注册吧.
 
 Tips
 ====
 
-**Order**: In general, startup logic happens in the order ``IStartable.Start()``, ``AutoActivate``, build callbacks. That said, it is *not guaranteed*. For example, as noted in the ``IStartable`` docs above, things will happen in dependency order rather than registration order. Further, Autofac reserves the right to change this order (e.g., refactor the calls to ``IStartable.Start()`` and ``AutoActivate`` into build callbacks). If you need to control the specific order in which initialization logic runs, it's better to write your own initialization logic where you can control the order.
+**顺序**: 大部分的情况下, startup 逻辑以 ``IStartable.Start()``, ``AutoActivate``, build callbacks(创建回调)这样的顺序进行. 意思是, 这 *并不是可以完全保证的*. 例如, 注意上面的 ``IStartable`` 文档, 其实是以依赖的顺序二并非注册的顺序进行的. 进一步来说, Autofac 保留了改变顺序的权利 (例如, 把调用 ``IStartable.Start()`` 和 ``AutoActivate`` 重构进创建回调内部). 如果你需要控制初始化逻辑运行的具体顺序, 最好在你控制顺序的地方编写你自己的初始化顺序.
 
-**Avoid creating lifetime scopes during IStartable.Start or AutoActivate**: If your startup logic includes the creation of a lifetime scope from which components will be resolved, this scope won't have all the startables executed yet. By creating the scope, you're forcing a race condition. This sort of logic would be better to execute in custom logic after the container is built rather than as part of an ``IStartable``.
+**不要在 IStartable.Start 或 AutoActivate 过程中创建生命周期**: 如果你的 startup 逻辑中包括生命周期的创建(组件从中被解析), 这时候并非所有的 startables 都已执行. 创建这样的生命周期, 会造成资源竞争. 这样的逻辑放在容器创建后的自定义逻辑中更好, 而不是作为 ``IStartable`` 的一部分.
 
-**Avoid overusing startup logic**: The ability to run startup logic on container build may feel like it's also a good fit for orchestrating general application startup logic. Given the ordering and other challenges you may run into, it is recommended you keep *application startup* logic separate from *dependency startup* logic.
+**不要过度使用 startup 逻辑**: 在容器创建时可以执行 startup 逻辑的能力会让人感觉在这时安排一般的应用启动逻辑都是合适的. 而考虑到顺序和其他你也许会遇到的挑战, 我们建议你将 *应用启动* 逻辑和 *依赖启动* 逻辑分开.
 
-**Consider OnActivated and SingleInstance for lazy initialization**: Instead of using build callbacks or startup logic, consider using :doc:`the lifetime event OnActivated <events>` with a ``SingleInstance`` registration so the initialization can happen on an object but not be tied to the order of container build.
-=======
-注意如果你不调用 ``SingleInstance`` 那么 ``OnActivated`` 方法将会在 *每个依赖的新实例* 创建时被调用. 由于 "热启动" 对象通常是单例且创建需要消耗较大资源, 所以还是以单例注册吧.
->>>>>>> 100% of lifetime startup
-=======
-
-注意如果你不调用 ``SingleInstance`` 那么 ``OnActivated`` 方法将会在 *每个依赖的新实例* 创建时被调用. 由于 "热启动" 对象通常是单例且创建需要消耗较大资源, 所以还是以单例注册吧.
->>>>>>> 64f8901eccf98f2d356bd8e835f455cc1637b28c
+**考虑使用 OnActivated 和 SingleInstance 来做延迟初始化**: 我们可以不使用创建回调或 startup 逻辑, 取而代之的, 可以用 :doc:`生命周期激活后事件 <events>` 和 ``单例`` 注册, 这样初始化将会发生在一个对象上, 而不需要受限于容器创建的顺序.
