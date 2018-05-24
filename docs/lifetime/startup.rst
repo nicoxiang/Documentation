@@ -12,11 +12,14 @@ Autofac允许容器创建完成时通知组件或者自动激活组件.
 
 所有三种情况, **都是在容器创建完成时, 组件就被激活了**.
 
+<<<<<<< HEAD
 **尽量少使用启动时运行代码.** 你有可能会因为过度使用它而陷入困境. 更多信息见 "Tips" 章节.
 
 .. contents::
   :local:
 
+=======
+>>>>>>> 64f8901eccf98f2d356bd8e835f455cc1637b28c
 可启动组件
 ====================
 
@@ -261,6 +264,7 @@ Will output the following:
     Dependency4.Initialize
 
 你会从输出中注意到回调和 ``OnActivated`` 方法是以依赖顺序执行的. 如果你想让激活 *和* 启动都是以依赖顺序执行 (不只是激活/解析), 这是一个解决方案.
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 Note if you don't use ``SingleInstance`` then ``OnActivated`` will be called for *every new instance of the dependency*. Since "warm start" objects are usually singletons and are expensive to create, this is generally what you want anyway.
@@ -278,3 +282,7 @@ Tips
 =======
 注意如果你不调用 ``SingleInstance`` 那么 ``OnActivated`` 方法将会在 *每个依赖的新实例* 创建时被调用. 由于 "热启动" 对象通常是单例且创建需要消耗较大资源, 所以还是以单例注册吧.
 >>>>>>> 100% of lifetime startup
+=======
+
+注意如果你不调用 ``SingleInstance`` 那么 ``OnActivated`` 方法将会在 *每个依赖的新实例* 创建时被调用. 由于 "热启动" 对象通常是单例且创建需要消耗较大资源, 所以还是以单例注册吧.
+>>>>>>> 64f8901eccf98f2d356bd8e835f455cc1637b28c
