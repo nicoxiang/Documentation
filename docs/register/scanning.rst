@@ -31,21 +31,21 @@ Autofac也可以被认为是约定驱动注册或扫描的, 它可以根据用�
     builder.RegisterAssemblyTypes(asm)
            .PublicOnly();
 
-要过滤注册的类型, 使用 ``Where()`` 谓语表达式:
+要过滤注册的类型, 使用 ``Where()`` 表达式:
 
 .. sourcecode:: csharp
 
     builder.RegisterAssemblyTypes(asm)
            .Where(t => t.Name.EndsWith("Repository"));
 
-要从扫描类型中排除类型, 使用 ``Except()`` 谓语表达式:
+要从扫描类型中排除类型, 使用 ``Except()`` 表达式:
 
 .. sourcecode:: csharp
 
     builder.RegisterAssemblyTypes(asm)
            .Except<MyUnwantedType>();
 
-``Except()`` 谓语表达式同样允许你自定义类型排除的规则:
+``Except()`` 表达式同样允许你自定义类型排除的规则:
 
 .. sourcecode:: csharp
 
