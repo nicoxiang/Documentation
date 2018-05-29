@@ -31,7 +31,7 @@
   * NHibernate *(not in the plan)* ![Progress](http://progressed.io/bar/0)
   * Moq *(not in the plan)* ![Progress](http://progressed.io/bar/0)
   * FakeItEasy *(not in the plan)* ![Progress](http://progressed.io/bar/0)
-* Best Practices and Recommendations ![Progress](http://progressed.io/bar/0)
+* Best Practices and Recommendations ![Progress](http://progressed.io/bar/100)
 * Advance Topics *(not in the plan)* ![Progress](http://progressed.io/bar/0)
 * Examples ![Progress](http://progressed.io/bar/100)
 * Frequently Asked Questions *(not in the plan)* ![Progress](http://progressed.io/bar/0)
