@@ -126,6 +126,30 @@ Autofac可以自动释放一些组件, 但你也可以手动指定释放机制.
 
 区分 **你创建的** 生命周期作用域和 **集成库替你创建** 的生命周期作用域是非常重要的. 你不用担心管理集成的作用域 (如 ASP.NET 请求作用域) - 这些会自动完成. 然而, 如果你手动创建了你自己的作用域, 你需要负责它的释放.
 
+已提供的实例
+==================
+
+如果你已经提供了 :doc:`一个实例组件注册 <../register/registration>` 给Autofac, Autofac将会获取实例的所有权并处理它的释放.
+
+.. sourcecode:: csharp
+
+    // If you do this, Autofac will dispose of the StringWriter
+    // instance when the container is disposed.
+    var output = new StringWriter();
+    builder.RegisterInstance(output)
+           .As<TextWriter>();
+
+如果你想要自己来控制实例的释放, 你需要将实例注册为 ``ExternallyOwned()``.
+
+.. sourcecode:: csharp
+
+    // Using ExternallyOwned means you will be responsible for
+    // disposing the StringWriter instead of Autofac.
+    var output = new StringWriter();
+    builder.RegisterInstance(output)
+           .As<TextWriter>()
+           .ExternallyOwned();
+
 更复杂的层级结构
 ====================
 
