@@ -1,3 +1,9 @@
+# LOOKING FOR MAINTAINERS
+
+Due to personal reason I can't put much focus on this project, so if you're interested in maintaining `autofac chinese documentation`, feel free to open an issue to get in touch!
+
+----
+
 ## Autofac Chinese Documentation
 
   This is an unofficial chinese translation documentation of Autofac. Any pull request will be accepted if bad translation exists or you have a better translation. Meanwhile you can provide translation of pages that are not in my translating plan.
