@@ -17,9 +17,7 @@ Due to personal reason I can't put much focus on this project, so if you're inte
 * Registering Components ![Progress](http://progressed.io/bar/100)
 * Resolving Services ![Progress](http://progressed.io/bar/100)
 * Controlling Scope and Lifetime ![Progress](http://progressed.io/bar/100) 
-* Configuration  
-  * JSON/XML Configuration ![Progress](http://progressed.io/bar/0)
-  * Modules ![Progress](http://progressed.io/bar/100)
+* Configuration ![Progress](http://progressed.io/bar/100)
 * Application Integration
   * ASP.NET 
     * OWIN ![Progress](http://progressed.io/bar/100)
