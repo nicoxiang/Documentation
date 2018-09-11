@@ -95,7 +95,7 @@ ASP.NET Core 1.1 引入了强类型容器配置的能力. 它提供了 ``Configu
 入门 (Without ConfigureContainer)
 ========================================
 
-如果你在创建你的容器时需要更多的灵活性或者你需要存储所创建容器的引用 (如, 这样你就可以在应用停止时自己释放容器), 你需要跳过 ``ConfigureContainer`` 并且在 ``ConfigureServices`` 中注册所有东西. 这也是你在ASP.NET Core 1.0中需要采取的方式.
+如果你在创建你的容器时需要更多的灵活性或者你需要存储所创建容器的引用, 你需要跳过 ``ConfigureContainer`` 并且在 ``ConfigureServices`` 中注册所有东西. 这也是你在ASP.NET Core 1.0中需要采取的方式.
 
 * Nuget引入 ``Autofac.Extensions.DependencyInjection`` 包.
 * 在你的 ``Startup`` 类的 ``ConfigureServices`` 方法中...
@@ -104,8 +104,6 @@ ASP.NET Core 1.1 引入了强类型容器配置的能力. 它提供了 ``Configu
   - 直接注册服务到 ``ContainerBuilder`` .
   - 创建容器.
   - 使用容器创建 ``AutofacServiceProvider`` 并返回.
-
-* 在你的 ``Startup`` 类的 ``Configure`` 方法中, 你可以选择性地在应用停止时注册 ``IApplicationLifetime.ApplicationStopped`` 事件释放容器.
 
 .. sourcecode:: csharp
 
@@ -136,9 +134,7 @@ ASP.NET Core 1.1 引入了强类型容器配置的能力. 它提供了 ``Configu
         var builder = new ContainerBuilder();
 
         // Register dependencies, populate the services from
-        // the collection, and build the container. If you want
-        // to dispose of the container at the end of the app,
-        // be sure to keep a reference to it as a property or field.
+        // the collection, and build the container.
         //
         // Note that Populate is basically a foreach to add things
         // into Autofac that are in the collection. If you register
@@ -167,11 +163,15 @@ ASP.NET Core 1.1 引入了强类型容器配置的能力. 它提供了 ``Configu
 
           app.UseMvc();
 
-          // If you want to dispose of resources that have been resolved in the
+          // As of Autofac.Extensions.DependencyInjection 4.3.0 the AutofacDependencyResolver
+          // implements IDisposable and will be disposed - along with the application container -
+          // when the app stops and the WebHost disposes it.
+          //
+          // Prior to 4.3.0, if you want to dispose of resources that have been resolved in the
           // application container, register for the "ApplicationStopped" event.
           // You can only do this if you have a direct reference to the container,
           // so it won't work with the above ConfigureContainer mechanism.
-          appLifetime.ApplicationStopped.Register(() => this.ApplicationContainer.Dispose());
+          // appLifetime.ApplicationStopped.Register(() => this.ApplicationContainer.Dispose());
       }
     }
 
