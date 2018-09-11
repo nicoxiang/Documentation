@@ -1,40 +1,40 @@
 ==========================
-JSON/XML Configuration
+JSON/XML 配置
 ==========================
 
-Most IoC containers provide a programmatic interface as well as JSON/XML file-based configuration support, and Autofac is no exception.
+大多数的IoC容器在提供可编程配置接口的同时, 也会支持基于JSON/XML文件配置, Autofac也不例外.
 
-Autofac encourages programmatic configuration through the ``ContainerBuilder`` class. Using the programmatic interface is central to the design of the container. JSON or XML is recommended when concrete classes cannot be chosen or configured at compile-time.
+Autofac鼓励通过 ``ContainerBuilder`` 类进行编程配置. 使用可编程接口是容器设计的核心. 当遇到实体类无法在编译时被选中或配置的情况, 推荐使用JSON 或 XML.
 
-Before diving too deeply into JSON/XML configuration, be sure to read :doc:`Modules<modules>` - this explains how to handle more complex scenarios than the basic JSON/XML component registration will allow. Configuration in JSON/XML is not a feature-for-feature replacement for programmatic configuration, so complex scenarios may require a combination of JSON/XML and modules.
+在深入挖掘JSON/XML配置章节前, 请确保已阅读 :doc:`Modules<modules>` - 该章节解释了如何处理比JSON/XML组件注册所能容许的更复杂的场景. JSON/XML配置并不是编程配置的功能替代方案, 复杂的场景也许会需要JSON/XML和模块(modules)配置的组合.
 
 .. contents::
   :local:
   :depth: 2
 
-Configuring With Microsoft Configuration (4.0+)
+使用 Microsoft Configuration 配置(4.0+)
 ===============================================
 
 .. note::
 
-   Microsoft Configuration applies to the 4.0+ version of Autofac.Configuration. It does not work with previous versions of the configuration package.
+   Microsoft Configuration 适用于Autofac.Configuration 4.0+ 版本. 之前版本的configuration包无法适用.
 
-With the release of `Microsoft.Extensions.Configuration <https://www.nuget.org/packages/Microsoft.Extensions.Configuration>`_, and Autofac.Configuration 4.0.0, Autofac takes advantage of the more flexible configuration model not previously available when limited to application configuration files. If you were using the ``app.config`` or ``web.config`` based configuration available before, you will need to migrate your configuration to the new format and update the way you set configuration with your application container.
+随着 `Microsoft.Extensions.Configuration <https://www.nuget.org/packages/Microsoft.Extensions.Configuration>`_, 和 Autofac.Configuration 4.0.0 的发布, Autofac利用了更复杂的配置模型, 而在此之前它受限于应用的配置文件. 如果你以前使用基于 ``app.config`` 或 ``web.config`` 的配置文件, 你将需要迁移你的配置到最新的格式, 并更改你进行应用容器配置的方式.
 
-Quick Start
+入门
 -----------
-The basic steps to getting configuration set up with your application are:
+基础的应用配置有以下几步:
 
-1. Set up your configuration in JSON or XML files that can be read by ``Microsoft.Extensions.Configuration``.
+1. 创建能够被 ``Microsoft.Extensions.Configuration`` 读取的JSON或XML配置文件.
 
-   * JSON configuration uses ``Microsoft.Extensions.Configuration.Json``
-   * XML configuration uses ``Microsoft.Extensions.Configuration.Xml``
+   * JSON配置使用 ``Microsoft.Extensions.Configuration.Json``
+   * XML配置使用 ``Microsoft.Extensions.Configuration.Xml``
 
-2. Build the configuration using the ``Microsoft.Extensions.Configuration.ConfigurationBuilder``.
-3. Create a new ``Autofac.Configuration.ConfigurationModule`` and pass the built ``Microsoft.Extensions.Configuration.IConfiguration`` into it.
-4. Register the ``Autofac.Configuration.ConfigurationModule`` with your container.
+2. 使用 ``Microsoft.Extensions.Configuration.ConfigurationBuilder`` 构建配置.
+3. 创建一个新的 ``Autofac.Configuration.ConfigurationModule`` , 然后把构建好的 ``Microsoft.Extensions.Configuration.IConfiguration`` 传递进去.
+4. 用你的容器注册 ``Autofac.Configuration.ConfigurationModule``.
 
-A configuration file with some simple registrations looks like this:
+一个含有简单注册的配置文件类似如下:
 
 .. sourcecode:: json
 
@@ -57,7 +57,7 @@ A configuration file with some simple registrations looks like this:
       }]
     }
 
-JSON is cleaner and easier to read, but if you prefer XML, the same configuration looks like this:
+JSON更清晰易读, 但如果你更喜欢XML, 相同的配置类似如下:
 
 .. sourcecode:: xml
 
@@ -78,9 +78,9 @@ JSON is cleaner and easier to read, but if you prefer XML, the same configuratio
         </components>
     </autofac>
 
-*Note the ordinal "naming" of components and services in XML - this is due to the way Microsoft.Extensions.Configuration handles ordinal collections (arrays).*
+*注意XML中组件和服务有顺序的 "命名(naming)" - 这是由于 Microsoft.Extensions.Configuration 处理有序集合(数组) 的方式所致.*
 
-Build up your configuration and register it with the Autofac ``ContainerBuilder`` like this:
+构建你的配置并像下面这样用 Autofac ``ContainerBuilder`` 进行注册:
 
 .. sourcecode:: csharp
 
@@ -95,9 +95,9 @@ Build up your configuration and register it with the Autofac ``ContainerBuilder`
     var builder = new ContainerBuilder();
     builder.RegisterModule(module);
 
-Default Assembly
+默认程序集
 -----------------
-You can specify a "default assembly" option in the configuration to help write types in a shorter fashion. If you don't specify an assembly-qualified type name in a type or interface reference, it will be assumed to be in the default assembly.
+你可以在配置中指定一个 "默认程序集" 选项, 来帮助你以更短的方式写类型. 如果你在一个类型或接口引用中没有指定一个限定程序集的类型名称, 它将会假定在默认程序集中.
 
 
 .. sourcecode:: json
@@ -106,13 +106,13 @@ You can specify a "default assembly" option in the configuration to help write t
       "defaultAssembly": "Autofac.Example.Calculator"
     }
 
-Components
+组件
 ----------
-Components are the most common thing that you'll register. You can specify several things on each component from lifetime scope to parameters.
+组件是你注册最多的东西. 从生命周期到参数, 每个组件你都可以指定很多东西.
 
-Components are added to a top-level ``components`` element in configuration. Inside that is an array of the components you want to register.
+组件会被加入到配置的顶级的 ``components`` 元素中. 里面是你想要注册的组件数组.
 
-This example shows one component that has *all of the options* on it, just for syntax illustration purposes. You wouldn't actually use every one of these in every component registration.
+下面的示例展示了一个拥有 *所有选项* 的组件, 只是为了达到说明语法的目的. 实际在任何组件的注册中你都不会用上里面所有的选项.
 
 .. sourcecode:: json
 
@@ -160,16 +160,16 @@ Element Name           Description                                              
 ``properties``         A name/value dictionary where the name of each element is the name of a property and the value is the value to inject.                                  Any settable property on the component type.
 ====================== ======================================================================================================================================================= ===========================================================================
 
-Note that both ``parameters`` and ``properties`` support dictionary and enumerable values. You can see an example of how to specify those in the JSON structure, above.
+注意 ``parameters`` 和 ``properties`` 都支持字典和枚举类型. 你可以在上面示例中看到如何以JSON格式指定这些选项.
 
-Modules
+模块
 -------
 
-When using :doc:`modules<modules>` with Autofac, you can register those modules along with components when using configuration.
+在Autofac使用 :doc:`modules<modules>` 时, 你可以使用配置注册这些模块和组件.
 
-Modules are added to a top-level ``modules`` element in configuration. Inside that is an array of the modules you want to register.
+模块会被加入到配置的顶级的 ``modules`` 元素中. 里面是你想要注册的模块数组.
 
-This example shows one module that has *all of the options* on it, just for syntax illustration purposes. You wouldn't actually use every one of these in every module registration.
+下面的示例展示了一个拥有 *所有选项* 的模块, 只是为了达到说明语法的目的. 实际在任何模块的注册中你都不会用上里面所有的选项.
 
 .. sourcecode:: json
 
@@ -196,19 +196,19 @@ Element Name           Description                                              
 ``properties``         A name/value dictionary where the name of each element is the name of a property and the value is the value to inject.                                  Any settable property on the module type.
 ====================== ======================================================================================================================================================= ===============================================================================================
 
-Note that both ``parameters`` and ``properties`` support dictionary and enumerable values. You can see an example of how to specify those in the JSON structure, above.
+注意 ``parameters`` 和 ``properties`` 都支持字典和枚举类型. 你可以在上面示例中看到如何以JSON格式指定这些选项.
 
-You are allowed to register *the same module multiple times using different parameter/property sets* if you so choose.
+允许 *使用不同的参数/属性集合注册相同的模块多次* , 如果你这样选择的话.
 
-Type Names
+类型名称
 ----------
-In all cases where you see a type name (component type, service types, module type) it is expected to be `the standard, assembly qualified type name <https://msdn.microsoft.com/en-us/library/yfsftwz6(v=vs.110).aspx>`_ that you would normally be able to pass to ``Type.GetType(string typename)``. If the type is in the ``defaultAssembly`` you can leave the assembly name off, but it doens't hurt to put it there regardless.
+不管在什么情况下, 如果你看到一个类型名称 (组件类, 服务类, 模块类) , 它应该都指的是 `标准的, 限定程序集的类型名称 <https://msdn.microsoft.com/en-us/library/yfsftwz6(v=vs.110).aspx>`_ , 你可以正常地传入进 ``Type.GetType(string typename)``. 如果该类型在 ``默认程序集`` 中, 你可以去掉程序集名称, 但如果加上也是没有关系的.
 
-Assembly qualified type names have the full type with namespace, a comma, and the name of the assembly, like ``Autofac.Example.Calculator.OperationModule, Autofac.Example.Calculator``. In that case, ``Autofac.Example.Calculator.OperationModule`` is the type and it's in the ``Autofac.Example.Calculator`` assembly.
+限定程序集的类型名称包括带命名空间的完整类型, 逗号, 以及程序集的名称, 如 ``Autofac.Example.Calculator.OperationModule, Autofac.Example.Calculator``. 这个示例中, ``Autofac.Example.Calculator.OperationModule`` 是类型, 它在 ``Autofac.Example.Calculator`` 程序集中.
 
-Generics are a little more complicated. Configuration does not support open generics so you have to specify the fully qualified name of each of the generic parameters, too.
+泛型稍有点复杂. 配置不支持泛型, 因此你也必须指定每个泛型参数的完整限定名.
 
-For example, say you have a repository ``IRepository<T>`` in a ``ConfigWithGenericsDemo`` assembly. Let's also say you have a class ``StringRepository`` that implements ``IRepository<string>``. To register that in configuration, it would look like this:
+例如, 假设你在 ``ConfigWithGenericsDemo`` 程序集中有一个 repository ``IRepository<T>``. 同时假设我们有一个类 ``StringRepository`` 实现 ``IRepository<string>``. 为了在配置中注册它, 大致如下:
 
 .. sourcecode:: json
 
@@ -221,7 +221,7 @@ For example, say you have a repository ``IRepository<T>`` in a ``ConfigWithGener
       }]
     }
 
-If you're having a difficult time figuring out what your type name is, you can always do something like this in code:
+如果你很难搞清楚你的类型名称是什么, 你也可以用代码做如下的事:
 
 
 .. sourcecode:: csharp
@@ -230,40 +230,40 @@ If you're having a difficult time figuring out what your type name is, you can a
     // copy/paste it out of there into your config.
     System.Diagnostics.Debug.WriteLine(typeof(IRepository<string>).AssemblyQualifiedName);
 
-Differences from Legacy Configuration
+与传统配置的区别
 -------------------------------------
-When migrating from the legacy (pre 4.0 version) ``app.config`` based format to the new format, there are some key changes to be aware of:
+从基于 (4.0 版本前) ``app.config`` 的格式迁移至新的格式时, 我们需要知道一些关键的改变:
 
-- **There is no ConfigurationSettingsReader.** ``Microsoft.Extensions.Configuration`` has entirely replaced the old XML format configuration. The legacy configuration documentation does not apply to the 4.0+ series of configuration package.
-- **Multiple configuration files handled differently.** The legacy configuration had a ``files`` element that would automatically pull several files together at once for configuration. Use the ``Microsoft.Extensions.Configuration.ConfigurationBuilder`` to accomplish this now.
-- **AutoActivate is supported.** You can specify :doc:`components should auto-activate <../lifetime/startup>` now, a feature previously unavailable in configuration.
-- **XML uses element children rather than attributes.** This helps keep the XML and JSON parsing the same when using ``Microsoft.Extensions.Configuration`` so you can combine XML and JSON configuration sources correctly.
-- **Using XML requires you to name components and services with numbers.** ``Microsoft.Extensions.Configuration`` requires every configuration item to have a name and a value. The way it supports ordinal collections (arrays) is that it implicitly gives unnamed elements in a collection names with numbers ("0", "1", and so on). You can see an example of this in the quick start, above. If you don't go with JSON, you need to watch for this requirement from ``Microsoft.Extensions.Configuration`` or you won't get what you expect.
-- **Per-request lifetime scope is supported.** Previously you couldn't configure elements to have :doc:`per-request lifetime scope <../lifetime/instance-scope>`. Now you can.
-- **Dashes in names/values are gone.** Names of XML elements used to include dashes like ``inject-properties`` - to work with the JSON configuration format, these are now camel-case, like ``injectProperties``.
-- **Services get specified in a child element.** The legacy configuration allowed a service to be declared right at the top of the component. The new system requires all services be in the ``services`` collection.
+- **没有ConfigurationSettingsReader了.** ``Microsoft.Extensions.Configuration`` 已经完全替换了旧的XML格式配置. 传统的配置文档不再适用于 4.0+ 系列的配置包.
+- **多配置文件的处理不一样了.** 传统的配置有一个 ``files`` 元素, 它可以一次自动拉取多个文件作为配置. 现在可以使用 ``Microsoft.Extensions.Configuration.ConfigurationBuilder`` 来完成.
+- **支持自动激活组件.** 你现在可以指定 :doc:`组件应自动激活 <../lifetime/startup>`, 在之前的配置方式中是不行的.
+- **XML使用子元素而不是特性(attributes).** 这可以帮助XML和JSON使用 ``Microsoft.Extensions.Configuration`` 时解析时得相同, 这样就可以正确地组合XML和JSON配置源了.
+- **使用XML需要以数字命名组件和服务.** ``Microsoft.Extensions.Configuration`` 需要每个配置项拥有一个名字和值. 它支持有序集合(数组)的方式是显示地给集合中未命名的元素一个数字 ("0", "1", 等等). 你可以在上面的入门中找到示例. 如果你不使用JSON, 你需要注意当心 ``Microsoft.Extensions.Configuration`` 所需要的, 否则将无法得到你想要的结果.
+- **支持每个请求一个作用域(Per-request lifetime scope).** 之前你无法配置元素有 :doc:`每个请求一个作用域(per-request lifetime scope) <../lifetime/instance-scope>`. 现在你可以了.
+- **名称/值中的破折号不存在了.** XML元素的名称以前包含类似 ``inject-properties`` - 为了使其以JSON配置的格式work, 现在这些是驼峰大小写, 如 ``injectProperties``.
+- **服务在子元素中指定.** 传统的配置允许服务被定义在组件的顶部. 新系统中需要所有服务在 ``services`` 集合中.
 
-Additional Tips
+额外的建议
 ---------------
-The new ``Microsoft.Extensions.Configuration`` mechanism adds a lot of flexibility. Things you may want to take advantage of:
+新的 ``Microsoft.Extensions.Configuration`` 机制增加了很多灵活性. 你可以利用:
 
-- **Environment variable support.** You can use ``Microsoft.Extensions.Configuration.EnvironmentVariables`` to enable configuration changes based on the environment. A quick way to debug, patch, or fix something without touching code might be to switch an Autofac registration based on environment.
-- **Easy configuration merging.** The ``ConfigurationBuilder`` allows you to create configuration from a lot of sources and merge them into one. If you have a lot of configuration, consider scanning for your configuration files and building the configuration dynamically rather than hardcoding paths.
-- **Custom configuration sources.** You can implement ``Microsoft.Extensions.Configuration.ConfigurationProvider`` yourself backed by more than just files. If you want to centralize configuration, consider a database or REST API backed configuration source.
+- **支持环境变量.** 你可以使用 ``Microsoft.Extensions.Configuration.EnvironmentVariables`` 来允许配置随着环境的改变而改变. 根据环境改变Autofac的注册, 可以更方便地在不动到代码的前提下去调试, 打补丁, 或者修复些东西.
+- **简便的配置合并.**  ``ConfigurationBuilder`` 允许你从多个源创建配置并将它们合并为一个. 如果你有很多配置, 可以考虑扫描你的那些配置文件, 动态地构建配置而不是hardcoding路径.
+- **自定义配置源.** 你可以自己实现 ``Microsoft.Extensions.Configuration.ConfigurationProvider`` 来支持不仅仅文件配置. 如果你想要集中化配置, 可以考虑数据库或是支持REST API的配置源.
 
-Configuring With Application Configuration (Legacy Pre-4.0)
+使用应用配置(传统4.0版本前)
 ===========================================================
 
 .. note::
 
-   Legacy application configuration as described below applies to the 3.x and earlier versions of Autofac.Configuration. It does not work with the 4.0+ version of the package.
+   下面讨论的传统的应用配置适用于 3.x 和更早的 Autofac.Configuration 版本. 4.0+版本的configuration包无法适用.
 
-Prior to the release of `Microsoft.Extensions.Configuration <https://www.nuget.org/packages/Microsoft.Extensions.Configuration>`_ and the updated configuration model, Autofac tied into standard .NET application configuration files. (``app.config`` / ``web.config``). In the 3.x series of the Autofac.Configuration package, this was the way to configure things.
+在 `Microsoft.Extensions.Configuration <https://www.nuget.org/packages/Microsoft.Extensions.Configuration>`_ 和使用更新后配置模型之前, Autofac和.NET应用配置文件 (``app.config`` / ``web.config``) 绑定在一起. 3.x 系列的 Autofac.Configuration 包, 是这样进行配置的.
 
-Setup
+建立
 -----
 
-Using the legacy configuration mechanism, you need to declare a section handler somewhere near the top of your config file::
+使用传统的配置机制, 你需要在靠近你配置文件顶部的地方定义一个section handler::
 
     <?xml version="1.0" encoding="utf-8" ?>
     <configuration>
@@ -271,7 +271,7 @@ Using the legacy configuration mechanism, you need to declare a section handler 
             <section name="autofac" type="Autofac.Configuration.SectionHandler, Autofac.Configuration"/>
         </configSections>
 
-Then, provide a section describing your components::
+然后, 提供一个区段(section)来描述你的组件::
 
     <autofac defaultAssembly="Autofac.Example.Calculator.Api">
         <components>
@@ -287,16 +287,16 @@ Then, provide a section describing your components::
                 </parameters>
             </component>
 
-The ``defaultAssembly`` attribute is optional, allowing namespace-qualified rather than fully-qualified type names to be used. This can save some clutter and typing, especially if you use one configuration file per assembly (see Additional Config Files below.)
+``默认程序集`` 特性是可选的, 它允许使用限定命名空间类型名而不是完全限定的类型名. 这样可以不这么杂乱并减少字符, 特别是如果你每个程序集使用一个配置文件 (见如下额外配置文件部分.)
 
-Components
+组件
 ----------
-Components are the most common thing that you'll register. You can specify several things on each component from lifetime scope to parameters.
+组件是你注册最多的东西. 从生命周期到参数, 每个组件你都可以指定很多东西.
 
-Component Attributes
+组件特性
 ~~~~~~~~~~~~~~~~~~~~
 
-The following can be used as attributes on the ``component`` element (defaults are the same as for the programmatic API):
+下表中可以作为 ``组件`` 元素的特性 (默认值与编程式API默认值相同):
 
 ====================== =============================================================================================================================== =================================================================
 Attribute Name         Description                                                                                                                     Valid Values
@@ -309,7 +309,7 @@ Attribute Name         Description                                              
 ``inject-properties``  Enable property (setter) injection for the component.                                                                           ``yes``, ``no``.
 ====================== =============================================================================================================================== =================================================================
 
-Component Child Elements
+组件子元素
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 ============== =======================================================================================================================================================
@@ -321,34 +321,34 @@ Element        Description
 ``metadata``   A list of ``item`` nodes with ``name``, ``value`` and ``type`` attributes.
 ============== =======================================================================================================================================================
 
-There are some features missing from the XML configuration syntax that are available through the programmatic API - for example registration of generics. Using modules is recommended in these cases.
+在XML配置语法中, 有一些编程式API拥有的功能消失了 - 例如泛型注册. 在这种情况下推荐使用模块(modules).
 
-Modules
+模块
 -------
 
-Configuring the container using components is very fine-grained and can get verbose quickly. Autofac has support for packaging components into :doc:`Modules<./modules>` in order to encapsulate implementation while providing flexible configuration.
+使用组件来配置容器是非常细粒度的并且很快就会变得冗长. Autofac支持把组件打包进 :doc:`模块<./modules>` , 在提供灵活配置的时候来封装实现.
 
-Modules are registered by type::
+模块通过类型注册::
 
     <modules>
         <module type="MyModule" />
 
-You can add nested ``parameters`` and ``properties`` to a module registration in the same manner as for components above.
+你可以用上面注册组件相同的方式, 添加嵌套的 ``parameters`` 和 ``properties`` 到模块注册中.
 
-Additional Config Files
+额外的配置文件
 -----------------------
 
-You can include additional config files using::
+你可以加入额外的配置文件如下::
 
     <files>
         <file name="Controllers.config" section="controllers" />
 
-Configuring the Container
+配置容器
 -------------------------
 
-First, you must **reference Autofac.Configuration.dll in from your project**.
+首先, 你必须 **在你的项目中引入 Autofac.Configuration.dll**.
 
-To configure the container use a ``ConfigurationSettingsReader`` initialised with the name you gave to your XML configuration section:
+为了配置容器, 你可以用XML配置区段(configuration section)的名称来初始化 ``ConfigurationSettingsReader``:
 
 .. sourcecode:: csharp
 
@@ -356,9 +356,9 @@ To configure the container use a ``ConfigurationSettingsReader`` initialised wit
     builder.RegisterModule(new ConfigurationSettingsReader("mycomponents"));
     // Register other components and call Build() to create the container.
 
-The container settings reader will override default components already registered; you can write your application so that it will run with sensible defaults and then override only those component registrations necessary for a particular deployment.
+container settings reader将会重写掉已注册的默认组件; 你可以让你的程序以合理的默认值运行, 然后重写那些只在特定部署情况必要的组件注册.
 
-Multiple Files or Sections
+多文件或区段(sections)
 --------------------------
 
-You can use multiple settings readers in the same container, to read different sections or even different config files if the filename is supplied to the ``ConfigurationSettingsReader`` constructor.
+你可以在同一个容器中使用多个 settings readers , 来读取不同的区段甚至不同的配置文件, 如果文件名传给 ``ConfigurationSettingsReader`` 构造方法.

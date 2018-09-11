@@ -65,7 +65,7 @@ MVC集成提供了controllers, model binders, action filters, 和views的依赖�
     // ...or you can register individual controlllers manually.
     builder.RegisterType<HomeController>().InstancePerRequest();
 
-注意ASP.NET MVC通过控制器具体类型来判断请求哪个控制器, 因此把它们以 ``As<IController>()`` 注册是不正确的. 同时, 如果你人为注册控制器并且选择特定的生命周期, 你必须以 ``InstancePerDependency()`` 或 ``InstancePerRequest()`` 注册 - **如果你尝试对多个请求复用同一个控制器实例, ASP.NET MVC会报错**.
+注意ASP.NET MVC通过控制器实体类来判断请求哪个控制器, 因此把它们以 ``As<IController>()`` 注册是不正确的. 同时, 如果你人为注册控制器并且选择特定的生命周期, 你必须以 ``InstancePerDependency()`` 或 ``InstancePerRequest()`` 注册 - **如果你尝试对多个请求复用同一个控制器实例, ASP.NET MVC会报错**.
 
 设置依赖解析器(Dependency Resolver)
 ========================================

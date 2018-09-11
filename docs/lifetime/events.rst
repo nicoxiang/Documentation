@@ -16,7 +16,7 @@ Autofac暴露了一些能在实例生命周期多个阶段拦截到的事件. �
 * :doc:`进行属性注入或方法注入 <../register/prop-method-injection>`
 * 进行其他的初始化工作
 
-在一些情况下, 比如用 ``RegisterType<T>()``, 注册的具体类型会被用于类型解析并被 ``ActivatingEventArgs`` 使用. 例如, 下面的实例将会抛一个类型转换的异常:
+在一些情况下, 比如用 ``RegisterType<T>()``, 注册的实体类会被用于类型解析并被 ``ActivatingEventArgs`` 使用. 例如, 下面的实例将会抛一个类型转换的异常:
 
 .. sourcecode:: csharp
 
