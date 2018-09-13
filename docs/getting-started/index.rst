@@ -166,11 +166,11 @@
 应用执行
 =====================
 
-在应用程序执行阶段, 你将充分利用这些刚注册的组件. 你可以从一个 *生命周期* 中 *解析* 它们.
+在应用程序执行阶段, 你需要充分利用这些刚注册的组件. 你可以从一个 *生命周期* 中 *解析* 它们.
 
 容器本身是也是一个生命周期, 从技术角度来说, 你可以直接从Container解析组件. 然而, **我们并不推荐直接这么做**.
 
-解析组件时, 根据 :doc:`定义的实例作用域 <../lifetime/instance-scope>`, 创建一个对象的新实例. (解析一个组件大致相当于调用"new"实例化一个类. 虽然这个概念看上去有点过于简单化了, 但是从类比的角度来说这是完全合适的). 一些组件需要被释放 (实现``IDisposable``接口) - :doc:`Autofac会为你在生命周期释放时处理组件的释放 <../lifetime/disposal>`.
+解析组件时, 根据 :doc:`定义的实例作用域 <../lifetime/instance-scope>`, 创建一个对象的新实例. (解析一个组件大致相当于调用"new"实例化一个类. 虽然这个概念看上去有点过于简单化了, 但是从类比的角度来说也是合适的). 一些组件需要被释放 (实现``IDisposable``接口) - :doc:`Autofac会为你在生命周期释放时处理组件的释放 <../lifetime/disposal>`.
 
 然而, 容器在应用的生命周期内一直存在. 如果你直接从该容器中解析了太多东西, 应用结束时将会有一堆东西等着被释放. 这是非常不合适的 (很有可能造成"内存泄漏").
 
@@ -208,16 +208,16 @@
 
 现在当运行程序时...
 
-- "WriteDate"方法向Autofac请求一个``IDateWriter``.
-- Autofac发现``IDateWriter``对应``TodayWriter``因此开始创建``TodayWriter``.
-- Autofac发现``TodayWriter``在它构造方法中需要一个``IOutput``.
-- Autofac发现``IOutput``对应``ConsoleOutput``因此开始创建新的``ConsoleOutput``实例.
-- Autofac使用新的``ConsoleOutput``实例完成``TodayWriter``的创建.
-- Autofac返回完整构建的``TodayWriter``给"WriteDate"使用.
+- "WriteDate"方法向Autofac请求一个 ``IDateWriter``.
+- Autofac发现 ``IDateWriter`` 对应 ``TodayWriter`` 因此开始创建 ``TodayWriter``.
+- Autofac发现 ``TodayWriter`` 在它构造方法中需要一个 ``IOutput``.
+- Autofac发现 ``IOutput`` 对应 ``ConsoleOutput`` 因此开始创建新的 ``ConsoleOutput`` 实例.
+- Autofac使用新的 ``ConsoleOutput`` 实例完成 ``TodayWriter`` 的创建.
+- Autofac返回完整构建的 ``TodayWriter`` 给"WriteDate"使用.
 
-之后，如果你希望你的应用输出一个不同的日期, 你可以实现另外一个``IDateWriter``然后在应用启动时改变一下注册过程. 你不需要修改任何其他的类. 耶, 这就是控制反转!
+之后，如果你希望你的应用输出一个不同的日期, 你可以实现另外一个 ``IDateWriter`` 然后在应用启动时改变一下注册过程. 你不需要修改任何其他的类. 耶, 这就是控制反转!
 
-**注意: 通常来说, 服务位置大多考虑反模式** `(看此文章) <http://blog.ploeh.dk/2010/02/03/ServiceLocatorIsAnAntiPattern.aspx>`_. 也就是说, 在代码中四处人为地创建生命周期并且少量使用容器并不是最佳的方式. 使用 :doc:`Autofac 集成类库 <../integration/index>` 时你通常不必做在示例应用中的这些事. 事情都会在关键部分和应用的"顶层"位置得到解决, 人为的处理是极少存在的. 当然, 如何构建你的应用取决于你自身.
+**注意: 通常来说, 服务定位模式大多情况应被看作是一种反模式** `(阅读文章) <http://blog.ploeh.dk/2010/02/03/ServiceLocatorIsAnAntiPattern.aspx>`_. 也就是说, 在代码中四处人为地创建生命周期而少量地使用容器并不是最佳的方式. 使用 :doc:`Autofac 集成类库 <../integration/index>` 时你通常不必做在示例应用中的这些事. 这些东西都会在应用的中心,"顶层"的位置得到解决, 人为的处理是极少存在的. 当然, 如何构建你的应用取决于你自身.
 
 更进一步
 =============
