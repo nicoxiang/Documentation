@@ -39,5 +39,5 @@ Due to personal reason I can't put much focus on this project, so if you're inte
 * Advance Topics *(not in the plan)* ![Progress](http://progressed.io/bar/0)
 * Examples ![Progress](http://progressed.io/bar/100)
 * Frequently Asked Questions *(not in the plan)* ![Progress](http://progressed.io/bar/0)
-* Glossary ![Progress](http://progressed.io/bar/0)
+* Glossary ![Progress](http://progressed.io/bar/100)
   

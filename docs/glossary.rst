@@ -2,27 +2,27 @@
 术语
 ========
 
-The goal of this page is to help keep documentation, discussions, and APIs consistent.
+本页的目的是保持文档, 讨论和 APIs 之间的一致性.
 
-============== =======
-Term           Meaning
-============== =======
-*Activator*    Part of a *Registration* that, given a *Context* and a set of *Parameters*, can create a *Component Instance* bound to that *Context*
-*Argument*     A formal argument to a constructor on a .NET type
-*Component*    A body of code that declares the *Services* it provides and the *Dependencies* it consumes
-*Instance*     A .NET object obtained by *Activating* a *Component* that provides *Services* within a *Container* (also *Component Instance*)
-*Container*    A construct that manages the *Components* that make up an application
-*Context*      A bounded region in which a specific set of *Services* is available
-*Dependency*   A *Service* required by a *Component*
-*Lifetime*     A duration bounded by the *Activation* of an *Instance* and its disposal
-*Parameter*    Non-*Service* objects used to configure a *Component*
-*Registration* The act of adding and configuring a *Component* for use in a *Container*, and the information associated with this process
-*Scope*        The specific *Context* in which *Instances* of a *Component* will be shared by other *Component* that depend on their *Services*
-*Service*      A well-defined behavioural contract shared between a providing and a consuming *Component*
-============== =======
+==================== =======
+Term                 Meaning
+==================== =======
+*Activator(激活器)*   *注册* 中的一部分, 提供一个 *上下文* 和一组 *参数*, 可以创建一个绑定于该 *上下文* 的 *组件实例*
+*Argument(形参)*      一个构造函数的 .NET 类型形参
+*Component(组件)*     一串声明了它所提供 *服务* 和它所消费 *依赖* 的代码
+*Instance(实例)*      通过 *Activating(激活)* 一个在 *容器* (也可以是 *组件实例* )中提供 *服务* 的 *组件* , 来获得的一个.NET对象
+*Container(容器)*     管理组成应用的 *组件* 的一种结构
+*Context(上下文)*     一块界定的区域, 在其中特定的一组 *服务* 是可用的
+*Dependency(依赖)*    一个被 *组件* 需要的 *服务* 
+*Lifetime(生命周期)*   从 *实例* 的 *激活* 到 *释放* 的持续时间
+*Parameter(实参)*     用来配置一个 *组件* 的非 *服务* 对象
+*Registration(注册)*  添加和配置 *组件* 到 *容器* 的行为, 和与此过程相关的信息
+*Scope(作用域)*        一个特定的 *上下文* , 在其中 *组件* 的 *实例* 将会被其他 *组件* 依据它们的 *服务* 所共享
+*Service(服务)*        一个在提供和消费 *组件* 之间明确定义的行为约定
+==================== =======
 
-Admittedly this seems a bit low-level to fit with the typical idea of a 'universal language', but within the domain of IoC containers and specifically Autofac these can be viewed as concepts rather than implementation details.
+不可否认, 这似乎很难符合传统观念的 '通俗语言', 但在IoC容器的领域特别是Autofac, 它们可以被当成概念而不是实现细节.
 
-Wild deviations from these terms in the API or code should be fixed or raised as issues to fix in a future version.
+在未来的版本中, API和代码里存在和术语较大偏差的地方应该被修复, 或者以issues的方式被提出并得到修复.
 
-The terms *Application*, *Type*, *Delegate*, *Object*, *Property* etc. have their usual meaning in the context of .NET software development.
+术语 *Application(应用)*, *Type(类型)*, *Delegate(委托)*, *Object(对象)*, *Property(属性)* 等. 拥有着和平常 .NET 软件开发领域相同的含义.
