@@ -45,7 +45,7 @@ Autofac也可以被认为是约定驱动注册或扫描的, 它可以根据用�
     builder.RegisterAssemblyTypes(asm)
            .Except<MyUnwantedType>();
 
-``Except()`` 表达式同样允许你自定义类型排除的规则:
+``Except()`` 表达式同样允许你自定义被排除类型的注册规则:
 
 .. sourcecode:: csharp
 
