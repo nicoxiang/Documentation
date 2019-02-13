@@ -394,7 +394,7 @@ OWIN 集成
 
 * 完成所有基础Web API集成的工作 - 注册控制器, 设置依赖解析器等.
 * 用 :doc:`基础的Autofac OWIN集成 <owin>` 创建你的应用.
-* 添加 `Autofac.WebApi2.Owin <http://www.nuget.org/packages/Autofac.WebApi2.Owin/>`_ 引用NuGet package.
+* 添加 `Autofac.WebApi2.Owin <https://www.nuget.org/packages/Autofac.WebApi2.Owin/>`_ 引用NuGet package.
 * 应用startup类中, 在注册基础Autofac中间件后注册Autofac Web API中间件.
 
 .. sourcecode:: csharp

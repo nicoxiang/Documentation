@@ -121,7 +121,7 @@
           public SingletonRule(InstancePerRequestDependency dep) { }
         }
 
-        public class InstancePerRequestDependency { }
+        public class InstancePerRequestDependency : IRule { }
 
 
         [Fact]

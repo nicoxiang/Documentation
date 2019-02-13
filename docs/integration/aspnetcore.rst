@@ -263,7 +263,7 @@ ASP.NET Core 1.1 引入了强类型容器配置的能力. 它提供了 ``Configu
 * **不再需要依赖解析器(DependencyResolver).** 其他ASP.NET集成机制在许多地方需要创建基于Autofac的自定义依赖解析器. 使用 ``Microsoft.Extensions.DependencyInjection`` 和 ``Startup.ConfigureServices`` 方法, 你现在只要返回 ``IServiceProvider`` , "神奇的事就发生了." 在控制器, 类等内部. 如果你需要手动定位服务, 拿 ``IServiceProvider`` 即可.
 * **没有特殊的中间件.** 以前的 :doc:`OWIN集成 <owin>` 需要特殊的Autofac中间件的注册, 用来管理请求生命周期作用域. ``Microsoft.Extensions.DependencyInjection`` 现在做了这些繁重的工作, 因此现在不需要注册额外的中间件了.
 * **不再需要手动注册控制器.** 你以前需要用Autofac手动注册所有的控制器这样DI才会work. ASP.NET Core框架现在在服务解析过程中将自动传入所有控制器, 因此你不必手动注册.
-* **没有通过依赖注入触发中间件的扩展方法.** :doc:`OWIN集成 <owin>` 有类似 ``UseAutofacMiddleware()`` 的扩展方法来允许依赖注入进入中间件内. 现在这些通过结合 `自动注入构造方法参数和动态解析中间件Invoke方法的参数 <http://docs.asp.net/en/latest/fundamentals/middleware.html>`_ , 都能自动完成, . ASP.NET Core框架负责了所有的这些事.
+* **没有通过依赖注入触发中间件的扩展方法.** :doc:`OWIN集成 <owin>` 有类似 ``UseAutofacMiddleware()`` 的扩展方法来允许依赖注入进入中间件内. 现在这些通过结合 `自动注入构造方法参数和动态解析中间件Invoke方法的参数 <https://docs.asp.net/en/latest/fundamentals/middleware.html>`_ , 都能自动完成, . ASP.NET Core框架负责了所有的这些事.
 * **MVC 和 Web API 现在是一个东西了.** 以前根据你是使用 MVC 还是 Web API ,有不同的方法hook进DI. 这两件东西在ASP.NET Core中被整合了, 因此只需构建一处依赖解析器, 只需维护一份配置.
 * **控制器不再从容器中解析; 只有控制器构造方法.** 这意味着控制器生命周期, 属性注入, 和其他的事不再归Autofac管理 - 它们归ASP.NET Core管理. 你可以使用 ``AddControllersAsServices()`` 改变 - 见下面的讨论.
 

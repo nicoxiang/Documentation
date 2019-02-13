@@ -288,8 +288,8 @@ Autofac支持开放泛型. 使用 ``RegisterGeneric()`` 方法:
 
 .. sourcecode:: csharp
 
-    builder.Register<ConsoleLogger>().As<ILogger>();
-    builder.Register<FileLogger>().As<ILogger>();
+    builder.RegisterType<ConsoleLogger>().As<ILogger>();
+    builder.RegisterType<FileLogger>().As<ILogger>();
 
 上例中, ``FileLogger`` 将会作为 ``ILogger`` 默认的服务提供方因为它是最后被注册的.
 
@@ -297,8 +297,8 @@ Autofac支持开放泛型. 使用 ``RegisterGeneric()`` 方法:
 
 .. sourcecode:: csharp
 
-    builder.Register<ConsoleLogger>().As<ILogger>();
-    builder.Register<FileLogger>().As<ILogger>().PreserveExistingDefaults();
+    builder.RegisterType<ConsoleLogger>().As<ILogger>();
+    builder.RegisterType<FileLogger>().As<ILogger>().PreserveExistingDefaults();
 
 上例中, ``ConsoleLogger`` 将会作为 ``ILogger`` 默认的服务提供方因为最后注册的 ``FileLogger`` 使用了 ``PreserveExistingDefaults()``.
 

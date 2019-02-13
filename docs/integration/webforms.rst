@@ -2,7 +2,7 @@
 Web Forms
 =========
 
-ASP.NET web forms集成需要 `Autofac.Web NuGet package <http://www.nuget.org/packages/Autofac.Web/>`_.
+ASP.NET web forms集成需要 `Autofac.Web NuGet package <https://www.nuget.org/packages/Autofac.Web/>`_.
 
 Web forms集成为后台代码(code-behind)类提供了依赖注入. 它同样添加 :doc:`每个请求生命周期支持 <../faq/per-request-scope>`.
 
@@ -80,7 +80,7 @@ Web forms集成为后台代码(code-behind)类提供了依赖注入. 它同样�
 添加模块到Web.config
 =========================
 
-Autofac管理组件生命周期和添加依赖注入到ASP.NET管道的方法是实现 `IHttpModule <http://msdn.microsoft.com/en-us/library/system.web.ihttpmodule.aspx>`_ . 你需要在 ``web.config`` 中进行配置.
+Autofac管理组件生命周期和添加依赖注入到ASP.NET管道的方法是实现 `IHttpModule <https://msdn.microsoft.com/en-us/library/system.web.ihttpmodule.aspx>`_ . 你需要在 ``web.config`` 中进行配置.
 
 下面的配置片段展示了配置的模块.
 

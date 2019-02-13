@@ -208,12 +208,16 @@
 
 现在当运行程序时...
 
-- "WriteDate"方法向Autofac请求一个 ``IDateWriter``.
-- Autofac发现 ``IDateWriter`` 对应 ``TodayWriter`` 因此开始创建 ``TodayWriter``.
-- Autofac发现 ``TodayWriter`` 在它构造方法中需要一个 ``IOutput``.
-- Autofac发现 ``IOutput`` 对应 ``ConsoleOutput`` 因此开始创建新的 ``ConsoleOutput`` 实例.
-- Autofac使用新的 ``ConsoleOutput`` 实例完成 ``TodayWriter`` 的创建.
-- Autofac返回完整构建的 ``TodayWriter`` 给"WriteDate"使用.
+- ``WriteDate`` 方法创建了一个生命周期, 从中可以解析依赖. 这么做可以避免内存泄漏 - 如果 ``IDateWriter`` 或者它的依赖是可被释放的(disposable)的, 那么当生命周期被释放时他们也将被自动释放.
+- ``WriteDate`` 方法手动地从生命周期中解析 ``IDateWriter`` . (这就是 "服务定位.") 在内部地...
+ + Autofac发现 ``IDateWriter`` 对应 ``TodayWriter`` 因此开始创建 ``TodayWriter``.
+ + Autofac发现 ``TodayWriter`` 在它构造方法中需要一个 ``IOutput``. (这就是 "构造方法注入.")
+ + Autofac发现 ``IOutput`` 对应 ``ConsoleOutput`` 因此开始创建新的 ``ConsoleOutput`` 实例.
+ + Autofac使用新的 ``ConsoleOutput`` 实例完成 ``TodayWriter`` 的创建.
+ + Autofac返回完整构建的 ``TodayWriter`` 给"WriteDate"使用.
+
+- 调用 ``writer.WriteDate()`` 就是一个全新的 ``TodayWriter.WriteDate()`` 因为这就是它所解析出的.
+- Autofac生命周期被释放. 任何从生命周期解析出的可释放对象也都被同时释放.
 
 之后，如果你希望你的应用输出一个不同的日期, 你可以实现另外一个 ``IDateWriter`` 然后在应用启动时改变一下注册过程. 你不需要修改任何其他的类. 耶, 这就是控制反转!
 
@@ -231,10 +235,10 @@
 需要帮助?
 ==========
 
-- 你可以 `在StackOverflow上提问 <http://stackoverflow.com/questions/tagged/autofac>`_.
-- 你可以 `参与 Autofac Google Group <https://groups.google.com/forum/#forum/autofac>`_.
-- 这里有一篇基础 `Autofac 教程 <http://www.codeproject.com/KB/architecture/di-with-autofac.aspx>`_ on CodeProject.
-- 如果你想深入, 我们有 :doc:`高级调试tips <../advanced/debugging>`.
+- You can `ask questions on StackOverflow <https://stackoverflow.com/questions/tagged/autofac>`_.
+- You can `participate in the Autofac Google Group <https://groups.google.com/forum/#forum/autofac>`_.
+- There's an introductory `Autofac tutorial <http://www.codeproject.com/KB/architecture/di-with-autofac.aspx>`_ on CodeProject.
+- We have :doc:`advanced debugging tips <../advanced/debugging>` if you want to dive deep.
 
 源代码Build
 ====================

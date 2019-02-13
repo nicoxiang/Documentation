@@ -22,6 +22,6 @@ Autofac 是一款适用于Microsoft .NET 4.5, Silverlight 5, Windows Store apps,
    术语 <glossary.rst>
    贡献者 <contributors.rst>
    支持 <support.rst>
-   API 文档 <http://autofac.org/apidoc/>
+   API 文档 <https://autofac.org/apidoc/>
 
 

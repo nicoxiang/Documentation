@@ -2,7 +2,7 @@
 最佳实践和建议
 ==================================
 
-你可以在 `StackOverflow <http://stackoverflow.com/questions/tagged/autofac>`_ 上使用 ``autofac`` 标签或在 `google discussion group <https://groups.google.com/forum/#forum/autofac>`_ 寻求Autofac使用上的指导, 但下面的小贴士也能很好地帮到你.
+你可以在 `StackOverflow <https://stackoverflow.com/questions/tagged/autofac>`_ 上使用 ``autofac`` 标签或在 `google discussion group <https://groups.google.com/forum/#forum/autofac>`_ 寻求Autofac使用上的指导, 但下面的小贴士也能很好地帮到你.
 
 总是从嵌套的生命周期中解析依赖
 =================================================

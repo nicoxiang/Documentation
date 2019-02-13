@@ -168,7 +168,7 @@ IIS 托管的 Web 应用
 
 应用第一次启动时IIS托管应用里面所有的程序集都被加载进 ``AppDomain`` , 但是 **当AppDomain被IIS回收时, 程序集只会按需加载.**
 
-为了避免这个问题, 使用位于 `System.Web.Compilation.BuildManager <http://msdn.microsoft.com/en-us/library/system.web.compilation.buildmanager.aspx>`_ 的 `GetReferencedAssemblies() <http://msdn.microsoft.com/en-us/library/system.web.compilation.buildmanager.getreferencedassemblies.aspx>`_ 方法来获取相关程序集的列表:
+为了避免这个问题, 使用位于 `System.Web.Compilation.BuildManager <https://msdn.microsoft.com/en-us/library/system.web.compilation.buildmanager.aspx>`_ 的 `GetReferencedAssemblies() <https://msdn.microsoft.com/en-us/library/system.web.compilation.buildmanager.getreferencedassemblies.aspx>`_ 方法来获取相关程序集的列表:
 
 .. sourcecode:: csharp
 

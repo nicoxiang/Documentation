@@ -4,7 +4,7 @@ MVC
 
 Autofac一直保持更新以支持最新版本的ASP.NET MVC, 因此文档也是保持最新. 总的来说, 集成在跨版本之间依然是相当一致的.
 
-MVC集成需要 `Autofac.Mvc5 NuGet package <http://www.nuget.org/packages/Autofac.Mvc5/>`_.
+MVC集成需要 `Autofac.Mvc5 NuGet package <https://www.nuget.org/packages/Autofac.Mvc5/>`_.
 
 MVC集成提供了controllers, model binders, action filters, 和views的依赖注入. 它同样添加 :doc:`每个请求生命周期支持 <../faq/per-request-scope>`.
 
@@ -246,7 +246,7 @@ OWIN集成
 
 * 完成基础MVC集成要做的所有事 - 注册控制器, 设置依赖解析器等.
 * 用 :doc:`基础的Autofac OWIN集成 <owin>` 创建你的应用.
-* 添加 `Autofac.Mvc5.Owin <http://www.nuget.org/packages/Autofac.Mvc5.Owin/>`_ 引用NuGet package.
+* 添加 `Autofac.Mvc5.Owin <https://www.nuget.org/packages/Autofac.Mvc5.Owin/>`_ 引用NuGet package.
 * 应用startup类中, 在注册基础Autofac中间件后注册Autofac MVC中间件.
 
 .. sourcecode:: csharp
