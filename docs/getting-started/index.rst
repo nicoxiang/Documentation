@@ -236,10 +236,10 @@
 需要帮助?
 ==========
 
-- You can `ask questions on StackOverflow <https://stackoverflow.com/questions/tagged/autofac>`_.
-- You can `participate in the Autofac Google Group <https://groups.google.com/forum/#forum/autofac>`_.
-- There's an introductory `Autofac tutorial <http://www.codeproject.com/KB/architecture/di-with-autofac.aspx>`_ on CodeProject.
-- We have :doc:`advanced debugging tips <../advanced/debugging>` if you want to dive deep.
+- 你可以 `在StackOverflow上提问 <https://stackoverflow.com/questions/tagged/autofac>`_.
+- 你可以 `参与 Autofac Google Group <https://groups.google.com/forum/#forum/autofac>`_.
+- 这里有一篇基础 `Autofac 教程 <http://www.codeproject.com/KB/architecture/di-with-autofac.aspx>`_ on CodeProject.
+- 如果你想深入, 我们有 :doc:`高级调试tips <../advanced/debugging>`.
 
 源代码Build
 ====================
