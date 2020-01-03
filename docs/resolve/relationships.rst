@@ -144,10 +144,6 @@ Relationship                                        Type                        
 
 动态实例化 (Func<B>)
 -------------------------------
-使用 *自动生成工厂* 可以让你无需绑定组件到Autofac就能高效的调用 ``Resolve<T>()`` . 如果你需要创建不止一个所提供服务的实例, 或者如果, 可以使用这种关系类型. This relationship is also useful in cases like :doc:`WCF integration <../integration/wcf>` where you need to create a new service proxy after faulting the channel.
-
-使用这种关系类型, **生命周期对实例化的影响是无法改变的**. 如果你以 ``InstancePerDependency()`` 注册一个对象并且多次调用 ``Func<B>`` 方法, 你每次都会得到一个新的实例. 然而, 如果你以 ``SingleInstance()`` 注册一个对象并且多次调用 ``Func<B>`` 来解析对象, 你 *每次只会得到一个相同的对象*.
-
 使用 *自动生成工厂* 可以让你在程序控制流中以编码的形式解析一个新的 `B`, 不需要直接依赖于Autofac库. 在下面这些情况下使用这种关系:
 
 * 基于给定的服务你需要创建超过一个实例.
@@ -244,7 +240,7 @@ This relationship is also useful in cases like :doc:`WCF integration <../integra
     }
 
 在内部, Autofac仅仅基于类型去决定构造方法参数的值. 
-结果就造成了 **自动生成工厂(auto-generated function factories)在入参列表中不能有重复的类型Internally**.
+结果就造成了 **自动生成工厂(auto-generated function factories)在入参列表中不能有重复的类型**.
 
 当使用这种关系的时候 **生命周期对实例化的影响是无法改变的**, 就像使用 :doc:`delegate factories <../advanced/delegate-factories>`.
 如果你将对象注册为 ``InstancePerDependency()`` 并且调用 ``Func<X, Y, B>`` 多次, 你将每次都得到一个新的实例.
