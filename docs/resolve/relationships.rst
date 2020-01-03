@@ -217,7 +217,7 @@ This relationship is also useful in cases like :doc:`WCF integration <../integra
 
 另一种做法是, 你可以使用这种方式覆盖掉已经从容器中解析出来的构造方法的参数, 转而使用一个已存在的实例.
 
-Example:
+示例:
 
 .. sourcecode:: csharp
 
@@ -243,8 +243,8 @@ Example:
         }
     }
 
-在内部, Autofac会把Func的入参作为类型参数. 这就意味着 **自动生成工厂在入参列表不能有重复的类型.** 例如, 假设你有如下类型:
-Internally, Autofac determines what values to use for the constructor args solely based on the type and behaves as though we've temporarily defined the input values for resolution. A consequence of this is that  **auto-generated function factories cannot have duplicate types in the input parameter list.** See below for further notes on this.
+在内部, Autofac仅仅基于类型去决定构造方法参数的值. 
+结果就造成了 **自动生成工厂(auto-generated function factories)在入参列表中不能有重复的类型Internally**.
 
 当使用这种关系的时候 **生命周期对实例化的影响是无法改变的**, 就像使用 :doc:`delegate factories <../advanced/delegate-factories>`.
 如果你将对象注册为 ``InstancePerDependency()`` 并且调用 ``Func<X, Y, B>`` 多次, 你将每次都得到一个新的实例.
