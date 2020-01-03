@@ -4,7 +4,7 @@
 
 .NET Core 通过 `Microsoft.Extensions.DependencyInjection <https://github.com/aspnet/DependencyInjection>`_ 引入了 `conforming container <http://blog.ploeh.dk/2014/05/19/conforming-container/>`_ . ``Autofac.Extensions.DependencyInjection`` 包实现了它的抽象以此来通过Autofac提供依赖注入.
 
-集成 :doc:`ASP.NET Core <aspnetcore>` 和它非常相似因为整个框架统一了抽象和依赖注入. :doc:`ASP.NET Core 集成章节<aspnetcore>` 在ASP.NET Core使用的相关主题内容方面有更详细的信息.
+集成 :doc:`ASP.NET Core <aspnetcore>` 和它非常相似因为整个框架统一了抽象和依赖注入. :doc:`ASP.NET Core 集成章节<aspnetcore>` 在ASP.NET Core (和 generically hosted application) 使用的相关主题内容方面有更详细的信息.
 
 .. contents::
   :local:

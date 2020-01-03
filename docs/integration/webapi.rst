@@ -113,7 +113,9 @@ Web API 集成提供了controllers, model binders和 action filters的依赖注�
 
 通过依赖注入提供过滤器
 ========================================
-因为特性(attributes)通过反射API创建, 你不能自己调用构造方法. 这就使得你在使用特性除了属性注入没有了其他选择. Autofac Web API集成提供了一种机制, 允许你创建实现过滤器接口 (``IAutofacActionFilter``, ``IAutofacAuthorizationFilter`` 和 ``IAutofacExceptionFilter``)  的类, 然后就可以通过使用容器构造器(container builder)的注册语法将它们和需要的控制器或action方法连接起来.
+因为特性(attributes)通过反射API创建, 你不能自己调用构造方法. 
+这就使得你在使用特性时除了属性注入没有了其他选择. 
+Autofac Web API集成提供了一种机制, 允许你创建实现过滤器接口 (``IAutofacActionFilter``, ``IAutofacContinuationActionFilter``, ``IAutofacAuthorizationFilter`` and ``IAutofacExceptionFilter``) 的类, 然后就可以通过使用容器构造器(container builder)的注册语法将它们和需要的控制器或action方法连接起来.
 
 注册过滤器提供者(Filter Provider)
 ---------------------------------
@@ -125,10 +127,12 @@ Web API 集成提供了controllers, model binders和 action filters的依赖注�
     var builder = new ContainerBuilder();
     builder.RegisterWebApiFilterProvider(config);
 
-实现过滤器接口
-------------------------------
+Standard Action Filter Interface
+********************************
 
-你的类需要继承自集成中定义的适当的过滤器接口, 而不是原生Web API框架中的过滤器特性(filter attributes). 下面的过滤器是一个action filter并实现了 ``IAutofacActionFilter`` 而不是 ``System.Web.Http.Filters.IActionFilter``.
+``IAutofacActionFilter`` 接口允许你定义一个过滤器, 可以在action的执行前后触发, 类似于继承 ``ActionFilterAttribute``.
+
+下面的过滤器是一个action过滤器, 它实现了 ``IAutofacActionFilter`` 而不是 ``System.Web.Http.Filters.IActionFilter``.
 
 .. sourcecode:: csharp
 
@@ -156,41 +160,119 @@ Web API 集成提供了controllers, model binders和 action filters的依赖注�
 
 注意示例中没有真正的异步代码运行所以它返回 ``Task.FromResult(0)``, 这是一种返回 "empty task" 常用的方法. 如果你的filter确实需要异步代码, 你可以返回一个真正的 ``Task`` 对象或像其他异步方法一样使用 ``async``/``await`` 代码.
 
+Continuation Action Filter Interface
+*************************************
+
+除了上面示例中普通的 ``IAutofacActionFilter``, 还有一种 ``IAutofacContinuationActionFilter``. 这个接口和Action Filter功能类似, 
+但它并没有 ``OnActionExecutingAsync`` 和 ``OnActionExecutedAsync`` 方法, 它遵循 continuation
+style, 只有一个 ``ExecuteActionFilterAsync`` 方法, 方法接受一个回调, 回调用于执行调用链中的下一个过滤器.
+
+如果你想要将整个请求包裹在一个 ``using`` 块中, 你也许就会想用 ``IAutofacContinuationActionFilter`` 替代 ``IAutofacActionFilter``,
+例如你想要给请求分配一个 ``TransactionScope``, 像下面这样:
+
+.. sourcecode:: csharp
+
+    public class TransactionScopeFilter : IAutofacContinuationActionFilter
+    {
+        public async Task<HttpResponseMessage> ExecuteActionFilterAsync(
+            HttpActionContext actionContext,
+            CancellationToken cancellationToken,
+            Func<Task<HttpResponseMessage>> next)
+        {
+            using (new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                return await next();
+            }
+        }
+    }
+
+.. note:: 
+
+  普通的 ``IAutofacActionFilter`` 运行在continuation filter内部, 所以异步上下文在
+  ``OnActionExecutingAsync``, action方法本身, 和过滤器的 ``OnActionExecutedAsync`` 之间都会被保留. 
+
 注册过滤器
 -------------------
 
 对于要执行的过滤器, 你要用容器注册它, 并告知容器应该作用于哪个控制器, 也可选作用于哪个action. 通过使用下面的 ``ContainerBuilder`` 扩展方法完成:
 
-- ``AsWebApiActionFilterFor<TController>()``
-- ``AsWebApiActionFilterOverrideFor<TController>()``
-- ``AsWebApiAuthorizationFilterFor<TController>()``
-- ``AsWebApiAuthorizationOverrideFilterFor<TController>()``
-- ``AsWebApiAuthenticationFilterFor<TController>()``
-- ``AsWebApiAuthenticationOverrideFilterFor<TController>()``
-- ``AsWebApiExceptionFilterFor<TController>()``
-- ``AsWebApiExceptionOverrideFilterFor<TController>()``
+- ActionFilter
+- ActionFilterOverride
+- AuthenticationFilter
+- AuthenticationFilterOverride
+- AuthorizationFilter
+- AuthorizationFilterOverride
+- ExceptionFilter
+- ExceptionFilterOverride
 
-这些方法需要一个泛型的类型参数用作传入控制器的类型, 和一个可选的lambda表达式用来表示filter应该作用于控制器上的某个指定的方法. 如果你不提供lambda表达式filter将会应用与控制器上的所有方法, 和放置一个控制器级别的filter特性其实是一样的.
+对于每种过滤器类型, 都有几个注册方法:
 
-你可以应用任意多的filters. 注册一个类型的filter不会移除或替换掉之前的已注册filters.
+``AsWebApi{FilterType}ForAllControllers``
+  注册此过滤器让它在所有控制器的所有action方法上都生效, 类似注册一个全局Web API过滤器.
 
-下面的示例中filter被应用到 ``ValuesController`` 的 ``Get`` 方法上.
+``AsWebApi{FilterType}For<TController>()``
+  给特定的控制器注册过滤器, 类似于在控制器级别放置一个基于特性的过滤器.
+
+  指定一个控制器的基类可以让过滤器应用于所有继承自它的类.
+
+  如果你正在特定的action上应用一个过滤器特性, 该方法接受一个可选的lambda表达式参数, 用来指明过滤器应该应用在控制器的哪个特定的方法上.
+
+  下面的示例中一个Action过滤器被应用在 ``ValuesController`` 的 ``Get`` action 方法上.
+
+  .. sourcecode:: csharp
+
+      var builder = new ContainerBuilder();
+       
+      builder.Register(c => new LoggingActionFilter(c.Resolve<ILogger>()))
+          .AsWebApiActionFilterFor<ValuesController>(c => c.Get(default(int)))
+          .InstancePerRequest();
+
+  当应用filter到一个action方法上时需要一个用 ``default`` 关键字和参数数据类型结合成的参数, 作为lambda表达式中的一个占位符. 例如, 上例中的 ``Get`` action方法需要一个 ``int`` 参数, 并用 ``default(int)`` 作为lambda表达式中的强类型占位符.
+
+``AsWebApi{FilterType}Where()``
+  ``*Where`` 方法允许你指定一个predicate, 通过它可以在附加过滤器到控制器和/或actions的时候有更多自定义的选择. 
+
+  下面的示例中一个Exception过滤器被应用在所有POST方法上:
+
+  .. sourcecode:: csharp
+
+      var builder = new ContainerBuilder();
+       
+      builder.Register(c => new LoggingExceptionFilter(c.Resolve<ILogger>()))
+          .AsWebApiExceptionFilterWhere(action => action.SupportedHttpMethods.Contains(HttpMethod.Post))
+          .InstancePerRequest();
+
+  另外还有一个版本的predicate接受一个 ``ILifetimeScope`` 参数, 你可以在你的predicate内部消费服务:
+
+  .. sourcecode:: csharp
+
+      var builder = new ContainerBuilder();
+       
+      builder.Register(c => new LoggingExceptionFilter(c.Resolve<ILogger>()))
+          .AsWebApiExceptionFilterWhere((scope, action) => scope.Resolve<IFilterConfig>().ShouldFilter(action))
+          .InstancePerRequest();
+
+  .. note:: 
+
+     Filter predicates are invoked once for each action/filter combination; they are not invoked on every request.
+
+你可以应用任意数量的过滤器. 为一个类型注册一个过滤器不会移除或过滤掉之前注册的过滤器.
+
+你可以把你的过滤器注册方法串联起来, 把一个过滤器附加到多个控制器上, 如:
 
 .. sourcecode:: csharp
 
-    var builder = new ContainerBuilder();
-     
-    builder.Register(c => new LoggingActionFilter(c.Resolve<ILogger>()))
-        .AsWebApiActionFilterFor<ValuesController>(c => c.Get(default(int)))
-        .InstancePerRequest();
-
-当应用filter到一个action方法上时需要一个用 ``default`` 关键字和参数数据类型结合成的参数, 作为lambda表达式中的一个占位符. 例如, 上例中的 ``Get`` action方法需要一个 ``int`` 参数, 并用 ``default(int)`` 作为lambda表达式中的强类型占位符.
-
-也可以在泛型类参数中提供一个基类控制器, 来让filter作用域所有的继承的控制器. 另外, 你也可以让你的action方法的lambda表达式对应于基类控制器上的一个方法, 这样它就会应用于所有继承控制器的该方法上.
+  builder.Register(c => new LoggingActionFilter(c.Resolve<ILogger>()))
+      .AsWebApiActionFilterFor<LoginController>()
+      .AsWebApiActionFilterFor<ValuesController>(c => c.Get(default(int)))
+      .AsWebApiActionFilterFor<ValuesController>(c => c.Post(default(string)))
+      .InstancePerRequest();
 
 过滤器重载
 ----------------
-注册filters时, 有基础的注册方法如 ``AsWebApiActionFilterFor<TController>()`` 和重载注册方法如 ``AsWebApiActionFilterOverrideFor<TController>()``. 重载方法的关键是提供一种方式来保证某个filter先执行. 你可以有任意多的重载filter - 它们并不是 *替换* filters, 而只是 *先* 运行.
+注册filters时, 有基础的注册方法如 ``AsWebApiActionFilterFor<TController>()`` 和重载注册方法如 ``AsWebApiActionFilterOverrideFor<TController>()``. 
+
+重载方法的关键是提供一种方式来保证某个filter先执行. 你可以有任意多的重载filter - 它们并不是 *替换* filters, 而只是 *先* 运行.
 
 Filters将会以此顺序执行:
 
@@ -199,34 +281,29 @@ Filters将会以此顺序执行:
 - Controller scoped filters
 - Action scoped filters
 
-为什么我们使用非标准的过滤器接口
------------------------------------------
+在Autofac Action过滤器中给Response赋值
+------------------------------------------------
 
-如果你想知道为什么我们引入了特殊的接口, 看一下Web API ``IActionFilter`` 接口中的签名就很显而易见了.
-
-.. sourcecode:: csharp
-
-    public interface IActionFilter : IFilter
-    {
-      Task<HttpResponseMessage> ExecuteActionFilterAsync(HttpActionContext actionContext, CancellationToken cancellationToken, Func<Task<HttpResponseMessage>> continuation);
-    }
-
-比较下你需要实现的Autofac接口.
+和基础的Web API过滤器一样,  你可以在一个action过滤器的 ``OnActionExecutingAsync`` 方法中设置 ``HttpResponseMessage``.
 
 .. sourcecode:: csharp
 
-    public interface IAutofacActionFilter
+  class RequestRejectionFilter : IAutofacActionFilter
+  {
+    public Task OnActionExecutingAsync(HttpActionContext actionContext, CancellationToken cancellationToken)
     {
-      Task OnActionExecutedAsync(HttpActionExecutedContext actionExecutedContext, CancellationToken cancellationToken);
-
-      Task OnActionExecutingAsync(HttpActionContext actionContext, CancellationToken cancellationToken);
+      // Request is not valid for some reason.
+      actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "Request not valid");
+      return Task.FromResult(0);
     }
 
-问题就出在 ``OnActionExecutingAsync`` 和 ``OnActionExecutedAsync`` 方法其实是定义在 ``ActionFilterAttribute`` 上的而不是 ``IActionFilter`` 接口上. Web API大量使用 ``System.Threading.Tasks`` 命名空间意味着特性中用适当的错误处理将返回的task串联起来需要大量的代码 ( ``ActionFilterAttribute`` 包含了将近100行这样的代码). 这绝对不是你想自己处理的事.
+    public void Task OnActionExecutedAsync(HttpActionExecutedContext actionExecutedContext, CancellationToken cancellationToken)
+    {
+    }
+  }
 
-Autofac引入了新的接口, 允许你集中注意实现filter的代码而不是应付所有的细节问题. 在内部它创建了真正的Web API特性的自定义实例, 从容器中解析filter的具体实现并在适当的时候执行.
-
-另一个对内部特性进行封装的原因是为了filters支持 ``InstancePerRequest`` 生命周期作用域. 见下面详情.
+为了与基础的Web API行为相匹配, 如果你设置 ``Response`` 属性, 那么后续的action过滤器将不会被触发. 
+然而, 任何已经触发的action过滤器的 ``OnActionExecutedAsync`` 方法还是会被调用, 相关response也会被填充.
 
 标准Web API过滤器特性都是单例
 -------------------------------------------------

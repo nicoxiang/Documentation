@@ -88,9 +88,9 @@ Relationship                                        Type                        
 
 可控生命周期 (Owned<B>)
 ------------------------------
-*被拥有依赖* 当它不再被需要时可以被它的所有者释放. 被拥有依赖通常对应了它所依赖组件执行的某些工作单元.
+*owned dependency* 当它不再被需要时可以被它的所有者释放. Owned dependencies通常和它所依赖组件执行的某些工作单元相对应.
 
-使用实现 ``IDisposable`` 的组件时, 关系类型非常有意思. :doc:`Autofac在生命周期作用域最后自动释放disposable的组件 <../lifetime/disposal>` , 但这也许会意味着一个组件会被持有过长时间; 或者你也许会想要自己来控制对象的释放. 这种情况下, 你可以使用 *被拥有依赖*.
+使用实现 ``IDisposable`` 的组件时, 类之间的关系非常有趣. :doc:`Autofac在生命周期作用域最后自动释放disposable的组件 <../lifetime/disposal>` , 但这也许会意味着一个组件会被持有过长时间; 或者你也许会想要自己来控制对象的释放. 这种情况下, 你可以使用 *owned dependency*.
 
 .. sourcecode:: csharp
 
@@ -144,23 +144,42 @@ Relationship                                        Type                        
 
 动态实例化 (Func<B>)
 -------------------------------
-使用 *自动生成工厂* 可以让你无需绑定组件到Autofac就能高效的调用 ``Resolve<T>()`` . 如果你需要创建不止一个所提供服务的实例, 或者如果你不确定是否你需要一个服务并且希望在运行时才去作出选择, 可以使用这种关系类型. This relationship is also useful in cases like :doc:`WCF integration <../integration/wcf>` where you need to create a new service proxy after faulting the channel.
+使用 *自动生成工厂* 可以让你无需绑定组件到Autofac就能高效的调用 ``Resolve<T>()`` . 如果你需要创建不止一个所提供服务的实例, 或者如果, 可以使用这种关系类型. This relationship is also useful in cases like :doc:`WCF integration <../integration/wcf>` where you need to create a new service proxy after faulting the channel.
 
 使用这种关系类型, **生命周期对实例化的影响是无法改变的**. 如果你以 ``InstancePerDependency()`` 注册一个对象并且多次调用 ``Func<B>`` 方法, 你每次都会得到一个新的实例. 然而, 如果你以 ``SingleInstance()`` 注册一个对象并且多次调用 ``Func<B>`` 来解析对象, 你 *每次只会得到一个相同的对象*.
+
+使用 *自动生成工厂* 可以让你在程序控制流中以编码的形式解析一个新的 `B`, 不需要直接依赖于Autofac库. 在下面这些情况下使用这种关系:
+
+* 基于给定的服务你需要创建超过一个实例.
+* 在设置service的时候你想要一些特殊的控制.
+* 你不确定是否你需要一个服务并且希望在运行时才去作出选择.
+
+This relationship is also useful in cases like :doc:`WCF integration <../integration/wcf>` where you need to create a new service proxy after faulting the channel.
+
+``Func<B>`` 运作的时候和调用 ``Resolve<B>()`` 类似. 这意味着它不会局限于作用在对象的无参构造函数那样 - 它会绑定构造函数参数, 做属性注入, 并且会遵循 ``Resolve<B>()`` 一样的整个生命周期.
+
+进一步地来说, 生命周期也同样有效. 如果你将对象注册为 ``InstancePerDependency()`` 并且调用 ``Func<B>`` 多次, 你将每次都得到一个新的实例; 如果你将对象注册为 ``SingleInstance()`` 并且调用 ``Func<B>`` 去解析对象多次, 你 *每次都会得到相同的实例*.
 
 这种关系类型的示例如下:
 
 .. sourcecode:: csharp
 
+    public class B
+    {
+      public B() {}
+      
+      public void DoSomething() {}
+    }
+
     public class A
     {
-      Func<B> _b;
+      Func<B> _newB;
 
-      public A(Func<B> b) { _b = b; }
+      public A(Func<B> b) { _newB = b; }
 
       public void M()
       {
-          var b = _b();
+          var b = _newB();
           b.DoSomething();
       }
     }
@@ -168,24 +187,70 @@ Relationship                                        Type                        
 
 带参数实例化 (Func<X, Y, B>)
 -------------------------------------------
-你可以使用一个 *自动生成工厂* 来传参给解析方法. 这是区别于 :doc:`注册时传参 <../register/parameters>` 或 :doc:`手动解析时传参 <../resolve/parameters>` 的另一种替代方法:
+当对象的构造方法需要额外的参数时, 你同样可以使用一个 *自动生成工厂* 在为它提供参数. 因为 ``Func<B>`` 关系类似于 ``Resolve<B>()``, 那么同样地, ``Func<X, Y, B>`` 关系类似于调用 ``Resolve<B>(TypedParameter.From<X>(x), TypedParameter.From<Y>(y))`` - 既一种有参数的解析操作.
+这是除了 :doc:`注册时传参 <../register/parameters>` 或 :doc:`手动解析时传参 <../resolve/parameters>` 之外的另一种替代方法:
 
 .. sourcecode:: csharp
 
+    public class B
+    {
+      public B(string someString, int id) {}
+      
+      public void DoSomething() {}
+    }
+
     public class A
     {
-        Func<int, string, B> _b;
+        Func<int, string, B> _newB;
 
-        public A(Func<int, string, B> b) { _b = b }
+        public A(Func<int, string, B> b) { _newB = b }
 
         public void M()
         {
-            var b = _b(42, "http://hel.owr.ld");
+            var b = _newB(42, "http://hell.owor.ld");
+            b.DoSomething();
+        }
+    }
+
+注意因为我们是在解析实例而不是直接调用构造方法, 我们在声明参数的时候不一定要保持和构造方法定义参数的顺序一样, 我们也不需要提供构造方法中列出的 *所有* 参数. 
+如果一些构造方法参数可以从生命周期中解析出来, 那么参数就可以从 ``Func<X, Y, B>`` 定义的签名中省略. 你只 *需要* 列出生命周期无法解析出的类型.
+
+另一种做法是, 你可以使用这种方式覆盖掉已经从容器中解析出来的构造方法的参数, 转而使用一个已存在的实例.
+
+Example:
+
+.. sourcecode:: csharp
+
+    //Suppose that P, Q & R are all registered with the Autofac Container.
+    public class B
+    {
+      public B(int id, P peaDependency, Q queueDependency, R ourDependency) {}
+      
+      public void DoSomething() {}
+    }
+
+    public class A
+    {
+        Func<int, P, B> _newB;
+
+        public A(Func<int, P, B> bFactory) { _newB = bFactory }
+
+        public void M(P existingPea)
+        {
+            // The Q and R will be resolved by Autofac, but P will be existingPea instead.
+            var b = _newB(42, existingPea);
             b.DoSomething();
         }
     }
 
 在内部, Autofac会把Func的入参作为类型参数. 这就意味着 **自动生成工厂在入参列表不能有重复的类型.** 例如, 假设你有如下类型:
+Internally, Autofac determines what values to use for the constructor args solely based on the type and behaves as though we've temporarily defined the input values for resolution. A consequence of this is that  **auto-generated function factories cannot have duplicate types in the input parameter list.** See below for further notes on this.
+
+当使用这种关系的时候 **生命周期对实例化的影响是无法改变的**, 就像使用 :doc:`delegate factories <../advanced/delegate-factories>`.
+如果你将对象注册为 ``InstancePerDependency()`` 并且调用 ``Func<X, Y, B>`` 多次, 你将每次都得到一个新的实例.
+然而, 如果你将对象注册为 ``SingleInstance()`` 并且调用 ``Func<X, Y, B>`` 去解析对象多次, 你将 *每次都得到相同的实例, 无论你是否传入了不同的参数..* 只是传入不同的参数无法覆盖掉生命周期造成的影响.
+
+如上所述, ``Func<X, Y, B>`` 把参数当做 ``TypedParameter`` 所以在入参列表中你不能有重复的类型. 例如, 假设你有这样的一个类:
 
 .. sourcecode:: csharp
 
@@ -197,7 +262,7 @@ Relationship                                        Type                        
       }
     }
 
-你也许想要注册这个类型然后给它写了一个自动生成工厂. *你依然能解析Func, 但是你不能执行它.*
+你也许希望注册这个类型, 并拥有一个它的自动生成工厂. *你依然能解析Func, 但是你不能执行它.*
 
 .. sourcecode:: csharp
 
@@ -228,7 +293,7 @@ Relationship                                        Type                        
 
 另一个选择是 :doc:`委托工厂, 你可以查看高级章节 <../advanced/delegate-factories>`.
 
-如果你依然决定使用内置的自动生成工厂 (``Func<X, Y, B>``) 解析一个工厂, 并且保证每种类型入参只有一个, 它还是能正常运行的, 但是构造方法中相同的类型的参数都会是相同的值.
+如果你依然决意要使用内置的自动生成工厂 (``Func<X, Y, B>``) , 并且保证每种类型入参只有一个, 它还是能正常运行的, 但是构造方法中相同的类型的参数都会是相同的值.
 
 .. sourcecode:: csharp
 
@@ -239,8 +304,6 @@ Relationship                                        Type                        
     var obj = func(1, "three");
 
 你可以 :doc:`在高级章节 <../advanced/delegate-factories>` 阅读更多关于委托工厂的内容和 ``RegisterGeneratedFactory()`` 方法.
-
-使用这种关系类型和使用委托工厂, **生命周期对实例化的影响是无法改变的** . 如果你以 ``InstancePerDependency()`` 注册一个对象并且多次调用 ``Func<X, Y, B>`` , 你每次都会得到一个新的实例. 然而, 如果你以 ``SingleInstance()`` 注册一个对象并且多次调用 ``Func<X, Y, B>`` 来解析对象, 你 *每次只会得到一个相同的对象, 无论你是否传入了不同的参数.* 只是传入不同的参数无法覆盖掉生命周期造成的影响.
 
 
 可遍历型 (IEnumerable<B>, IList<B>, ICollection<B>)
