@@ -46,7 +46,56 @@ Autofac可以自动释放一些组件, 但你也可以手动指定释放机制.
     // the component, and dispose of the scopes.
     // Your component will be disposed with the scope.
 
-特定释放
+
+异步释放支持
+-----------------------------
+
+如果你得组件的释放行为需要一些I/O操作, 例如将缓冲区刷到一个文件中,
+或者从网络发送一个数据包, 来关闭连接, 那么你可以实现新的 .NET `IAsyncDisposable <https://docs.microsoft.com/en-us/dotnet/api/system.iasyncdisposable?view=netstandard-2.1>`_ 接口.
+
+在 Autofac 5.0, 添加了对 ``IAsyncDisposable`` 接口的支持, 因此生命周期现在可以被异步释放:
+
+.. code-block:: csharp
+
+  class MyComponent : IDisposable, IAsyncDisposable 
+  {
+    INetworkResource myResource;
+
+    public void Dispose()
+    {
+      myResource.Close();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+      await myResource.CloseAsync();
+    }
+  }
+
+  // ...
+
+  await using (var scope = container.BeginLifetimeScope())
+  {
+      var service = scope.Resolve<MyComponent>():
+
+      // DisposeAsync will be called on MyComponent
+      // when the using block exits.
+  }
+
+当一个生命周期异步释放时, 任何实现了 ``IAsyncDisposable`` 和 ``IDisposable`` 接口的注册组件, 它们的 ``DisposeAsync()`` 方法会被调用, **而不是** ``Dispose()`` 方法.
+
+如果一个组件只实现了同步的 ``Dispose()`` 方法, 那么当生命周期异步释放时, 它还是会被调用的.
+
+当使用 Autofac ASP.NET Core 集成的时候, 所有的 per-request lifetime scopes 都是异步释放的.
+
+.. important:: 
+
+  尽管你并 *不一定要* 实现 ``IDisposable`` 接口, 如果你已经实现了 ``IAsyncDisposable``, 但我们还是强烈建议你这么做.
+
+  如果你的组件只实现了 ``IAsyncDisposable``, 但是有人同步地释放了生命周期,
+  那么 Autofac 将会抛出异常, 因为它不知道如何释放你的组件.
+
+特定地释放
 ------------------
 
 如果你的组件不实现 ``IDisposable`` 但仍然需要在生命周期作用域的结尾完成一些释放工作, 你可以使用 :doc:`释放生命周期事件 <events>`.
@@ -67,13 +116,13 @@ Autofac可以自动释放一些组件, 但你也可以手动指定释放机制.
 禁止释放
 ------------------
 
-组件默认被容器拥有并且会在适当的时候被它释放掉. 想要禁止这个行为, 注册组件为拥有外部所有权:
+组件默认被容器拥有并且会在适当的时候被它释放掉. 如果要禁止这个行为, 可以以被外部所有者拥有的方式注册组件 (register a component as having external ownership):
 
 .. sourcecode:: csharp
 
     builder.RegisterType<SomeComponent>().ExternallyOwned();
 
-容器不会调用以外部所有注册的对象的 ``Dispose()`` 方法. 以这种方式注册的组件何时释放取决于你.
+以这种方式注册的对象, 容器不会调用它的 ``Dispose()`` 或 ``DisposeAsync()`` 方法. 它何时释放取决于你.
 
 另一种可以禁用释放的方法是使用 :doc:`隐式关系类型 <../resolve/relationships>` ``Owned<T>`` 和 :doc:`被拥有的实例 <../advanced/owned-instances>`. 这种情况下, 在你的消费代码中并不是传入一个依赖 ``T`` , 而是一个依赖 ``Owned<T>``. 你的消费代码需要负责释放.
 

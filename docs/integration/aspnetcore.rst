@@ -52,7 +52,7 @@ ASP.NET Core 1.1 - 2.2
       }
     }
 
-下面的示例演示了 **ASP.NET Core 1.1 - 2.2** 使用方法, 你可以从 ``ConfigureServices(IServiceCollection services)`` 返回一个 ``IServiceProvider``. **这不适用于ASP.NET Core 3+** 或 .NET Core 3+ generic hosting 支持 - ASP.NET Core 3 已经废弃了从 ``ConfigureSerivces`` 返回service provider的能力.
+下面的示例演示了 **ASP.NET Core 1.1 - 2.2** 使用方法, 你可以从 ``ConfigureServices(IServiceCollection services)`` 返回一个 ``IServiceProvider``. **这不适用于ASP.NET Core 3+** 或 .NET Core 3+ generic hosting 支持 - ASP.NET Core 3 已经废弃了从 ``ConfigureServices`` 返回service provider的能力.
 
 .. sourcecode:: csharp
 
@@ -152,7 +152,7 @@ Startup类
     {
       public Startup(IHostingEnvironment env)
       {
-        // In ASP.NET Core 3.0 `env` will be an IWebHostingEnvironment, not IHostingEnvironment.
+        // In ASP.NET Core 3.0 `env` will be an IWebHostEnvironment, not IHostingEnvironment.
         var builder = new ConfigurationBuilder()
             .SetBasePath(env.ContentRootPath)
             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)

@@ -124,7 +124,7 @@ Autofac中, 模块实现 ``Autofac.Core.IModule`` 接口. 通常继承于 ``Auto
     builder.RegisterModule(new CarTransportModule());
     builder.RegisterModule(new ConfigurationSettingsReader());
 
-这样的话, '紧急情况' 重写可以在 :doc:`配置文件 <xml>` 中完成:
+这样的话, 可以在 :doc:`配置文件 <xml>` 中完成 '紧急情况' 下的重写:
 
 .. sourcecode:: json
 

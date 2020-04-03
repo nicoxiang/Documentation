@@ -316,7 +316,7 @@ Autofac支持开放泛型. 使用 ``RegisterGeneric()`` 方法:
 
 这边有两种好用的注册扩展方法:
 
-- ``OnlyIf()`` - 提供一个表达式, 使用一个 ``IComponentRegistry`` 来决定注册是否发生.
+- ``OnlyIf()`` - 提供一个表达式, 使用一个 ``IComponentRegistryBuilder`` 来决定注册是否发生.
 - ``IfNotRegistered()`` - 有其他服务已被注册的情况下阻止注册发生的快捷方法.
 
 这些方法在 ``ContainerBuilder.Build()`` 时执行并且以实际组件注册的顺序执行. 下面是一些展示它们如何工作的示例:

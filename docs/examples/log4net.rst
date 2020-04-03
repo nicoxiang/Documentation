@@ -42,7 +42,7 @@ log4net集成模块
           });
       }
 
-      protected override void AttachToComponentRegistration(IComponentRegistry componentRegistry, IComponentRegistration registration)
+      protected override void AttachToComponentRegistration(IComponentRegistryBuilder componentRegistryBuilder, IComponentRegistration registration)
       {
         // Handle constructor parameters.
         registration.Preparing += OnComponentPreparing;
