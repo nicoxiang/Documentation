@@ -56,7 +56,7 @@
     var builder = new ContainerBuilder();
     builder.RegisterType<Worker>().SingleInstance();
 
-当你解析一个单一实例组件时, 无论你从哪里请求它, 你都讲获得相同的实例.
+当你解析一个单一实例组件时, 无论你从哪里请求它, 你都将获得相同的实例.
 
 .. sourcecode:: csharp
 
